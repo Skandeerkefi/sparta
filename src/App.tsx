@@ -10,7 +10,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { useAuthStore } from "@/store/useAuthStore";
 import SlotOverlay from "@/pages/SlotOverlay";
-import BonusHuntPage from "@/pages/BonusHuntPage";
+import BonusHuntPage from "./pages/BonusHuntPage";
 import RoobetPage from "@/pages/RoobetPage";
 import RainPage from "@/pages/RainPage";
 import CSGOLeadPage from "./pages/CSGOLead";
@@ -19,6 +19,7 @@ import ClashLeaderboardPage from "./pages/ClashLeaderboardPage";
 import BethogMonthly from "./pages/BethogMonthly";
 import BethogMonthlyAdmin from "./pages/BethogMonthlyAdmin";
 import TournamentPage from "./pages/TournamentPage";
+import BonusHuntAdminPage from "./pages/BonusHuntAdminPage";
 function App() {
 	const loadFromStorage = useAuthStore((state) => state.loadFromStorage);
 	const user = useAuthStore((state) => state.user);
@@ -49,6 +50,7 @@ function App() {
 					<Route path='*' element={<NotFoundPage />} />
 					<Route path='/slot-overlay' element={<SlotOverlay />} />
 					<Route path='/bonus-hunt' element={<BonusHuntPage />} />
+					<Route path='/bonus-hunt/admin' element={<BonusHuntAdminPage />} />
 					<Route path='/leaderboards' element={<RoobetPage />} />
 					<Route path='/Leaderboards' element={<RoobetPage />} />
 					<Route path='/rain' element={<RainPage />} />
