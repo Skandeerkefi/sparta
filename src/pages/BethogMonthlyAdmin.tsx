@@ -80,11 +80,11 @@ export default function BethogMonthlyAdmin() {
   };
 
   return (
-    <div className="relative flex min-h-screen flex-col overflow-hidden text-white">
+    <div className="relative flex min-h-screen flex-col overflow-x-hidden overflow-hidden text-white">
       <GraphicalBackground />
       <Navbar />
 
-      <main className="relative z-10 flex-grow px-4 py-10 sm:px-6 lg:px-8">
+      <main className="relative z-10 flex-grow px-4 py-8 sm:px-6 lg:px-8">
         <section className="mx-auto w-full max-w-7xl">
           <div className="overflow-hidden rounded-[2rem] border border-[#C98958]/25 bg-black/55 shadow-2xl shadow-black/40 backdrop-blur-md">
             <div className="border-b border-[#C98958]/20 bg-gradient-to-r from-[#930203] to-[#C98958]/70 px-6 py-8 sm:px-10">
@@ -95,7 +95,7 @@ export default function BethogMonthlyAdmin() {
               </p>
             </div>
 
-            <div className="grid gap-4 border-b border-[#C98958]/15 px-6 py-6 sm:grid-cols-4 sm:px-10">
+            <div className="grid gap-4 border-b border-[#C98958]/15 px-6 py-6 sm:grid-cols-2 xl:grid-cols-4 sm:px-10">
               <div className="rounded-2xl border border-[#C98958]/20 bg-black/30 p-4">
                 <p className="text-xs uppercase tracking-[0.25em] text-white/45">Month</p>
                 <p className="mt-2 text-xl font-bold text-[#E7AC78]">{month}</p>

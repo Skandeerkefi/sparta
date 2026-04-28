@@ -365,32 +365,28 @@ function TournamentPage() {
       <Navbar />
 
       <main className='relative z-10 flex-grow px-4 py-8 sm:px-6 lg:px-8'>
-        <section className='mx-auto w-full max-w-7xl space-y-6'>
+        <section className='mx-auto w-full max-w-[1600px] space-y-8'>
           <div className='overflow-hidden rounded-[2rem] border border-[#C98958]/25 bg-black/60 shadow-2xl shadow-black/40 backdrop-blur-md'>
-            <div className='border-b border-[#C98958]/20 bg-gradient-to-r from-[#930203] to-[#C98958]/70 px-6 py-8 sm:px-10'>
+            <div className='border-b border-[#C98958]/20 bg-gradient-to-r from-[#930203] via-[#A83A12] to-[#C98958]/70 px-6 py-8 sm:px-10'>
               <p className='text-xs font-semibold uppercase tracking-[0.35em] text-white/75'>Tournament Mode</p>
-              <div className='mt-3 flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between'>
+              <div className='mt-4 grid gap-6 xl:grid-cols-[minmax(0,1.3fr)_360px] xl:items-end'>
                 <div>
-                  <h1 className='text-3xl font-black tracking-tight text-white sm:text-5xl'>Bethog Slot Tournament</h1>
-                  <p className='mt-3 max-w-3xl text-sm text-white/85 sm:text-base'>
-                    Players join a fixed bracket, pick a slot for each round, and advance by posting the highest multiplier.
-                    The bracket auto-progresses from opening round to final with locked picks per phase.
+                  <h1 className='text-4xl font-black tracking-tight text-white sm:text-5xl lg:text-6xl'>Bethog Slot Tournament</h1>
+                  <p className='mt-4 max-w-3xl text-sm leading-6 text-white/85 sm:text-base'>
+                    Players join a fixed bracket, choose one slot for each round, and advance by posting the strongest multiplier.
+                    The layout below separates the bracket, player progress, and admin tools so the flow is easier to follow.
                   </p>
                 </div>
 
-                <div className='flex flex-wrap gap-2'>
-                  <StatusBadge status={state.tournament?.status || "upcoming"} />
-                  <Badge className='bg-[#120b0a] text-[#E7AC78] border border-[#C98958]/30'>
-                    {state.players.length}/{state.tournament?.playerLimit || 0} Players
-                  </Badge>
-                  <Badge className='bg-[#120b0a] text-[#E7AC78] border border-[#C98958]/30'>
-                    Prize Pool {Number(state.tournament?.prizePool || 0).toLocaleString()}
-                  </Badge>
+                <div className='grid gap-3 sm:grid-cols-3 xl:grid-cols-1'>
+                  <HeroStat label='Status' value={<StatusBadge status={state.tournament?.status || "upcoming"} />} />
+                  <HeroStat label='Players' value={`${state.players.length}/${state.tournament?.playerLimit || 0}`} />
+                  <HeroStat label='Prize Pool' value={Number(state.tournament?.prizePool || 0).toLocaleString()} />
                 </div>
               </div>
             </div>
 
-            <div className='grid gap-6 px-6 py-6 lg:grid-cols-[1.6fr_0.9fr] lg:px-10 lg:py-10'>
+            <div className='grid gap-6 px-6 py-6 xl:grid-cols-[minmax(0,1.5fr)_minmax(360px,420px)] xl:px-10 xl:py-10'>
               <section className='space-y-6'>
                 <div className='rounded-3xl border border-[#C98958]/20 bg-[#120b0a]/80 p-5 shadow-lg shadow-black/30'>
                   <div className='flex items-center justify-between gap-4'>
@@ -402,9 +398,9 @@ function TournamentPage() {
                   </div>
 
                   <div className='mt-6 overflow-x-auto pb-2'>
-                    <div className='flex gap-4 min-w-max'>
+                    <div className='flex flex-col sm:flex-row gap-4 sm:min-w-max'>
                       {groupedMatches.map((round) => (
-                        <div key={round.roundIndex} className='min-w-[290px] rounded-2xl border border-[#C98958]/15 bg-black/25 p-4'>
+                        <div key={round.roundIndex} className='w-full sm:min-w-[290px] rounded-2xl border border-[#C98958]/15 bg-black/25 p-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.03)]'>
                           <div className='mb-4'>
                             <p className='text-xs uppercase tracking-[0.3em] text-white/45'>Round {round.roundIndex + 1}</p>
                             <h3 className='mt-1 text-lg font-bold text-[#E7AC78]'>{round.roundLabel}</h3>
@@ -614,7 +610,7 @@ function TournamentPage() {
                 </div>
               </section>
 
-              <aside className='space-y-6'>
+              <aside className='space-y-6 xl:sticky xl:top-24 xl:self-start'>
                 <div className='rounded-3xl border border-[#C98958]/20 bg-[#120b0a]/80 p-5 shadow-lg shadow-black/30'>
                   <h2 className='text-xl font-bold text-white'>Admin Tournament Creator</h2>
                   <p className='mt-2 text-sm text-white/50'>Define player count and prize pool, then the bracket skeleton is created automatically.</p>
@@ -734,6 +730,15 @@ function TournamentPage() {
       </main>
 
       <Footer />
+    </div>
+  );
+}
+
+function HeroStat({ label, value }: { label: string; value: React.ReactNode }) {
+  return (
+    <div className='rounded-2xl border border-white/10 bg-black/20 px-4 py-3 shadow-inner shadow-black/20 backdrop-blur-sm'>
+      <p className='text-[0.65rem] font-semibold uppercase tracking-[0.35em] text-white/45'>{label}</p>
+      <div className='mt-2 text-lg font-bold text-white'>{value}</div>
     </div>
   );
 }

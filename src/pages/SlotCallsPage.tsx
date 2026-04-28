@@ -188,9 +188,9 @@ function SlotCallsPage() {
 
 			<Navbar />
 
-			<main className='container relative z-10 flex-grow max-w-6xl px-4 py-8 mx-auto'>
-				<div className='flex items-center justify-between mb-4'>
-					<h1 className='text-2xl font-bold'>Slot Calls</h1>
+			<main className='relative z-10 mx-auto flex-grow w-full max-w-6xl px-4 py-8 sm:px-6 lg:px-8'>
+				<div className='mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between'>
+					<h1 className='text-2xl font-bold sm:text-3xl'>Slot Calls</h1>
 					<Dialog>
 						<DialogTrigger asChild>
 							<Button
@@ -229,23 +229,23 @@ function SlotCallsPage() {
 					</Dialog>
 				</div>
 
-				<div className='flex flex-wrap items-center gap-4 mb-6'>
+				<div className='mb-6 flex flex-col gap-4 lg:flex-row lg:items-center'>
 					<Input
 						placeholder='Search slot name or requester...'
 						value={searchQuery}
 						onChange={(e) => setSearchQuery(e.target.value)}
-						className='flex-grow max-w-sm bg-[#E7AC78] text-white border border-[#C98958]'
+						className='w-full bg-[#E7AC78] text-white border border-[#C98958] lg:max-w-sm'
 					/>
 
 					<Tabs
 						value={filter}
 						onValueChange={(val) => setFilter(val as FilterStatus)}
-						className='flex-grow max-w-lg'
+						className='w-full lg:max-w-lg'
 					>
-						<TabsList className='border-b border-[#C98958] bg-black'>
+						<TabsList className='flex w-full flex-wrap gap-2 border-b border-[#C98958] bg-black p-1'>
 							<TabsTrigger
 								value='all'
-								className='text-[#E7AC78] data-[state=active]:bg-[#E7AC78] data-[state=active]:text-black'
+								className='min-w-[88px] flex-1 text-[#E7AC78] data-[state=active]:bg-[#E7AC78] data-[state=active]:text-black'
 							>
 								All
 							</TabsTrigger>

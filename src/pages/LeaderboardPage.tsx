@@ -52,18 +52,18 @@ function LeaderboardPage() {
 	}, [periodInfo]);
 
 	return (
-		<div className='relative flex flex-col min-h-screen text-white '>
+		<div className='relative flex min-h-screen flex-col overflow-x-hidden text-white'>
 			{/* Background Canvas */}
 			<GraphicalBackground />
 
 			<Navbar />
 
-			<main className='container relative z-10 flex-grow max-w-6xl px-6 py-12 mx-auto'>
+			<main className='relative z-10 mx-auto flex-grow w-full max-w-6xl px-4 py-10 sm:px-6 sm:py-12'>
 				{/* Header */}
-				<div className='flex flex-col items-center justify-between gap-4 mb-10 sm:flex-row'>
+				<div className='mb-10 flex flex-col items-center justify-between gap-4 sm:flex-row'>
 					<div className='flex items-center gap-3 text-[#C98958]'>
-						<Crown className='w-7 h-7' />
-						<h1 className='text-3xl font-extrabold tracking-tight'>
+						<Crown className='h-7 w-7' />
+						<h1 className='text-center text-2xl font-extrabold tracking-tight sm:text-left sm:text-3xl'>
 							Rainbet Bi-Weekly Leaderboard
 						</h1>
 					</div>
@@ -89,7 +89,7 @@ function LeaderboardPage() {
 				</div>
 
 				{/* Affiliate Info */}
-				<div className='p-6 mb-10 rounded-lg bg-gray-300/20 border border-[#C98958] text-white shadow-md'>
+				<div className='mb-10 rounded-lg border border-[#C98958] bg-gray-300/20 p-4 text-white shadow-md sm:p-6'>
 					<p className='mb-4 leading-relaxed text-gray-100'>
 						Use affiliate code{" "}
 						<span className='font-semibold text-[#C98958]'>MisterTee</span> on{" "}
@@ -104,7 +104,7 @@ function LeaderboardPage() {
 						to appear on this leaderboard and compete for rewards!
 					</p>
 
-					<div className='inline-flex items-center gap-3 rounded-md bg-[#C98958]/30 px-4 py-2 w-max select-text'>
+					<div className='inline-flex max-w-full items-center gap-3 rounded-md bg-[#C98958]/30 px-4 py-2 select-text'>
 						<span className='font-semibold text-[#C98958]'>
 							Affiliate Code:
 						</span>
@@ -129,7 +129,7 @@ function LeaderboardPage() {
 					<h2 className='mb-8 text-3xl font-bold text-center text-[#C98958] tracking-wide'>
 						Top Players
 					</h2>
-					<div className='grid grid-cols-1 gap-8 md:grid-cols-3'>
+					<div className='grid grid-cols-1 gap-8 md:grid-cols-2 xl:grid-cols-3'>
 						{monthlyLeaderboard.length > 0 ? (
 							<>
 								<RewardCard

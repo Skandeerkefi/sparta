@@ -15,13 +15,13 @@ function HomePage() {
 	};
 
 	return (
-		<div className='relative flex flex-col min-h-screen text-white'>
+		<div className='relative flex min-h-screen flex-col overflow-x-hidden text-white'>
 			<GraphicalBackground />
 
 			<Navbar />
 
 			<main className='relative z-10 flex-grow'>
-				<section className='max-w-5xl min-h-[calc(100vh-84px)] px-6 py-14 mx-auto text-center flex flex-col items-center justify-center'>
+				<section className='mx-auto flex min-h-[calc(100vh-84px)] max-w-5xl flex-col items-center justify-center px-4 py-12 text-center sm:px-6 sm:py-14'>
 					<h1 className='sparta-hero-title'>
 						<span className='sparta-hero-kicker'>Welcome To</span>
 						<span className='sparta-hero-wordmark' aria-label='Spartaaan'>
@@ -42,16 +42,16 @@ function HomePage() {
 						enjoy the rewards
 					</p>
 
-					<div className='flex flex-col items-center justify-center gap-4 mt-10 sm:flex-row'>
+					<div className='mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row'>
 						<Button
 							variant='outline'
-							className='min-w-[210px] h-14 border-2 border-[#C98958]/60 bg-black/45 text-white hover:bg-[#930203]/50'
+							className='h-14 w-full border-2 border-[#C98958]/60 bg-black/45 text-white hover:bg-[#930203]/50 sm:min-w-[210px]'
 							asChild
 						>
 							<Link to='/leaderboards'>Leaderboard</Link>
 						</Button>
 						<Button
-							className='min-w-[210px] h-14 bg-[#C98958] hover:bg-[#930203] text-white'
+							className='h-14 w-full bg-[#C98958] text-white hover:bg-[#930203] sm:min-w-[210px]'
 							asChild
 						>
 							<Link to='/signup' className='flex items-center gap-2'>
@@ -68,11 +68,11 @@ function HomePage() {
 					</div>
 				</section>
 
-				<section ref={liveRef} className='max-w-6xl px-6 mx-auto py-14'>
-					<h2 className='text-4xl font-bold text-center text-white uppercase sm:text-5xl'>
+				<section ref={liveRef} className='mx-auto max-w-6xl px-4 py-12 sm:px-6 sm:py-14'>
+					<h2 className='text-3xl font-bold text-center text-white uppercase sm:text-5xl'>
 						Watch Spartaaan Live
 					</h2>
-					<p className='mt-4 text-lg text-center text-white/65'>
+					<p className='mt-4 text-base text-center text-white/65 sm:text-lg'>
 						Watch Spartaaan live and catch exclusive giveaways during streams
 					</p>
 
@@ -89,15 +89,15 @@ function HomePage() {
 					</div>
 				</section>
 
-				<section className='max-w-6xl px-6 py-16 mx-auto'>
-					<h2 className='text-4xl font-bold text-center text-white uppercase sm:text-5xl'>
+				<section className='mx-auto max-w-6xl px-4 py-12 sm:px-6 sm:py-16'>
+					<h2 className='text-3xl font-bold text-center text-white uppercase sm:text-5xl'>
 						Bethog Promo
 					</h2>
-					<p className='mt-4 text-lg text-center text-white/65'>
+					<p className='mt-4 text-base text-center text-white/65 sm:text-lg'>
 						Use Spartaaan&apos;s official referral and promo code on Bethog
 					</p>
 
-					<div className='max-w-2xl mx-auto mt-10'>
+					<div className='mx-auto mt-10 max-w-2xl'>
 						<a
 							href='https://www.bethog.com/fr/casino?referral=SpartaaanOnKICK'
 							target='_blank'
@@ -120,8 +120,9 @@ function HomePage() {
 					</div>
 				</section>
 
-			<section className='max-w-6xl px-6 py-16 mx-auto'>
-				<h2 className='text-4xl font-bold text-center text-white uppercase sm:text-5xl'>						Socials
+					<section className='mx-auto max-w-6xl px-4 py-12 sm:px-6 sm:py-16'>
+						<h2 className='text-3xl font-bold text-center text-white uppercase sm:text-5xl'>
+							Socials
 					</h2>
 					<div className='w-24 h-px mx-auto mt-6 bg-gradient-to-r from-transparent via-[#C98958]/60 to-transparent' />
 

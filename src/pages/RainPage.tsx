@@ -45,28 +45,28 @@ export default function RainPage() {
 			: `Biweekly: ${formatDate(startOfPeriod)} - ${formatDate(endOfPeriod)}`;
 
 	return (
-		<div className='relative flex flex-col min-h-screen text-white '>
+		<div className='relative flex min-h-screen flex-col overflow-x-hidden text-white'>
 			<GraphicalBackground />
 			<Navbar />
 
-			<main className='relative z-10 flex-1 w-full max-w-6xl p-6 mx-auto'>
-				<h1 className='mb-2 text-3xl font-bold text-center'>
+			<main className='relative z-10 flex-1 w-full max-w-6xl px-4 py-6 mx-auto sm:px-6 lg:px-8'>
+				<h1 className='mb-2 text-2xl font-bold text-center sm:text-3xl'>
 					🌧 Rain.gg Leaderboard
 				</h1>
-				<h2 className='mb-6 text-xl text-center text-yellow-400'>
+				<h2 className='mb-6 text-lg text-center text-yellow-400 sm:text-xl'>
 					{periodLabel}
 				</h2>
 
-				<div className='flex justify-center gap-4 mb-6'>
+				<div className='mb-6 flex flex-col justify-center gap-3 sm:flex-row'>
 					<button
 						onClick={handlePrevPeriod}
-						className='px-5 py-2 transition bg-[#C98958] rounded hover:bg-[#C98958]'
+						className='rounded bg-[#C98958] px-5 py-2 transition hover:bg-[#C98958]'
 					>
 						Previous Period
 					</button>
 					<button
 						onClick={handleNextPeriod}
-						className='px-5 py-2 text-black transition bg-yellow-400 rounded hover:bg-yellow-500'
+						className='rounded bg-yellow-400 px-5 py-2 text-black transition hover:bg-yellow-500'
 					>
 						Next Period
 					</button>

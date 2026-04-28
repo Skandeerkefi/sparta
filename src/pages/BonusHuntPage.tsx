@@ -124,7 +124,7 @@ function BonusHuntPage() {
   }, [hunt]);
 
   return (
-    <div className='relative flex min-h-screen flex-col overflow-hidden text-white'>
+    <div className='relative flex min-h-screen flex-col overflow-x-hidden overflow-hidden text-white'>
       <GraphicalBackground />
       <Navbar />
 

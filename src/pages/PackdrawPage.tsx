@@ -76,12 +76,12 @@ const PackdrawPage = () => {
 	}, []);
 
 	return (
-		<div className="relative flex flex-col min-h-screen text-white bg-black">
+		<div className="relative flex min-h-screen flex-col overflow-x-hidden bg-black text-white">
 			<GraphicalBackground />
 			<Navbar />
 
-			<main className="container flex-grow p-4 mx-auto">
-				<h1 className="mb-4 text-5xl font-extrabold text-center text-[#C98958] drop-shadow-lg">
+			<main className="mx-auto w-full max-w-6xl flex-grow px-4 py-6 sm:px-6 lg:px-8">
+				<h1 className="mb-4 text-center text-3xl font-extrabold text-[#C98958] drop-shadow-lg sm:text-5xl">
 					🔥 Packdraw Monthly Leaderboard 🔥
 				</h1>
 
@@ -89,7 +89,7 @@ const PackdrawPage = () => {
 					Range: <span className="text-[#C98958]">{getDisplayRange()}</span>
 				</p>
 
-				<p className="mb-6 font-semibold text-center text-gray-300 text-md">
+				<p className="mb-6 text-center text-sm font-semibold text-gray-300 sm:text-md">
 					⏳ Next Reset In:{" "}
 					<span className="font-bold text-yellow-400">{timeLeft}</span>
 				</p>

@@ -72,19 +72,19 @@ function GiveawaysPage() {
 	};
 
 	return (
-		<div className='relative flex flex-col min-h-screen text-white'>
+		<div className='relative flex min-h-screen flex-col overflow-x-hidden text-white'>
 			{/* Background Canvas */}
 			<GraphicalBackground />
 
 			<Navbar />
 
-			<main className='container relative z-10 flex-grow max-w-6xl px-4 py-8 mx-auto'>
-				<div className='flex items-center gap-2 mb-8'>
+			<main className='relative z-10 mx-auto flex-grow w-full max-w-6xl px-4 py-8 sm:px-6 lg:px-8'>
+				<div className='mb-8 flex items-center gap-2'>
 					<Gift className='w-6 h-6 text-[#E7AC78]' />
-					<h1 className='text-3xl font-bold'>Giveaways</h1>
+					<h1 className='text-2xl font-bold sm:text-3xl'>Giveaways</h1>
 				</div>
 
-				<div className='p-6 mb-8 rounded-lg bg-[#0F0604] border border-[#C98958]'>
+				<div className='mb-8 rounded-lg border border-[#C98958] bg-[#0F0604] p-4 sm:p-6'>
 					<p className='mb-6 text-[#E7AC78]'>
 						Join Spartaaan&apos;s exciting giveaways for a chance to win real
 						prizes! New opportunities every week.
@@ -132,14 +132,14 @@ function GiveawaysPage() {
 							<Tabs
 								defaultValue='all'
 								onValueChange={(val) => setFilter(val as any)}
-								className=' border border-[#C98958] rounded-md'
+								className='rounded-md border border-[#C98958]'
 							>
-								<TabsList className='flex space-x-2 bg-black'>
+								<TabsList className='flex w-full flex-wrap gap-2 bg-black p-1'>
 									{["all", "active", "upcoming", "completed"].map((val) => (
 										<TabsTrigger
 											key={val}
 											value={val}
-											className='text-[#E7AC78] data-[state=active]:bg-[#E7AC78] data-[state=active]:text-black'
+											className='min-w-[92px] flex-1 text-[#E7AC78] data-[state=active]:bg-[#E7AC78] data-[state=active]:text-black'
 										>
 											{val.charAt(0).toUpperCase() + val.slice(1)}
 										</TabsTrigger>
@@ -151,7 +151,7 @@ function GiveawaysPage() {
 				</div>
 
 				{filteredGiveaways.length > 0 ? (
-					<div className='grid grid-cols-1 gap-6 md:grid-cols-3'>
+					<div className='grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3'>
 						{filteredGiveaways.map((giveaway) => (
 							<div
 								key={giveaway._id}

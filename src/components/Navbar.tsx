@@ -1,21 +1,76 @@
 import { Link, useLocation } from "react-router-dom";
-import { useState, useEffect } from "react";
-import { Dices, Crown, Flame, Trophy, Gift, Users, LogIn, User, LogOut, CalendarRange } from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
+import {
+	Dices,
+	Flame,
+	Trophy,
+	Gift,
+	Users,
+	LogIn,
+	User,
+	LogOut,
+	CalendarRange,
+	Menu,
+	X,
+	Radio,
+} from "lucide-react";
 import useMediaQuery from "@/hooks/use-media-query";
 import { useAuthStore } from "@/store/useAuthStore";
 
 export function Navbar() {
 	const location = useLocation();
-	const isMobile = useMediaQuery("(max-width: 768px)");
+	const isMobile = useMediaQuery("(max-width: 1023px)");
 	const [isOpen, setIsOpen] = useState(false);
 	const [isLive, setIsLive] = useState(false);
 	const [viewerCount, setViewerCount] = useState<number | null>(null);
 
 	const { user, logout } = useAuthStore();
+	const sidebarWidth = "18rem";
+
+	const mainMenuItems = useMemo(
+		() => [
+			{ path: "/", name: "Home", icon: <Dices className='h-5 w-5' /> },
+			{ path: "/tournament", name: "Tournament", icon: <Trophy className='h-5 w-5' /> },
+			{ path: "/bonus-hunt", name: "Bonus Hunt", icon: <Flame className='h-5 w-5' /> },
+			{ path: "/bethog-monthly", name: "Bethog Monthly", icon: <CalendarRange className='h-5 w-5' /> },
+			{ path: "/slot-calls", name: "Slot Calls", icon: <Users className='h-5 w-5' /> },
+			{ path: "/giveaways", name: "Giveaways", icon: <Gift className='h-5 w-5' /> },
+		],
+		[]
+	);
+
+	const adminMenuItems = useMemo(
+		() =>
+			user?.role === "admin"
+				? [
+					{ path: "/bethog-monthly/admin", name: "Bethog Admin", icon: <CalendarRange className='h-5 w-5' /> },
+					{ path: "/bonus-hunt/admin", name: "Bonus Hunt Admin", icon: <Flame className='h-5 w-5' /> },
+				]
+				: [],
+		[ user?.role ]
+	);
+
+	const allMenuItems = [...mainMenuItems, ...adminMenuItems];
 
 	useEffect(() => {
 		setIsOpen(false);
 	}, [location, isMobile]);
+
+	useEffect(() => {
+		const previousPaddingLeft = document.body.style.paddingLeft;
+		const previousOverflowX = document.body.style.overflowX;
+		const previousOverflowY = document.body.style.overflowY;
+
+		document.body.style.paddingLeft = isMobile ? "0px" : sidebarWidth;
+		document.body.style.overflowX = "hidden";
+		document.body.style.overflowY = isMobile && isOpen ? "hidden" : previousOverflowY;
+
+		return () => {
+			document.body.style.paddingLeft = previousPaddingLeft;
+			document.body.style.overflowX = previousOverflowX;
+			document.body.style.overflowY = previousOverflowY;
+		};
+	}, [isMobile, isOpen]);
 
 	useEffect(() => {
 		const fetchLiveStatus = async () => {
@@ -40,265 +95,233 @@ export function Navbar() {
 		return () => clearInterval(interval);
 	}, []);
 
-	const menuItems = [
-		{ path: "/", name: "Home", icon: <Dices className='w-5 h-5' /> },
-		{ path: "/leaderboards", name: "Leaderboard", icon: <Crown className='w-5 h-5' /> },
-		{ path: "/tournament", name: "Tournament", icon: <Trophy className='w-5 h-5' /> },
-		{ path: "/bonus-hunt", name: "Bonus Hunt", icon: <Flame className='w-5 h-5' /> },
-		{
-			path: "/bethog-monthly",
-			name: "Bethog Monthly",
-			icon: <CalendarRange className='w-5 h-5' />,
-		},
-		{
-			path: "/slot-calls",
-			name: "Slot Calls",
-			icon: <Users className='w-5 h-5' />,
-		},
-		{
-			path: "/giveaways",
-			name: "Giveaways",
-			icon: <Gift className='w-5 h-5' />,
-		},
-	];
-
-	const adminMenuItems =
-		user?.role === "admin"
-			? [
-				{
-					path: "/bethog-monthly/admin",
-					name: "Bethog Admin",
-					icon: <CalendarRange className='w-5 h-5' />,
-				},
-				{
-					path: "/bonus-hunt/admin",
-					name: "Bonus Hunt Admin",
-					icon: <Flame className='w-5 h-5' />,
-				},
-			]
-			: [];
-
-	const allMenuItems = [...menuItems, ...adminMenuItems];
-
 	return (
-		<nav className='sticky top-0 z-50 bg-gradient-to-r from-[#0F0604] to-[#1a191f] border-b border-[#C98958]/20 shadow-2xl backdrop-blur-md'>
-			<div className='flex items-center justify-between w-full gap-3 px-4 py-3 mx-auto sm:px-6 sm:py-4 max-w-7xl'>
-				{/* Logo */}
-			<Link to='/' className='flex items-center flex-shrink-0 gap-2 transition-opacity select-none sm:gap-3 hover:opacity-80'>
-				<img
-					src='https://i.ibb.co/x8LZRrDq/3dgifmaker72872.gif'
-					alt='Spartaaan Logo'
-					className='w-9 sm:w-12 h-9 sm:h-12 rounded-full border-2 border-[#C98958] shadow-lg object-cover hover:border-[#E7AC78] transition-colors'
-				/>
-				<div className='hidden sm:block'>
-					<span className='text-lg sm:text-2xl font-black tracking-tight text-[#C98958]'>Spart</span>
-					<span className='text-lg sm:text-2xl font-black tracking-tight text-[#E7AC78]'>aaan</span>
-				</div>
-			</Link>
+		<>
+			{/* Desktop Sidebar */}
+			<aside className='hidden lg:fixed lg:inset-y-0 lg:left-0 lg:z-50 lg:flex lg:w-72 lg:flex-col border-r border-[#C98958]/20 bg-gradient-to-b from-[#0F0604] via-[#15111a] to-[#1a191f] shadow-2xl backdrop-blur-md'>
+				<div className='flex h-full flex-col px-4 py-5'>
+					<Link to='/' className='flex items-center gap-3 rounded-2xl border border-[#C98958]/15 bg-black/20 px-4 py-3 transition hover:border-[#C98958]/35 hover:bg-black/35'>
+						<img
+							src='https://i.ibb.co/x8LZRrDq/3dgifmaker72872.gif'
+							alt='Spartaaan Logo'
+							className='h-12 w-12 rounded-full border-2 border-[#C98958] object-cover'
+						/>
+						<div>
+							<div className='text-xs uppercase tracking-[0.35em] text-white/40'>Spartaaan</div>
+							<div className='text-xl font-black tracking-tight text-[#E7AC78]'>Dashboard</div>
+						</div>
+					</Link>
 
-				{/* Desktop Menu */}
-				{!isMobile && (
-				<div className='flex items-center min-w-0 gap-4 ml-auto lg:gap-6'>
-					<ul className='flex max-w-[52vw] items-center gap-1 overflow-x-auto whitespace-nowrap pr-2 lg:gap-2'>
-						{allMenuItems.map((item) => (
-							<li key={item.name}>
-								<Link
-									to={item.path}
-									className={`flex shrink-0 items-center gap-2 px-2.5 py-2 text-xs lg:text-sm font-semibold rounded-lg transition-all duration-300 ${
-										location.pathname === item.path
-											? "bg-[#C98958] text-white shadow-lg shadow-[#C98958]/50"
-											: "text-[#E7AC78] hover:bg-[#C98958]/20 hover:text-[#C98958]"
-									}`}
-								>
-									{item.icon}
-									<span className='hidden xl:inline'>{item.name}</span>
-								</Link>
-							</li>
-						))}
-					</ul>
+					<div className='mt-5 flex items-center justify-between rounded-2xl border border-[#C98958]/15 bg-black/20 px-4 py-3'>
+						<div className='flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.25em] text-white/45'>
+							<Radio className={`h-4 w-4 ${isLive ? "text-[#C98958]" : "text-gray-500"}`} />
+							<span>{isLive ? "Live now" : "Offline"}</span>
+						</div>
+						{isLive && <span className='text-xs text-[#E7AC78]'>{viewerCount !== null ? viewerCount : 0}</span>}
+					</div>
 
-					{/* User controls */}
-					<div className='flex items-center shrink-0 gap-2 lg:gap-3 pl-4 lg:pl-6 border-l border-[#C98958]/20'>
+					<nav className='mt-5 flex-1 overflow-y-auto pr-1'>
+						<div className='space-y-2'>
+							{mainMenuItems.map((item) => (
+								<SidebarLink key={item.name} item={item} active={location.pathname === item.path} />
+							))}
+						</div>
+
+						{adminMenuItems.length > 0 && (
+							<div className='mt-6 border-t border-[#C98958]/15 pt-4'>
+								<div className='mb-3 text-xs font-semibold uppercase tracking-[0.3em] text-white/35'>Admin</div>
+								<div className='space-y-2'>
+									{adminMenuItems.map((item) => (
+										<SidebarLink key={item.name} item={item} active={location.pathname === item.path} />
+									))}
+								</div>
+							</div>
+						)}
+					</nav>
+
+					<div className='mt-auto space-y-3 border-t border-[#C98958]/15 pt-4'>
 						{user ? (
 							<>
 								<Link
 									to='/profile'
-									className='hidden sm:flex items-center gap-2 text-[#E7AC78] hover:text-[#C98958] font-semibold transition text-xs lg:text-sm'
+									className='flex items-center gap-3 rounded-2xl border border-[#C98958]/15 bg-black/20 px-4 py-3 text-sm font-semibold text-[#E7AC78] transition hover:border-[#C98958]/35 hover:bg-black/35 hover:text-[#C98958]'
 								>
-									<User className='w-4 h-4' />
-									<span className='hidden lg:inline'>{user.username}</span>
+									<User className='h-4 w-4' />
+									<span className='truncate'>{user.kickUsername}</span>
 								</Link>
 								<button
 									onClick={logout}
-									className='flex items-center gap-1 lg:gap-2 bg-[#C98958] hover:bg-[#930203] text-white px-2 lg:px-3 py-1.5 rounded-lg font-semibold transition text-xs lg:text-sm'
+									className='flex w-full items-center justify-center gap-2 rounded-2xl bg-[#C98958] px-4 py-3 text-sm font-semibold text-white transition hover:bg-[#930203]'
 								>
-									<LogOut className='w-3 h-3 lg:w-4 lg:h-4' />
-									<span className='hidden lg:inline'>Logout</span>
+									<LogOut className='h-4 w-4' />
+									Logout
 								</button>
 							</>
 						) : (
 							<>
 								<Link
 									to='/login'
-									className='flex items-center gap-1 lg:gap-2 border border-[#C98958] text-[#C98958] hover:bg-[#C98958] hover:text-white px-2 lg:px-3 py-1.5 rounded-lg font-semibold transition text-xs lg:text-sm'
+									className='flex items-center justify-center gap-2 rounded-2xl border border-[#C98958] px-4 py-3 text-sm font-semibold text-[#C98958] transition hover:bg-[#C98958] hover:text-white'
 								>
-									<LogIn className='w-3 h-3 lg:w-4 lg:h-4' />
-									<span className='hidden lg:inline'>Login</span>
+									<LogIn className='h-4 w-4' />
+									Login
 								</Link>
 								<Link
 									to='/signup'
-									className='hidden sm:block text-[#E7AC78] font-semibold hover:text-[#C98958] transition text-xs lg:text-sm px-2'
+									className='block text-center text-sm font-semibold text-[#E7AC78] transition hover:text-[#C98958]'
 								>
 									Sign Up
 								</Link>
 							</>
 						)}
 					</div>
+				</div>
+			</aside>
 
-					{/* Live Status */}
-					<div
-						className={`shrink-0 px-2.5 lg:px-4 py-1 lg:py-2 rounded-full text-xs font-bold select-none ${
-							isLive
-								? "bg-[#C98958] text-white shadow-lg shadow-[#C98958]/50 animate-pulse"
-								: "bg-gray-700/40 text-gray-400"
-						}`}
-						title={isLive ? "Currently Live" : "Offline"}
-					>
-						{isLive ? (
-							<>
-								<span role='img' aria-label='Live'>
-									🔴
-								</span>{" "}
-								<span className='hidden sm:inline'>LIVE {viewerCount !== null ? `(${viewerCount})` : ""}</span>
-							</>
-						) : (
-							<span className='hidden sm:inline'>Offline</span>
-						)}
+			{/* Mobile Topbar */}
+			<div className='lg:hidden sticky top-0 z-50 border-b border-[#C98958]/20 bg-gradient-to-r from-[#0F0604] to-[#1a191f] shadow-2xl backdrop-blur-md'>
+				<div className='flex items-center justify-between gap-3 px-4 py-3'>
+					<Link to='/' className='flex items-center gap-2 transition-opacity hover:opacity-80'>
+						<img
+							src='https://i.ibb.co/x8LZRrDq/3dgifmaker72872.gif'
+							alt='Spartaaan Logo'
+							className='h-9 w-9 rounded-full border-2 border-[#C98958] object-cover sm:h-10 sm:w-10'
+						/>
+						<div className='min-w-0 text-base font-black tracking-tight text-[#E7AC78] sm:text-lg'>Spartaaan</div>
+					</Link>
+
+					<div className='flex items-center gap-2'>
+						<div
+							className={`rounded-full px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.2em] ${
+								isLive ? "bg-[#C98958] text-white" : "bg-gray-700/40 text-gray-400"
+							}`}
+						>
+							{isLive ? `Live ${viewerCount !== null ? `(${viewerCount})` : ""}` : "Offline"}
+						</div>
+						<button
+							onClick={() => setIsOpen(!isOpen)}
+							aria-label='Toggle menu'
+							aria-expanded={isOpen}
+							className='flex h-10 w-10 items-center justify-center rounded-xl border border-[#C98958]/20 bg-black/25 text-white'
+						>
+							{isOpen ? <X className='h-5 w-5' /> : <Menu className='h-5 w-5' />}
+						</button>
 					</div>
 				</div>
-			)}
 
-			{/* Mobile Hamburger */}
-			{isMobile && (
-				<div className='flex items-center gap-2 ml-auto'>
-					{/* Mobile Live Status Indicator */}
-					<div
-						className={`px-2 py-1.5 rounded-full text-xs font-bold flex-shrink-0 ${
-							isLive
-								? "bg-[#C98958] text-white animate-pulse"
-								: "bg-gray-700/40 text-gray-400"
-						}`}
-						title={isLive ? "Currently Live" : "Offline"}
-					>
-						🔴
+				<div className='border-t border-[#C98958]/15 px-3 py-2 sm:px-4'>
+					<div className='flex gap-2 overflow-x-auto pb-1 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden'>
+						{mainMenuItems.map((item) => (
+							<Link
+								key={item.name}
+								to={item.path}
+								className={`inline-flex shrink-0 items-center gap-2 rounded-full px-3 py-2 text-xs font-semibold transition ${
+									location.pathname === item.path
+										? "bg-[#C98958] text-white"
+										: "bg-black/20 text-[#E7AC78] hover:bg-[#C98958]/15 hover:text-[#C98958]"
+								}`}
+							>
+								{item.icon}
+								<span>{item.name}</span>
+							</Link>
+						))}
 					</div>
-					<button
-						onClick={() => setIsOpen(!isOpen)}
-						aria-label='Toggle menu'
-						aria-expanded={isOpen}
-						className='relative z-50 w-8 h-8 flex flex-col justify-center items-center gap-1.5 focus:outline-none'
-					>
-						<span
-							className={`block w-8 h-1 bg-white rounded transition-transform duration-300 ${
-								isOpen ? "rotate-45 translate-y-2" : ""
-							}`}
-						/>
-						<span
-							className={`block w-8 h-1 bg-white rounded transition-opacity duration-300 ${
-								isOpen ? "opacity-0" : "opacity-100"
-							}`}
-						/>
-						<span
-							className={`block w-8 h-1 bg-white rounded transition-transform duration-300 ${
-								isOpen ? "-rotate-45 -translate-y-2" : ""
-							}`}
-						/>
-					</button>
 				</div>
-			)}
 
-			{/* Mobile Dropdown Menu */}
-			{isMobile && (
-				<div
-					className={`fixed inset-0 z-[80] transition-opacity duration-300 ${
-						isOpen
-							? "opacity-100 pointer-events-auto"
-							: "opacity-0 pointer-events-none"
-					}`}
-					onClick={() => setIsOpen(false)}
-				>
-					<div className='absolute inset-0 bg-[#0F0604]' />
-					<div
-						className={`absolute top-0 right-0 w-full max-w-sm bg-gradient-to-b from-[#0F0604] to-[#1a191f] h-dvh shadow-2xl border-l border-[#C98958]/30 py-6 px-6 flex flex-col space-y-4 transform transition-transform duration-300 ${
-							isOpen ? "translate-x-0" : "translate-x-full"
-						}`}
-						onClick={(e) => e.stopPropagation()}
-					>
-						<ul className='flex flex-col space-y-2 font-semibold text-[#E7AC78]'>
-							{allMenuItems.map((item) => (
-								<li key={item.name}>
+				{isOpen && (
+					<div className='fixed inset-0 z-[80]' onClick={() => setIsOpen(false)}>
+						<div className='absolute inset-0 bg-black/70' />
+						<div
+							className='absolute right-0 top-0 flex h-full w-[min(92vw,22rem)] flex-col border-l border-[#C98958]/20 bg-gradient-to-b from-[#0F0604] via-[#15111a] to-[#1a191f] p-4 shadow-2xl'
+							onClick={(e) => e.stopPropagation()}
+						>
+							<div className='mb-4 flex items-center justify-between'>
+								<div className='text-sm font-semibold uppercase tracking-[0.35em] text-white/35'>Menu</div>
+								<button onClick={() => setIsOpen(false)} className='rounded-lg border border-[#C98958]/20 p-2 text-white'>
+									<X className='h-4 w-4' />
+								</button>
+							</div>
+
+							<div className='space-y-2 overflow-y-auto pr-1'>
+								{allMenuItems.map((item) => (
 									<Link
+										key={item.name}
 										to={item.path}
 										onClick={() => setIsOpen(false)}
-										className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-all ${
+										className={`flex items-center gap-3 rounded-2xl px-4 py-3 font-semibold transition ${
 											location.pathname === item.path
 												? "bg-[#C98958] text-white shadow-lg"
-												: "bg-[#1a1222] text-[#E7AC78] hover:bg-[#930203] hover:text-[#C98958]"
+												: "bg-black/20 text-[#E7AC78] hover:bg-[#930203] hover:text-[#C98958]"
 										}`}
 									>
 										{item.icon}
 										<span>{item.name}</span>
 									</Link>
-								</li>
-							))}
-						</ul>
+								))}
+							</div>
 
-						<div className='mt-8 pt-6 border-t border-[#C98958]/20 space-y-3'>
-							{user ? (
-								<>
-									<Link
-										to='/profile'
-										onClick={() => setIsOpen(false)}
-										className='flex items-center gap-3 text-[#E7AC78] text-base font-semibold hover:text-[#C98958] transition px-4 py-2'
-									>
-										<User className='w-5 h-5' />
-										<span>{user.username}</span>
-									</Link>
-									<button
-										onClick={() => {
+							<div className='mt-auto space-y-3 border-t border-[#C98958]/15 pt-4'>
+								{user ? (
+									<>
+										<Link
+											to='/profile'
+											onClick={() => setIsOpen(false)}
+											className='flex items-center gap-3 rounded-2xl border border-[#C98958]/15 bg-black/20 px-4 py-3 text-sm font-semibold text-[#E7AC78]'
+										>
+											<User className='h-4 w-4' />
+											<span className='truncate'>{user.kickUsername}</span>
+										</Link>
+										<button
+											onClick={() => {
 											logout();
 											setIsOpen(false);
 										}}
-										className='w-full bg-[#C98958] hover:bg-[#930203] text-white py-2 px-4 rounded-lg font-semibold transition flex items-center justify-center gap-2'
-									>
-										<LogOut className='w-4 h-4' />
-										Logout
-									</button>
-								</>
-							) : (
-								<>
-									<Link
-										to='/login'
-										onClick={() => setIsOpen(false)}
-										className='flex items-center justify-center gap-2 bg-[#C98958] hover:bg-[#930203] text-white py-2 px-4 rounded-lg font-semibold transition w-full'
-									>
-										<LogIn className='w-4 h-4' />
-										<span>Login</span>
-									</Link>
-									<Link
-										to='/signup'
-										onClick={() => setIsOpen(false)}
-										className='block text-center text-[#E7AC78] font-semibold hover:text-[#C98958] transition py-2'
-									>
-										Sign Up
-									</Link>
-								</>
-							)}
+											className='flex w-full items-center justify-center gap-2 rounded-2xl bg-[#C98958] px-4 py-3 text-sm font-semibold text-white'
+										>
+											<LogOut className='h-4 w-4' />
+											Logout
+										</button>
+									</>
+								) : (
+									<>
+										<Link
+											to='/login'
+											onClick={() => setIsOpen(false)}
+											className='flex items-center justify-center gap-2 rounded-2xl bg-[#C98958] px-4 py-3 text-sm font-semibold text-white'
+										>
+											<LogIn className='h-4 w-4' />
+											Login
+										</Link>
+										<Link
+											to='/signup'
+											onClick={() => setIsOpen(false)}
+											className='block text-center text-sm font-semibold text-[#E7AC78]'
+										>
+											Sign Up
+										</Link>
+									</>
+								)}
+							</div>
 						</div>
 					</div>
-				</div>
-			)}
-		</div>
-		</nav>
+				)}
+			</div>
+		</>
+	);
+}
+
+function SidebarLink({ item, active }: { item: { path: string; name: string; icon: React.ReactNode }; active: boolean }) {
+	return (
+		<Link
+			to={item.path}
+			className={`flex items-center gap-3 rounded-2xl px-4 py-3 text-sm font-semibold transition ${
+				active
+					? "bg-[#C98958] text-white shadow-lg shadow-[#C98958]/30"
+					: "bg-black/20 text-[#E7AC78] hover:bg-[#C98958]/15 hover:text-[#C98958]"
+			}`}
+		>
+			{item.icon}
+			<span className='truncate'>{item.name}</span>
+		</Link>
 	);
 }

@@ -251,3 +251,12 @@
 		transform: translateY(-4px) rotate(2deg);
 	}
 }
+
+/* Prevent global horizontal overflow on small devices while preserving internal scroll areas */
+@layer base {
+	html,
+	body,
+	#root {
+		overflow-x: hidden;
+	}
+}

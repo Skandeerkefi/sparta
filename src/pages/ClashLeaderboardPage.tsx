@@ -45,12 +45,12 @@ const ClashLeaderboardPage = () => {
   const sortedPlayers = (players || []).sort((a, b) => (b.wagered || 0) - (a.wagered || 0));
 
   return (
-    <div className="relative min-h-screen flex flex-col">
+    <div className="relative flex min-h-screen flex-col overflow-x-hidden">
       <GraphicalBackground />
       <Navbar />
 
-      <main className="flex-grow container mx-auto p-4 relative z-10">
-        <h1 className="text-3xl font-bold mb-2 text-center text-white">
+      <main className="relative z-10 mx-auto flex-grow w-full max-w-6xl px-4 py-8 sm:px-6 lg:px-8">
+        <h1 className="mb-2 text-center text-2xl font-bold text-white sm:text-3xl">
           Clash Leaderboard
         </h1>
 
@@ -58,7 +58,7 @@ const ClashLeaderboardPage = () => {
         {error && <p className="text-center text-[#C98958]">Error: {error}</p>}
 
         {!loading && !error && startDate && endDate && (
-          <p className="text-center text-white mb-4">
+          <p className="mb-4 text-center text-sm text-white sm:text-base">
             Period: {formatDate(startDate)} → {formatDate(endDate)} | Next update in: {countdown}
           </p>
         )}
