@@ -1,0 +1,253 @@
+/**
+ * **IMPORTANT** Never break the original structure, only add highly customized new styles
+ */
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+.animate-float {
+	animation: float infinite ease-in-out;
+}
+
+.animate-float {
+	animation: float 6s ease-in-out infinite;
+}
+/* Add to your global CSS or tailwind.css */
+@keyframes spin-slow {
+	from {
+		transform: rotate(0deg);
+	}
+	to {
+		transform: rotate(360deg);
+	}
+}
+.animate-spin-slow {
+	animation: spin-slow 60s linear infinite;
+}
+
+@layer base {
+	:root {
+		--background: 12 58% 4%;
+		--foreground: 30 72% 82%;
+		--card: 12 42% 8%;
+		--card-foreground: 30 72% 82%;
+		--popover: 12 58% 4%;
+		--popover-foreground: 30 72% 82%;
+		--primary: 26 50% 57%;
+		--primary-foreground: 12 58% 4%;
+		--secondary: 10 40% 12%;
+		--secondary-foreground: 30 72% 82%;
+		--muted: 10 34% 14%;
+		--muted-foreground: 29 42% 72%;
+		--accent: 26 50% 57%;
+		--accent-foreground: 12 58% 4%;
+		--destructive: 359 97% 29%;
+		--destructive-foreground: 30 72% 82%;
+		--border: 12 28% 22%;
+		--input: 12 28% 22%;
+		--ring: 26 50% 57%;
+		--chart-1: 26 50% 57%;
+		--chart-2: 359 97% 29%;
+		--chart-3: 30 72% 82%;
+		--chart-4: 12 58% 4%;
+		--chart-5: 26 50% 57%;
+		--radius: 0.5rem;
+		--sidebar-background: 12 58% 4%;
+		--sidebar-foreground: 30 72% 82%;
+		--sidebar-primary: 26 50% 57%;
+		--sidebar-primary-foreground: 12 58% 4%;
+		--sidebar-accent: 10 40% 12%;
+		--sidebar-accent-foreground: 30 72% 82%;
+		--sidebar-border: 12 28% 22%;
+		--sidebar-ring: 26 50% 57%;
+
+		/* Spartaaan custom colors */
+		--brand-gold: 26 50% 57%;
+		--brand-red: 359 97% 29%;
+		--brand-sand: 28 70% 69%;
+		--brand-dark: 12 58% 4%;
+	}
+
+	.dark {
+		--background: 12 58% 4%;
+		--foreground: 30 72% 82%;
+		--card: 12 42% 8%;
+		--card-foreground: 30 72% 82%;
+		--popover: 12 58% 4%;
+		--popover-foreground: 30 72% 82%;
+		--primary: 26 50% 57%;
+		--primary-foreground: 12 58% 4%;
+		--secondary: 10 40% 12%;
+		--secondary-foreground: 30 72% 82%;
+		--muted: 10 34% 14%;
+		--muted-foreground: 29 42% 72%;
+		--accent: 26 50% 57%;
+		--accent-foreground: 12 58% 4%;
+		--destructive: 359 97% 29%;
+		--destructive-foreground: 30 72% 82%;
+		--border: 12 28% 22%;
+		--input: 12 28% 22%;
+		--ring: 26 50% 57%;
+		--chart-1: 26 50% 57%;
+		--chart-2: 359 97% 29%;
+		--chart-3: 30 72% 82%;
+		--chart-4: 12 58% 4%;
+		--chart-5: 26 50% 57%;
+		--sidebar-background: 12 58% 4%;
+		--sidebar-foreground: 30 72% 82%;
+		--sidebar-primary: 26 50% 57%;
+		--sidebar-primary-foreground: 12 58% 4%;
+		--sidebar-accent: 10 40% 12%;
+		--sidebar-accent-foreground: 30 72% 82%;
+		--sidebar-border: 12 28% 22%;
+		--sidebar-ring: 26 50% 57%;
+	}
+}
+
+@layer base {
+	* {
+		@apply border-border;
+	}
+	body {
+		@apply bg-background text-foreground dark;
+		background-image:
+			radial-gradient(circle at 50% 116%, rgba(255, 109, 0, 0.12) 0%, rgba(255, 109, 0, 0) 44%),
+			radial-gradient(circle at 18% 100%, rgba(201, 137, 88, 0.08) 0%, rgba(201, 137, 88, 0) 40%),
+			radial-gradient(circle at 82% 100%, rgba(147, 2, 3, 0.11) 0%, rgba(147, 2, 3, 0) 42%),
+			linear-gradient(180deg, #0f0604 0%, #120705 44%, #170706 100%);
+		background-attachment: fixed;
+	}
+
+	body::before {
+		content: "";
+		position: fixed;
+		inset: 0;
+		pointer-events: none;
+		z-index: -1;
+		opacity: 0.25;
+		background-image: radial-gradient(circle, rgba(231, 172, 120, 0.22) 0.6px, transparent 0.8px);
+		background-size: 3px 3px;
+	}
+}
+
+@layer utilities {
+	.gradient-text {
+		@apply bg-gradient-to-r from-[#930203] to-[#C98958] bg-clip-text text-transparent;
+	}
+
+	.glass-card {
+		@apply border shadow-lg bg-card/80 backdrop-blur-sm border-black/20;
+	}
+
+	.nav-link {
+		@apply px-3 py-2 text-sm transition-colors rounded-md hover:bg-primary/20;
+	}
+
+	.nav-link-active {
+		@apply text-white bg-primary/20;
+	}
+}
+@keyframes neon-flicker {
+	0%,
+	19%,
+	21%,
+	23%,
+	25%,
+	54%,
+	56%,
+	100% {
+		text-shadow: 0 0 4px #C98958, 0 0 11px #C98958, 0 0 19px #C98958,
+			0 0 40px #C98958, 0 0 80px #C98958;
+		color: #0F0604;
+	}
+	20%,
+	22%,
+	24%,
+	55% {
+		text-shadow: none;
+		color: #930203;
+	}
+}
+
+.neon-text {
+	animation: neon-flicker 2.5s infinite alternate;
+	color: #C98958;
+	text-shadow: 0 0 5px #C98958, 0 0 10px #C98958, 0 0 20px #C98958,
+		0 0 40px #C98958, 0 0 80px #C98958;
+	user-select: none;
+}
+
+.sparta-hero-title {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 0.5rem;
+	line-height: 1;
+	text-transform: uppercase;
+}
+
+.sparta-hero-kicker {
+	font-size: clamp(1rem, 2vw, 1.3rem);
+	letter-spacing: 0.32em;
+	font-weight: 700;
+	color: rgba(231, 172, 120, 0.86);
+}
+
+.sparta-hero-wordmark {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.7rem;
+	font-size: clamp(2.8rem, 10vw, 7.1rem);
+	font-weight: 900;
+	letter-spacing: 0.06em;
+	background: linear-gradient(180deg, #f4d2a8 0%, #e7ac78 44%, #c98958 100%);
+	-webkit-background-clip: text;
+	background-clip: text;
+	color: transparent;
+	text-shadow: 0 8px 26px rgba(0, 0, 0, 0.45);
+	filter: drop-shadow(0 0 16px rgba(201, 137, 88, 0.28));
+	animation: spartaWordGlow 3.8s ease-in-out infinite;
+	padding: 0.08em 0;
+}
+
+.sparta-hero-word {
+	display: inline-block;
+}
+
+.sparta-hero-spear {
+	width: clamp(2rem, 6vw, 4.4rem);
+	height: clamp(2rem, 6vw, 4.4rem);
+	object-fit: contain;
+	filter: drop-shadow(0 0 12px rgba(201, 137, 88, 0.56));
+	animation: spartaSpearFloat 3.2s ease-in-out infinite;
+	transform-origin: center;
+	margin-left: 0.15rem;
+}
+
+.sparta-hero-sub {
+	font-size: clamp(0.95rem, 2.2vw, 1.35rem);
+	letter-spacing: 0.26em;
+	font-weight: 700;
+	color: rgba(231, 172, 120, 0.82);
+}
+
+@keyframes spartaWordGlow {
+	0%,
+	100% {
+		filter: drop-shadow(0 0 10px rgba(201, 137, 88, 0.2));
+	}
+	50% {
+		filter: drop-shadow(0 0 22px rgba(201, 137, 88, 0.38));
+	}
+}
+
+@keyframes spartaSpearFloat {
+	0%,
+	100% {
+		transform: translateY(0) rotate(-2deg);
+	}
+	50% {
+		transform: translateY(-4px) rotate(2deg);
+	}
+}
