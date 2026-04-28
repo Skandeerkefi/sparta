@@ -1,6 +1,6 @@
 import { Link, useLocation } from "react-router-dom";
 import { useState, useEffect } from "react";
-import { Dices, Crown, Gift, Users, LogIn, User, LogOut, CalendarRange } from "lucide-react";
+import { Dices, Crown, Trophy, Gift, Users, LogIn, User, LogOut, CalendarRange } from "lucide-react";
 import useMediaQuery from "@/hooks/use-media-query";
 import { useAuthStore } from "@/store/useAuthStore";
 
@@ -43,6 +43,7 @@ export function Navbar() {
 	const menuItems = [
 		{ path: "/", name: "Home", icon: <Dices className='w-5 h-5' /> },
 		{ path: "/leaderboards", name: "Leaderboard", icon: <Crown className='w-5 h-5' /> },
+		{ path: "/tournament", name: "Tournament", icon: <Trophy className='w-5 h-5' /> },
 		{
 			path: "/bethog-monthly",
 			name: "Bethog Monthly",
