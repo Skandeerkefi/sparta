@@ -1,4 +1,5 @@
 import { create } from "zustand";
+import { API_BASE } from "@/lib/api";
 
 interface User {
 	id: string;
@@ -43,10 +44,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
 
 	login: async (kickUsername, password) => {
 		try {
-			const res = await fetch(
-				"https://bswrxstidata-production.up.railway.app/api/auth/login",
-				// "https://pnpplxprssdata.onrender.com/api/auth/login",
-				{
+			const res = await fetch(`${API_BASE}/api/auth/login`, {
 					method: "POST",
 					headers: { "Content-Type": "application/json" },
 					body: JSON.stringify({ kickUsername, password }),
@@ -79,10 +77,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
 	signup: async (kickUsername, rainbetUsername, password, confirmPassword) => {
 		set({ isLoading: true });
 		try {
-			const res = await fetch(
-				// "https://pnpplxprssdata.onrender.com/api/auth/register",
-				"https://bswrxstidata-production.up.railway.app/api/auth/register",
-				{
+			const res = await fetch(`${API_BASE}/api/auth/register`, {
 					method: "POST",
 					headers: { "Content-Type": "application/json" },
 					body: JSON.stringify({

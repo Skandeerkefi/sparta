@@ -26,8 +26,9 @@ interface LeaderboardState {
 	fetchLeaderboard: () => Promise<void>;
 }
 
-const API_URL =
-	"https://bswrxstidata-production.up.railway.app/api/affiliates";
+import { API_BASE } from "@/lib/api";
+
+const API_URL = `${API_BASE}/api/affiliates`;
 
 /**
  * Calculate bi-weekly period dates

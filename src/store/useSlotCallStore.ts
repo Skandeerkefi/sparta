@@ -1,5 +1,6 @@
 import { create } from "zustand";
 import { useAuthStore } from "./useAuthStore";
+import { API_BASE } from "@/lib/api";
 
 export type SlotCallStatus = "pending" | "accepted" | "rejected" | "played";
 
@@ -42,9 +43,7 @@ export const useSlotCallStore = create<SlotCallState>((set, get) => ({
 
 		set({ isSubmitting: true });
 		try {
-			const res = await fetch(
-				"https://bswrxstidata-production.up.railway.app/api/slot-calls",
-				{
+			const res = await fetch(`${API_BASE}/api/slot-calls`, {
 					method: "POST",
 					headers: {
 						"Content-Type": "application/json",
@@ -92,7 +91,7 @@ export const useSlotCallStore = create<SlotCallState>((set, get) => ({
 
 		try {
 			const res = await fetch(
-				`https://bswrxstidata-production.up.railway.app/api/slot-calls/${id}/bonus-call`,
+				`${API_BASE}/api/slot-calls/${id}/bonus-call`,
 				{
 					method: "POST",
 					headers: {
@@ -126,9 +125,7 @@ export const useSlotCallStore = create<SlotCallState>((set, get) => ({
 		if (!token) return { success: false, error: "Not authenticated" };
 
 		try {
-			const res = await fetch(
-				`https://bswrxstidata-production.up.railway.app/api/slot-calls/${id}/status`,
-				{
+			const res = await fetch(`${API_BASE}/api/slot-calls/${id}/status`, {
 					method: "POST",
 					headers: {
 						"Content-Type": "application/json",
@@ -168,9 +165,7 @@ export const useSlotCallStore = create<SlotCallState>((set, get) => ({
 		if (!token) return { success: false, error: "Not authenticated" };
 
 		try {
-			const res = await fetch(
-				`https://bswrxstidata-production.up.railway.app/api/slot-calls/${id}`,
-				{
+			const res = await fetch(`${API_BASE}/api/slot-calls/${id}`, {
 					method: "DELETE",
 					headers: {
 						Authorization: `Bearer ${token}`,
@@ -200,8 +195,8 @@ export const useSlotCallStore = create<SlotCallState>((set, get) => ({
 
 		const url =
 			userRole === "admin"
-				? "https://bswrxstidata-production.up.railway.app/api/slot-calls"
-				: "https://bswrxstidata-production.up.railway.app/api/slot-calls/my";
+				? `${API_BASE}/api/slot-calls`
+				: `${API_BASE}/api/slot-calls/my`;
 
 		try {
 			const res = await fetch(url, {

@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { API_BASE } from "@/lib/api";
 import { useCSGOLeadStore } from "@/store/csgoleadStore";
 import GraphicalBackground from "@/components/GraphicalBackground";
 import { Navbar } from "@/components/Navbar";
@@ -19,7 +20,7 @@ const CSGOLeadPage = () => {
     const fetchData = async () => {
       await fetchLeaderboard(10);
 
-      const res = await fetch(`https://misterteedata-production.up.railway.app/api/leaderboard/csgowin`);
+      const res = await fetch(`${API_BASE}/api/leaderboard/csgowin`);
       const data = await res.json();
       const currentLB = data.leaderboards?.[0];
 

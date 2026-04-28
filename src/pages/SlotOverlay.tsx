@@ -8,15 +8,12 @@ export default function SlotOverlay() {
 	useEffect(() => {
 		const fetchOverlayCalls = async () => {
 			try {
-				const res = await fetch(
-					"https://misterteedata.onrender.com/api/slot-calls",
-					{
-						headers: {
-							Authorization:
-								"Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY4OGJkMTg2MjQyNGJjNjllZGJmZGM4YSIsInJvbGUiOiJhZG1pbiIsImtpY2tVc2VybmFtZSI6InNrYW5kZXIiLCJpYXQiOjE3NTQyMTk1MjcsImV4cCI6MTc1NDgyNDMyN30.Obp3v8gjiCKLWHuOhVX4ncEjga1fzj-67HIBhWDvt2k",
-						},
-					}
-				);
+				const res = await fetch(`${API_BASE}/api/slot-calls`, {
+					headers: {
+						Authorization:
+							"Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY4OGJkMTg2MjQyNGJjNjllZGJmZGM4YSIsInJvbGUiOiJhZG1pbiIsImtpY2tVc2VybmFtZSI6InNrYW5kZXIiLCJpYXQiOjE3NTQyMTk1MjcsImV4cCI6MTc1NDgyNDMyN30.Obp3v8gjiCKLWHuOhVX4ncEjga1fzj-67HIBhWDvt2k",
+					},
+				});
 
 				if (!res.ok) throw new Error("Failed to fetch slot calls");
 

@@ -1,6 +1,6 @@
 import { Link, useLocation } from "react-router-dom";
 import { useState, useEffect } from "react";
-import { Dices, Crown, Gift, Users, LogIn, User, LogOut } from "lucide-react";
+import { Dices, Crown, Gift, Users, LogIn, User, LogOut, CalendarRange } from "lucide-react";
 import useMediaQuery from "@/hooks/use-media-query";
 import { useAuthStore } from "@/store/useAuthStore";
 
@@ -44,6 +44,11 @@ export function Navbar() {
 		{ path: "/", name: "Home", icon: <Dices className='w-5 h-5' /> },
 		{ path: "/leaderboards", name: "Leaderboard", icon: <Crown className='w-5 h-5' /> },
 		{
+			path: "/bethog-monthly",
+			name: "Bethog Monthly",
+			icon: <CalendarRange className='w-5 h-5' />,
+		},
+		{
 			path: "/slot-calls",
 			name: "Slot Calls",
 			icon: <Users className='w-5 h-5' />,
@@ -55,9 +60,22 @@ export function Navbar() {
 		},
 	];
 
+	const adminMenuItems =
+		user?.role === "admin"
+			? [
+				{
+					path: "/bethog-monthly/admin",
+					name: "Bethog Admin",
+					icon: <CalendarRange className='w-5 h-5' />,
+				},
+			]
+			: [];
+
+	const allMenuItems = [...menuItems, ...adminMenuItems];
+
 	return (
 		<nav className='sticky top-0 z-50 bg-gradient-to-r from-[#0F0604] to-[#1a191f] border-b border-[#C98958]/20 shadow-2xl backdrop-blur-md'>
-			<div className='flex items-center justify-between w-full px-4 py-3 mx-auto sm:px-6 sm:py-4 max-w-7xl'>
+			<div className='flex items-center justify-between w-full gap-3 px-4 py-3 mx-auto sm:px-6 sm:py-4 max-w-7xl'>
 				{/* Logo */}
 			<Link to='/' className='flex items-center flex-shrink-0 gap-2 transition-opacity select-none sm:gap-3 hover:opacity-80'>
 				<img
@@ -73,27 +91,27 @@ export function Navbar() {
 
 				{/* Desktop Menu */}
 				{!isMobile && (
-				<div className='flex items-center gap-6 ml-auto lg:gap-12'>
-					<ul className='flex gap-1 lg:gap-2'>
-						{menuItems.map((item) => (
+				<div className='flex items-center min-w-0 gap-4 ml-auto lg:gap-6'>
+					<ul className='flex max-w-[52vw] items-center gap-1 overflow-x-auto whitespace-nowrap pr-2 lg:gap-2'>
+						{allMenuItems.map((item) => (
 							<li key={item.name}>
 								<Link
 									to={item.path}
-									className={`flex items-center gap-2 px-2.5 lg:px-4 py-2 lg:py-2.5 text-xs lg:text-sm font-semibold rounded-lg transition-all duration-300 ${
+									className={`flex shrink-0 items-center gap-2 px-2.5 py-2 text-xs lg:text-sm font-semibold rounded-lg transition-all duration-300 ${
 										location.pathname === item.path
 											? "bg-[#C98958] text-white shadow-lg shadow-[#C98958]/50"
 											: "text-[#E7AC78] hover:bg-[#C98958]/20 hover:text-[#C98958]"
 									}`}
 								>
 									{item.icon}
-									<span className='hidden lg:inline'>{item.name}</span>
+									<span className='hidden xl:inline'>{item.name}</span>
 								</Link>
 							</li>
 						))}
 					</ul>
 
 					{/* User controls */}
-					<div className='flex items-center gap-2 lg:gap-3 pl-4 lg:pl-6 border-l border-[#C98958]/20'>
+					<div className='flex items-center shrink-0 gap-2 lg:gap-3 pl-4 lg:pl-6 border-l border-[#C98958]/20'>
 						{user ? (
 							<>
 								<Link
@@ -132,7 +150,7 @@ export function Navbar() {
 
 					{/* Live Status */}
 					<div
-						className={`px-2.5 lg:px-4 py-1 lg:py-2 rounded-full text-xs font-bold select-none flex-shrink-0 ${
+						className={`shrink-0 px-2.5 lg:px-4 py-1 lg:py-2 rounded-full text-xs font-bold select-none ${
 							isLive
 								? "bg-[#C98958] text-white shadow-lg shadow-[#C98958]/50 animate-pulse"
 								: "bg-gray-700/40 text-gray-400"
@@ -210,7 +228,7 @@ export function Navbar() {
 						onClick={(e) => e.stopPropagation()}
 					>
 						<ul className='flex flex-col space-y-2 font-semibold text-[#E7AC78]'>
-							{menuItems.map((item) => (
+							{allMenuItems.map((item) => (
 								<li key={item.name}>
 									<Link
 										to={item.path}

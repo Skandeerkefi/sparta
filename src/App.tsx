@@ -16,6 +16,8 @@ import RainPage from "@/pages/RainPage";
 import CSGOLeadPage from "./pages/CSGOLead";
 import PackdrawPage from "./pages/PackdrawPage";
 import ClashLeaderboardPage from "./pages/ClashLeaderboardPage";
+import BethogMonthly from "./pages/BethogMonthly";
+import BethogMonthlyAdmin from "./pages/BethogMonthlyAdmin";
 function App() {
 	const loadFromStorage = useAuthStore((state) => state.loadFromStorage);
 	const user = useAuthStore((state) => state.user);
@@ -51,6 +53,8 @@ function App() {
 					<Route path='/rain' element={<RainPage />} />
 					<Route path='/clash' element={<ClashLeaderboardPage />} />
 					<Route path='/packdraw' element={<PackdrawPage />} />
+					<Route path='/bethog-monthly' element={<BethogMonthly />} />
+					<Route path='/bethog-monthly/admin' element={<BethogMonthlyAdmin />} />
 				</Routes>
 			</BrowserRouter>
 			<Toaster />

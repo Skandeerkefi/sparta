@@ -1,4 +1,5 @@
 import { create } from "zustand";
+import { API_BASE } from "@/lib/api";
 
 interface LeaderboardEntry {
   rank: number;
@@ -29,9 +30,7 @@ export const useCSGOLeadStore = create<CSGOLeadState>((set) => ({
     set({ loading: true, error: null });
 
     try {
-      const res = await fetch(
-        `https://bswrxstidata-production.up.railway.app/api/leaderboard/csgowin`
-      );
+      const res = await fetch(`${API_BASE}/api/leaderboard/csgowin`);
 
       if (!res.ok) throw new Error("Failed to fetch leaderboard");
 

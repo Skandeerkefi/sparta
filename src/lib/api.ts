@@ -1,9 +1,9 @@
 import axios from "axios";
 
-const api = axios.create({
-	// baseURL: "https://misterteedata.onrender.com",
-	baseURL: "https://bswrxstidata-production.up.railway.app",
-	// Your backend URL
+export const API_BASE = (import.meta.env.VITE_API_BASE as string) || "http://localhost:3000";
+
+export const http = axios.create({
+	baseURL: API_BASE,
 });
 
-export default api;
+export default http;
