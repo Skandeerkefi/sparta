@@ -757,16 +757,25 @@ function ParticipantRow({
   return (
     <div className={`rounded-xl border px-3 py-2 ${winner ? "border-[#C98958] bg-[#930203]/25" : "border-[#C98958]/10 bg-black/25"}`}>
       <div className='flex items-center justify-between gap-3'>
-        <div className='min-w-0'>
-          <p className='text-[0.65rem] uppercase tracking-[0.25em] text-white/40'>{label}</p>
-          <p className='truncate text-sm font-semibold text-white'>{player?.username || "TBD"}</p>
+        <div className='min-w-0 flex items-center gap-3'>
+          {selection?.image && (
+            <img
+              src={selection.image}
+              alt={selection.slotName || `${player?.username || 'slot'} image`}
+              className='h-10 w-10 rounded-md object-cover flex-shrink-0'
+            />
+          )}
+          <div className='min-w-0'>
+            <p className='text-[0.65rem] uppercase tracking-[0.25em] text-white/40'>{label}</p>
+            <p className='truncate text-sm font-semibold text-white'>{player?.username || "TBD"}</p>
+          </div>
         </div>
         {winner && <Badge className='bg-[#C98958] text-white'>Winner</Badge>}
       </div>
       <div className='mt-2 flex flex-wrap items-center gap-2 text-xs text-white/50'>
         <span>Seed #{player?.position || "—"}</span>
         <span>•</span>
-        <span>{selection?.slotName || "No slot selected yet"}</span>
+        <span className='truncate max-w-[180px]'>{selection?.slotName || "No slot selected yet"}</span>
       </div>
     </div>
   );

@@ -32,23 +32,13 @@ export function Footer() {
 								Home
 							</Link>
 							<Link
-								to='/leaderboards'
+								to='/bethog-monthly'
 								className='text-sm text-white/70 transition-colors hover:text-[#C98958]'
 							>
 								Leaderboard
 							</Link>
-							<Link
-								to='/terms'
-								className='text-sm text-white/70 transition-colors hover:text-[#C98958]'
-							>
-								Terms & Conditions
-							</Link>
-							<Link
-								to='/privacy'
-								className='text-sm text-white/70 transition-colors hover:text-[#C98958]'
-							>
-								Privacy Policy
-							</Link>
+							
+							
 						</div>
 					</div>
 
