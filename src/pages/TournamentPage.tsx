@@ -840,6 +840,7 @@ function TournamentPage() {
                                       </div>
                                     </>
                                   )}
+                                </div>
                                 <Button
                                   type='button'
                                   onClick={() => submitMatchResult(match)}
