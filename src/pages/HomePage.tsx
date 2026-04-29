@@ -6,7 +6,7 @@ import { ArrowRight, ArrowDown } from "lucide-react";
 import { FaKickstarterK, FaXTwitter } from "react-icons/fa6";
 import GraphicalBackground from "@/components/GraphicalBackground";
 import { useRef } from "react";
-
+import { FaYoutube } from "react-icons/fa";
 function HomePage() {
 	const liveRef = useRef<HTMLDivElement>(null);
 
@@ -15,7 +15,7 @@ function HomePage() {
 	};
 
 	return (
-		<div className='relative flex min-h-screen flex-col overflow-x-hidden text-white'>
+		<div className='relative flex flex-col min-h-screen overflow-x-hidden text-white'>
 			<GraphicalBackground />
 
 			<Navbar />
@@ -42,7 +42,7 @@ function HomePage() {
 						enjoy the rewards
 					</p>
 
-					<div className='mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row'>
+					<div className='flex flex-col items-center justify-center gap-4 mt-10 sm:flex-row'>
 						<Button
 							variant='outline'
 							className='h-14 w-full border-2 border-[#C98958]/60 bg-black/45 text-white hover:bg-[#930203]/50 sm:min-w-[210px]'
@@ -68,7 +68,7 @@ function HomePage() {
 					</div>
 				</section>
 
-				<section ref={liveRef} className='mx-auto max-w-6xl px-4 py-12 sm:px-6 sm:py-14'>
+				<section ref={liveRef} className='max-w-6xl px-4 py-12 mx-auto sm:px-6 sm:py-14'>
 					<h2 className='text-3xl font-bold text-center text-white uppercase sm:text-5xl'>
 						Watch Spartaaan Live
 					</h2>
@@ -89,7 +89,7 @@ function HomePage() {
 					</div>
 				</section>
 
-				<section className='mx-auto max-w-6xl px-4 py-12 sm:px-6 sm:py-16'>
+				<section className='max-w-6xl px-4 py-12 mx-auto sm:px-6 sm:py-16'>
 					<h2 className='text-3xl font-bold text-center text-white uppercase sm:text-5xl'>
 						Bethog Promo
 					</h2>
@@ -97,7 +97,7 @@ function HomePage() {
 						Use Spartaaan&apos;s official referral and promo code on Bethog
 					</p>
 
-					<div className='mx-auto mt-10 max-w-2xl'>
+					<div className='max-w-2xl mx-auto mt-10'>
 						<a
 							href='https://www.bethog.com/fr/casino?referral=SpartaaanOnKICK'
 							target='_blank'
@@ -106,7 +106,7 @@ function HomePage() {
 						>
 							<div className='flex items-center justify-center w-16 h-16 mx-auto border rounded-2xl border-[#C98958]/50 bg-[#930203]/30 p-2'>
 								<img
-									src='https://i.ibb.co/x8LZRrDq/3dgifmaker72872.gif'
+									src='https://i.ibb.co/5WZLnF0M/Screenshot-2026-04-20-184836-removebg-preview.png'
 									alt='Spartaaan logo'
 									className='object-contain w-full h-full'
 								/>
@@ -120,7 +120,7 @@ function HomePage() {
 					</div>
 				</section>
 
-					<section className='mx-auto max-w-6xl px-4 py-12 sm:px-6 sm:py-16'>
+					<section className='max-w-6xl px-4 py-12 mx-auto sm:px-6 sm:py-16'>
 						<h2 className='text-3xl font-bold text-center text-white uppercase sm:text-5xl'>
 							Socials
 					</h2>
@@ -161,7 +161,7 @@ function HomePage() {
 						>
 							<div className='flex items-center justify-center w-14 h-14 border rounded-2xl border-[#C98958]/50 bg-[#930203]/30 p-2'>
 								<img
-									src='https://i.ibb.co/x8LZRrDq/3dgifmaker72872.gif'
+									src='https://i.ibb.co/5WZLnF0M/Screenshot-2026-04-20-184836-removebg-preview.png'
 									alt='Bethog logo'
 									className='object-contain w-full h-full'
 								/>
@@ -171,20 +171,16 @@ function HomePage() {
 						</a>
 
 						<a
-							href='https://www.bethog.com/fr/casino?referral=SpartaaanOnKICK'
+							href='https://www.youtube.com/@SpartaaanOnKICK'
 							target='_blank'
 							rel='noreferrer'
 							className='p-6 transition-all border rounded-3xl bg-black/55 border-[#C98958]/35 hover:border-[#C98958] hover:-translate-y-1'
 						>
 							<div className='flex items-center justify-center w-14 h-14 border rounded-2xl border-[#C98958]/50 bg-[#930203]/30 p-2'>
-								<img
-									src='https://i.ibb.co/x8LZRrDq/3dgifmaker72872.gif'
-									alt='Spartaaan logo'
-									className='object-contain w-full h-full'
-								/>
+								<FaYoutube className='text-white w-7 h-7' />
 							</div>
-							<h3 className='mt-5 text-2xl font-bold text-white'>Promo Code</h3>
-							<p className='mt-2 text-white/65'>SpartaaanOnKICK</p>
+							<h3 className='mt-5 text-2xl font-bold text-white'>Subscribe</h3>
+							<p className='mt-2 text-white/65'>Spartaaan On Kick</p>
 						</a>
 					</div>
 				</section>
