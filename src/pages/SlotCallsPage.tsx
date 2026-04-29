@@ -237,8 +237,8 @@ function SlotCallsPage() {
 
 			<Navbar />
 
-			<main className='relative z-10 mx-auto flex-grow w-full max-w-6xl px-4 py-8 sm:px-6 lg:px-8'>
-				<div className='mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between'>
+			<main className='relative z-10 flex-grow w-full max-w-6xl px-4 py-8 mx-auto sm:px-6 lg:px-8'>
+				<div className='flex flex-col gap-3 mb-4 sm:flex-row sm:items-center sm:justify-between'>
 					<h1 className='text-2xl font-bold sm:text-3xl'>Slot Calls</h1>
 					<Dialog>
 						<DialogTrigger asChild>
@@ -274,7 +274,7 @@ function SlotCallsPage() {
 												<img
 													src={selectedSlot.image}
 													alt={selectedSlot.name}
-													className='h-64 w-full object-contain p-3'
+													className='object-contain w-full h-64 p-3'
 												/>
 											</div>
 											<div className='space-y-1'>
@@ -299,7 +299,7 @@ function SlotCallsPage() {
 												No slots found
 											</div>
 										) : (
-											<div className='grid grid-cols-2 gap-2 max-h-96 overflow-y-auto'>
+											<div className='grid grid-cols-2 gap-2 overflow-y-auto max-h-96'>
 												{searchResults.map((slot, idx) => (
 													<button
 														key={idx}
@@ -315,7 +315,7 @@ function SlotCallsPage() {
 															<img
 																src={slot.image}
 																alt={slot.name}
-															className='w-full h-32 object-contain rounded mb-1 bg-black/30 p-2'
+															className='object-contain w-full h-32 p-2 mb-1 rounded bg-black/30'
 															/>
 														)}
 														<p className='text-sm font-medium truncate'>{slot.name}</p>
@@ -335,7 +335,7 @@ function SlotCallsPage() {
 												<img
 													src={slotImageUrl}
 													alt={slotName}
-													className='w-16 h-16 object-cover rounded'
+													className='object-cover w-16 h-16 rounded'
 												/>
 											)}
 											<div className='flex-1'>
@@ -371,7 +371,7 @@ function SlotCallsPage() {
 					</Dialog>
 				</div>
 
-				<div className='mb-6 flex flex-col gap-4 lg:flex-row lg:items-center'>
+				<div className='flex flex-col gap-4 mb-6 lg:flex-row lg:items-center'>
 					<Input
 						placeholder='Search slot name or requester...'
 						value={searchQuery}
@@ -425,7 +425,7 @@ function SlotCallsPage() {
 							onChange={(e) => setShowOnly250Hit(e.target.checked)}
 							className='accent-[#C98958]'
 						/>
-						Show only 250x Hit
+						Show only 1.600x Hit
 					</label>
 				</div>
 

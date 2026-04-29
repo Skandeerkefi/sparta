@@ -116,7 +116,7 @@ export default function BonusHuntWidgetPage() {
           <div>
             <p className='text-xs font-semibold uppercase tracking-[0.4em] text-white/45'>Live OBS Widget</p>
             <h1 className='mt-2 text-3xl font-black tracking-tight text-white sm:text-5xl'>Bonus Hunt Tracker</h1>
-            <p className='mt-2 max-w-3xl text-sm text-white/65 sm:text-base'>
+            <p className='max-w-3xl mt-2 text-sm text-white/65 sm:text-base'>
               Compact live hunt view with winnings, progress, and every slot card updated in real time.
             </p>
           </div>
@@ -128,7 +128,7 @@ export default function BonusHuntWidgetPage() {
           </div>
         </header>
 
-        <section className='mt-6 grid gap-4 sm:grid-cols-2 xl:grid-cols-4'>
+        <section className='grid gap-4 mt-6 sm:grid-cols-2 xl:grid-cols-4'>
           <MetricCard label='Total Winnings' value={`$${formatNumber(stats?.totalWinnings)}`} />
           <MetricCard label='P&L' value={`${(stats?.profitLoss || 0) >= 0 ? "+" : ""}$${formatNumber(stats?.profitLoss)}`} />
           <MetricCard label='Run Avg X' value={formatMultiplier(stats?.runAvgX)} />
@@ -166,7 +166,7 @@ export default function BonusHuntWidgetPage() {
                     </span>
                   </div>
 
-                  <div className='mt-4 h-2 overflow-hidden rounded-full bg-black/30'>
+                  <div className='h-2 mt-4 overflow-hidden rounded-full bg-black/30'>
                     <div
                       className='h-full rounded-full bg-gradient-to-r from-[#930203] to-[#C98958]'
                       style={{ width: `${stats?.progressPercent || 0}%` }}
@@ -179,14 +179,14 @@ export default function BonusHuntWidgetPage() {
                     current.games.map((game) => (
                       <article key={game._id} className='overflow-hidden rounded-3xl border border-[#C98958]/15 bg-black/25 text-white shadow-lg shadow-black/20'>
                         {game.image ? (
-                          <img src={game.image} alt={game.slotName} className='h-40 w-full object-cover' />
+                          <img src={game.image} alt={game.slotName} className='object-cover w-full h-40' />
                         ) : (
-                          <div className='flex h-40 items-center justify-center bg-black/30 text-sm text-white/35'>
+                          <div className='flex items-center justify-center h-40 text-sm bg-black/30 text-white/35'>
                             No image available
                           </div>
                         )}
 
-                        <div className='space-y-3 p-4'>
+                        <div className='p-4 space-y-3'>
                           <div className='flex items-start justify-between gap-3'>
                             <div>
                               <h4 className='font-bold text-white'>{game.slotName}</h4>
@@ -204,11 +204,11 @@ export default function BonusHuntWidgetPage() {
                               <span className='text-white/50'>Bet</span>
                               <span className='font-semibold text-[#E7AC78]'>${formatNumber(game.betSize)}</span>
                             </div>
-                            <div className='mt-2 flex items-center justify-between'>
+                            <div className='flex items-center justify-between mt-2'>
                               <span className='text-white/50'>Multiplier</span>
                               <span className='font-semibold text-[#E7AC78]'>x{formatMultiplier(game.multiplier)}</span>
                             </div>
-                            <div className='mt-2 flex items-center justify-between'>
+                            <div className='flex items-center justify-between mt-2'>
                               <span className='text-white/50'>Payout</span>
                               <span className='font-semibold text-[#E7AC78]'>
                                 {game.status === "completed" ? `$${formatNumber(game.payout)}` : "Pending"}

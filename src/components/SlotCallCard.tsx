@@ -50,11 +50,11 @@ export function SlotCallCard({
 		<div className='flex flex-col p-4 rounded-lg glass-card bg-[#0F0604] border border-[#C98958] text-[#E7AC78]'>
 			{/* Image */}
 			{imageUrl && (
-				<div className='mb-3 rounded-lg overflow-hidden'>
+				<div className='mb-3 overflow-hidden rounded-lg'>
 					<img
 						src={imageUrl}
 						alt={slotName}
-						className='w-full h-32 object-cover'
+						className='object-cover w-full h-32'
 						onError={(e) => {
 							e.currentTarget.style.display = "none";
 						}}
@@ -76,11 +76,11 @@ export function SlotCallCard({
 					Requested by: <span className='text-[#E7AC78]'>{requester}</span>
 				</div>
 				{/* Quick indicators: expected points and 250x badge */}
-				<div className='ml-auto flex items-center gap-2'>
-					<span className='text-xs px-2 py-0.5 rounded-full bg-black/60 border border-[#C98958]'>+8 pts</span>
+				<div className='flex items-center gap-2 ml-auto'>
+					
 					{ x250Hit && (
 						<span className='text-xs px-2 py-0.5 rounded-full bg-yellow-600/20 border border-yellow-500 text-yellow-300 flex items-center gap-1'>
-							<span className='font-bold'>250x</span>
+							<span className='font-bold'>1,600x</span>
 						</span>
 					)}
 				</div>
@@ -102,7 +102,7 @@ export function SlotCallCard({
 							onChange={() => onToggleX250?.(id, !x250Hit)}
 							disabled={status !== "played"}
 						/>
-						Mark as 250x Hit
+						Mark as 1,600x Hit
 					</label>
 
 					{status === "pending" && (
