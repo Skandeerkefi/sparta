@@ -752,82 +752,94 @@ function TournamentPage() {
                             </div>
 
                             <div className='mt-3 space-y-2 text-sm text-white/75'>
-                              <p>A: {match.playerA?.username || "TBD"}</p>
-                              <p>B: {match.playerB?.username || "TBD"}</p>
+                              <p>A: {match.playerA?.username || "Bye (auto x0)"}</p>
+                              <p>B: {match.playerB?.username || "Bye (auto x0)"}</p>
                             </div>
 
-                            {match.status !== "completed" && match.playerA && match.playerB && (
+                            {match.status !== "completed" && (match.playerA || match.playerB) && (
                               <div className='mt-3 space-y-2'>
+                                {!match.playerA || !match.playerB ? (
+                                  <div className='rounded-xl border border-[#C98958]/20 bg-black/20 p-3 text-xs text-white/60'>
+                                    <p>One player has a bye. Enter results for the present player and they auto-advance with opponent x0.</p>
+                                  </div>
+                                ) : null}
                                 <div className='grid grid-cols-2 gap-2'>
-                                  <div className='rounded-xl border border-[#C98958]/10 bg-black/20 p-2'>
-                                    <p className='text-[0.65rem] uppercase tracking-[0.25em] text-white/40'>A Bet Size</p>
-                                    <Input
-                                      value={inputs.betSizeA}
-                                      onChange={(event) =>
-                                        setMatchInputs((prev) => ({
-                                          ...prev,
-                                          [match._id]: { ...(prev[match._id] || emptyMatchInput()), betSizeA: event.target.value },
-                                        }))
-                                      }
-                                      placeholder='Bet size A'
-                                      type='number'
-                                      step='0.01'
-                                      min='0'
-                                      className='mt-2 border-[#C98958]/25 bg-black/40 text-white placeholder:text-white/35'
-                                    />
-                                  </div>
-                                  <div className='rounded-xl border border-[#C98958]/10 bg-black/20 p-2'>
-                                    <p className='text-[0.65rem] uppercase tracking-[0.25em] text-white/40'>A Payout</p>
-                                    <Input
-                                      value={inputs.payoutA}
-                                      onChange={(event) =>
-                                        setMatchInputs((prev) => ({
-                                          ...prev,
-                                          [match._id]: { ...(prev[match._id] || emptyMatchInput()), payoutA: event.target.value },
-                                        }))
-                                      }
-                                      placeholder='Payout A'
-                                      type='number'
-                                      step='0.01'
-                                      min='0'
-                                      className='mt-2 border-[#C98958]/25 bg-black/40 text-white placeholder:text-white/35'
-                                    />
-                                  </div>
-                                  <div className='rounded-xl border border-[#C98958]/10 bg-black/20 p-2'>
-                                    <p className='text-[0.65rem] uppercase tracking-[0.25em] text-white/40'>B Bet Size</p>
-                                    <Input
-                                      value={inputs.betSizeB}
-                                      onChange={(event) =>
-                                        setMatchInputs((prev) => ({
-                                          ...prev,
-                                          [match._id]: { ...(prev[match._id] || emptyMatchInput()), betSizeB: event.target.value },
-                                        }))
-                                      }
-                                      placeholder='Bet size B'
-                                      type='number'
-                                      step='0.01'
-                                      min='0'
-                                      className='mt-2 border-[#C98958]/25 bg-black/40 text-white placeholder:text-white/35'
-                                    />
-                                  </div>
-                                  <div className='rounded-xl border border-[#C98958]/10 bg-black/20 p-2'>
-                                    <p className='text-[0.65rem] uppercase tracking-[0.25em] text-white/40'>B Payout</p>
-                                    <Input
-                                      value={inputs.payoutB}
-                                      onChange={(event) =>
-                                        setMatchInputs((prev) => ({
-                                          ...prev,
-                                          [match._id]: { ...(prev[match._id] || emptyMatchInput()), payoutB: event.target.value },
-                                        }))
-                                      }
-                                      placeholder='Payout B'
-                                      type='number'
-                                      step='0.01'
-                                      min='0'
-                                      className='mt-2 border-[#C98958]/25 bg-black/40 text-white placeholder:text-white/35'
-                                    />
-                                  </div>
-                                </div>
+                                  {match.playerA && (
+                                    <>
+                                      <div className='rounded-xl border border-[#C98958]/10 bg-black/20 p-2'>
+                                        <p className='text-[0.65rem] uppercase tracking-[0.25em] text-white/40'>A Bet Size</p>
+                                        <Input
+                                          value={inputs.betSizeA}
+                                          onChange={(event) =>
+                                            setMatchInputs((prev) => ({
+                                              ...prev,
+                                              [match._id]: { ...(prev[match._id] || emptyMatchInput()), betSizeA: event.target.value },
+                                            }))
+                                          }
+                                          placeholder='Bet size A'
+                                          type='number'
+                                          step='0.01'
+                                          min='0'
+                                          className='mt-2 border-[#C98958]/25 bg-black/40 text-white placeholder:text-white/35'
+                                        />
+                                      </div>
+                                      <div className='rounded-xl border border-[#C98958]/10 bg-black/20 p-2'>
+                                        <p className='text-[0.65rem] uppercase tracking-[0.25em] text-white/40'>A Payout</p>
+                                        <Input
+                                          value={inputs.payoutA}
+                                          onChange={(event) =>
+                                            setMatchInputs((prev) => ({
+                                              ...prev,
+                                              [match._id]: { ...(prev[match._id] || emptyMatchInput()), payoutA: event.target.value },
+                                            }))
+                                          }
+                                          placeholder='Payout A'
+                                          type='number'
+                                          step='0.01'
+                                          min='0'
+                                          className='mt-2 border-[#C98958]/25 bg-black/40 text-white placeholder:text-white/35'
+                                        />
+                                      </div>
+                                    </>
+                                  )}
+                                  {match.playerB && (
+                                    <>
+                                      <div className='rounded-xl border border-[#C98958]/10 bg-black/20 p-2'>
+                                        <p className='text-[0.65rem] uppercase tracking-[0.25em] text-white/40'>B Bet Size</p>
+                                        <Input
+                                          value={inputs.betSizeB}
+                                          onChange={(event) =>
+                                            setMatchInputs((prev) => ({
+                                              ...prev,
+                                              [match._id]: { ...(prev[match._id] || emptyMatchInput()), betSizeB: event.target.value },
+                                            }))
+                                          }
+                                          placeholder='Bet size B'
+                                          type='number'
+                                          step='0.01'
+                                          min='0'
+                                          className='mt-2 border-[#C98958]/25 bg-black/40 text-white placeholder:text-white/35'
+                                        />
+                                      </div>
+                                      <div className='rounded-xl border border-[#C98958]/10 bg-black/20 p-2'>
+                                        <p className='text-[0.65rem] uppercase tracking-[0.25em] text-white/40'>B Payout</p>
+                                        <Input
+                                          value={inputs.payoutB}
+                                          onChange={(event) =>
+                                            setMatchInputs((prev) => ({
+                                              ...prev,
+                                              [match._id]: { ...(prev[match._id] || emptyMatchInput()), payoutB: event.target.value },
+                                            }))
+                                          }
+                                          placeholder='Payout B'
+                                          type='number'
+                                          step='0.01'
+                                          min='0'
+                                          className='mt-2 border-[#C98958]/25 bg-black/40 text-white placeholder:text-white/35'
+                                        />
+                                      </div>
+                                    </>
+                                  )}
                                 <Button
                                   type='button'
                                   onClick={() => submitMatchResult(match)}
