@@ -360,7 +360,7 @@ function TournamentPage() {
   };
 
   return (
-    <div className='relative flex min-h-screen flex-col overflow-hidden text-white'>
+    <div className='relative flex flex-col min-h-screen overflow-hidden text-white'>
       <GraphicalBackground />
       <Navbar />
 
@@ -372,7 +372,7 @@ function TournamentPage() {
               <div className='mt-4 grid gap-6 xl:grid-cols-[minmax(0,1.3fr)_360px] xl:items-end'>
                 <div>
                   <h1 className='text-4xl font-black tracking-tight text-white sm:text-5xl lg:text-6xl'>Bethog Slot Tournament</h1>
-                  <p className='mt-4 max-w-3xl text-sm leading-6 text-white/85 sm:text-base'>
+                  <p className='max-w-3xl mt-4 text-sm leading-6 text-white/85 sm:text-base'>
                     Players join a fixed bracket, choose one slot for each round, and advance by posting the strongest multiplier.
                     The layout below separates the bracket, player progress, and admin tools so the flow is easier to follow.
                   </p>
@@ -397,8 +397,8 @@ function TournamentPage() {
                     {isLoading && <span className='text-xs uppercase tracking-[0.2em] text-white/40'>Refreshing</span>}
                   </div>
 
-                  <div className='mt-6 overflow-x-auto pb-2'>
-                    <div className='flex flex-col sm:flex-row gap-4 sm:min-w-max'>
+                  <div className='pb-2 mt-6 overflow-x-auto'>
+                    <div className='flex flex-col gap-4 sm:flex-row sm:min-w-max'>
                       {groupedMatches.map((round) => (
                         <div key={round.roundIndex} className='w-full sm:min-w-[290px] rounded-2xl border border-[#C98958]/15 bg-black/25 p-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.03)]'>
                           <div className='mb-4'>
@@ -469,7 +469,7 @@ function TournamentPage() {
                         <div className='rounded-2xl border border-[#C98958]/20 bg-black/25 p-4'>
                           <p className='text-xs uppercase tracking-[0.2em] text-white/45'>Progress</p>
                           <p className='mt-1 text-sm text-white/70'>Current round unlocked: {myProgress.currentRound + 1}</p>
-                          <div className='mt-3 flex flex-wrap gap-2'>
+                          <div className='flex flex-wrap gap-2 mt-3'>
                             {myProgress.slotSelections.map((selection) => (
                               <Badge key={`${selection.roundIndex}-${selection.slotId}`} className='bg-[#930203]/35 text-[#E7AC78] border border-[#C98958]/20'>
                                 R{selection.roundIndex + 1}: {selection.slotName}
@@ -484,7 +484,7 @@ function TournamentPage() {
                             {currentSelection ? (
                               <div className='mt-3 overflow-hidden rounded-2xl border border-[#C98958]/20 bg-[#100705]'>
                                 {currentSelection.image && (
-                                  <img src={currentSelection.image} alt={currentSelection.slotName} className='h-40 w-full object-cover' />
+                                  <img src={currentSelection.image} alt={currentSelection.slotName} className='object-cover w-full h-40' />
                                 )}
                                 <div className='p-4'>
                                   <div className='flex items-center justify-between gap-3'>
@@ -517,9 +517,9 @@ function TournamentPage() {
                                         className='flex w-full gap-3 rounded-2xl border border-[#C98958]/15 bg-black/25 p-3 text-left transition hover:border-[#C98958]'
                                       >
                                         {slot.image && (
-                                          <img src={slot.image} alt={slot.slotName} className='h-16 w-16 rounded-xl object-cover' />
+                                          <img src={slot.image} alt={slot.slotName} className='object-cover w-16 h-16 rounded-xl' />
                                         )}
-                                        <div className='min-w-0 flex-1'>
+                                        <div className='flex-1 min-w-0'>
                                           <p className='font-semibold text-white'>{slot.slotName}</p>
                                           <p className='text-sm text-white/50'>{slot.provider || "Unknown provider"}</p>
                                         </div>
@@ -594,7 +594,7 @@ function TournamentPage() {
 
                   <div className='rounded-3xl border border-[#C98958]/20 bg-[#120b0a]/80 p-5 shadow-lg shadow-black/30'>
                     <h2 className='text-xl font-bold text-white'>Tournament Status</h2>
-                    <div className='mt-4 grid gap-3 sm:grid-cols-2'>
+                    <div className='grid gap-3 mt-4 sm:grid-cols-2'>
                       <InfoTile label='Players' value={`${state.players.length}/${state.tournament?.playerLimit || 0}`} />
                       <InfoTile label='Rounds' value={state.totalRounds || 0} />
                       <InfoTile label='Prize Pool' value={Number(state.tournament?.prizePool || 0).toLocaleString()} />
@@ -736,7 +736,7 @@ function TournamentPage() {
 
 function HeroStat({ label, value }: { label: string; value: React.ReactNode }) {
   return (
-    <div className='rounded-2xl border border-white/10 bg-black/20 px-4 py-3 shadow-inner shadow-black/20 backdrop-blur-sm'>
+    <div className='px-4 py-3 border shadow-inner rounded-2xl border-white/10 bg-black/20 shadow-black/20 backdrop-blur-sm'>
       <p className='text-[0.65rem] font-semibold uppercase tracking-[0.35em] text-white/45'>{label}</p>
       <div className='mt-2 text-lg font-bold text-white'>{value}</div>
     </div>
@@ -757,22 +757,22 @@ function ParticipantRow({
   return (
     <div className={`rounded-xl border px-3 py-2 ${winner ? "border-[#C98958] bg-[#930203]/25" : "border-[#C98958]/10 bg-black/25"}`}>
       <div className='flex items-center justify-between gap-3'>
-        <div className='min-w-0 flex items-center gap-3'>
+        <div className='flex items-center min-w-0 gap-3'>
           {selection?.image && (
             <img
               src={selection.image}
               alt={selection.slotName || `${player?.username || 'slot'} image`}
-              className='h-10 w-10 rounded-md object-cover flex-shrink-0'
+              className='flex-shrink-0 object-cover w-10 h-10 rounded-md'
             />
           )}
           <div className='min-w-0'>
             <p className='text-[0.65rem] uppercase tracking-[0.25em] text-white/40'>{label}</p>
-            <p className='truncate text-sm font-semibold text-white'>{player?.username || "TBD"}</p>
+            <p className='text-sm font-semibold text-white truncate'>{player?.username || "TBD"}</p>
           </div>
         </div>
         {winner && <Badge className='bg-[#C98958] text-white'>Winner</Badge>}
       </div>
-      <div className='mt-2 flex flex-wrap items-center gap-2 text-xs text-white/50'>
+      <div className='flex flex-wrap items-center gap-2 mt-2 text-xs text-white/50'>
         <span>Seed #{player?.position || "—"}</span>
         <span>•</span>
         <span className='truncate max-w-[180px]'>{selection?.slotName || "No slot selected yet"}</span>

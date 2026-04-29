@@ -19,6 +19,9 @@ export default function BethogMonthlyAdmin() {
   const [wagering, setWagering] = useState(0);
   const [entries, setEntries] = useState<MonthlyEntryItem[]>([]);
   const [prizesInput, setPrizesInput] = useState("");
+  const [csvFileName, setCsvFileName] = useState("");
+  const [isImporting, setIsImporting] = useState(false);
+  const [importMessage, setImportMessage] = useState("");
 
   const prizeValues = useMemo(
     () =>
@@ -77,6 +80,46 @@ export default function BethogMonthlyAdmin() {
       body: JSON.stringify({ prizes: prizeValues }),
     });
     load();
+  };
+
+  const importCsv = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+
+    const input = e.currentTarget.elements.namedItem("csvFile") as HTMLInputElement | null;
+    const file = input?.files?.[0];
+
+    if (!file) {
+      setImportMessage("Choose a CSV file first.");
+      return;
+    }
+
+    setIsImporting(true);
+    setImportMessage("");
+
+    try {
+      const csvText = await file.text();
+      const res = await fetch(`${API_BASE}/api/monthly-leaderboard/${month}/import-csv`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ csvText }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(data?.error || "Failed to import CSV");
+      }
+
+      setCsvFileName(file.name);
+      setImportMessage(`Imported ${data.imported || 0} leaderboard rows from CSV.`);
+
+      if (input) input.value = "";
+      load();
+    } catch (error) {
+      setImportMessage(error instanceof Error ? error.message : "Failed to import CSV.");
+    } finally {
+      setIsImporting(false);
+    }
   };
 
   return (
@@ -138,6 +181,28 @@ export default function BethogMonthlyAdmin() {
                   </div>
                   <button className="w-full rounded-xl bg-[#C98958] px-4 py-3 font-semibold text-white transition hover:bg-[#930203]" type="submit">
                     Add Entry
+                  </button>
+                </form>
+
+                <form onSubmit={importCsv} className="rounded-3xl border border-[#C98958]/20 bg-[#120b0a]/80 p-5 shadow-lg shadow-black/30 space-y-4">
+                  <h3 className="text-lg font-bold text-white">Import CSV</h3>
+                  <p className="text-sm text-white/50">
+                    Upload a CSV with columns like <span className="text-[#E7AC78]">ID, Username, Campaign, Wager Amount ($)</span>. Only Username and Wager Amount will be used.
+                  </p>
+                  <input
+                    name="csvFile"
+                    type="file"
+                    accept=".csv,text/csv"
+                    className="w-full rounded-xl border border-[#C98958]/30 bg-black/60 px-4 py-3 text-sm text-white file:mr-4 file:rounded-lg file:border-0 file:bg-[#C98958] file:px-3 file:py-2 file:text-sm file:font-semibold file:text-white hover:file:bg-[#930203]"
+                  />
+                  {csvFileName && <p className="text-xs text-white/45">Last file: {csvFileName}</p>}
+                  {importMessage && <p className="text-sm text-[#E7AC78]">{importMessage}</p>}
+                  <button
+                    className="w-full rounded-xl bg-[#930203] px-4 py-3 font-semibold text-white transition hover:bg-[#C98958] disabled:cursor-not-allowed disabled:opacity-60"
+                    type="submit"
+                    disabled={isImporting}
+                  >
+                    {isImporting ? "Importing..." : "Import CSV to Month"}
                   </button>
                 </form>
 
