@@ -1,6 +1,8 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { API_BASE } from "@/lib/api";
 
+/* ───────── TYPES ───────── */
+
 type TournamentStatus = "upcoming" | "ongoing" | "finished";
 
 interface TournamentSummary {
@@ -14,19 +16,13 @@ interface TournamentSummary {
 
 interface SlotSelection {
   roundIndex: number;
-  slotId: string;
   slotName: string;
   provider?: string;
-  image?: string;
-  url?: string;
 }
 
 interface TournamentPlayer {
   _id: string;
   username: string;
-  position: number;
-  currentRound: number;
-  status: "active" | "eliminated" | "winner";
   slotSelections: SlotSelection[];
 }
 
@@ -59,203 +55,227 @@ const EMPTY_STATE: TournamentState = {
   totalRounds: 0,
 };
 
-const formatMultiplier = (value: number | null) =>
-  value === null || Number.isNaN(Number(value)) ? "—" : Number(value).toFixed(2);
+const formatMultiplier = (v: number | null) =>
+  v == null ? "—" : `${Number(v).toFixed(2)}x`;
+
+/* ───────── MAIN ───────── */
 
 export default function TournamentWidgetPage() {
   const [state, setState] = useState<TournamentState>(EMPTY_STATE);
 
-  const loadState = useCallback(async () => {
+  const load = useCallback(async () => {
     try {
-      const response = await fetch(`${API_BASE}/api/tournaments/current`);
-      const data = await response.json();
+      const res = await fetch(`${API_BASE}/api/tournaments/current`);
+      const data = await res.json();
       setState({ ...EMPTY_STATE, ...data });
-    } catch (error) {
-      console.error("Tournament widget load failed:", error);
+    } catch (e) {
+      console.error(e);
     }
   }, []);
 
   useEffect(() => {
-    loadState();
-    const interval = window.setInterval(loadState, 5000);
-    return () => window.clearInterval(interval);
-  }, [loadState]);
+    load();
+    const i = setInterval(load, 5000);
+    return () => clearInterval(i);
+  }, []);
 
-  const groupedMatches = useMemo(() => {
+  /* ───────── GROUP ROUNDS ───────── */
+
+  const rounds = useMemo(() => {
     const grouped: Record<number, TournamentMatch[]> = {};
-    state.matches.forEach((match) => {
-      if (!grouped[match.roundIndex]) grouped[match.roundIndex] = [];
-      grouped[match.roundIndex].push(match);
+
+    state.matches.forEach((m) => {
+      if (!grouped[m.roundIndex]) grouped[m.roundIndex] = [];
+      grouped[m.roundIndex].push(m);
     });
 
     return Object.entries(grouped)
-      .map(([roundIndex, matches]) => ({
-        roundIndex: Number(roundIndex),
-        roundLabel: matches[0]?.roundLabel || `Round ${Number(roundIndex) + 1}`,
-        matches: [...matches].sort((a, b) => a.matchIndex - b.matchIndex),
+      .map(([i, matches]) => ({
+        roundIndex: Number(i),
+        roundLabel: matches[0]?.roundLabel || `Round ${Number(i) + 1}`,
+        matches: matches.sort((a, b) => a.matchIndex - b.matchIndex),
       }))
       .sort((a, b) => a.roundIndex - b.roundIndex);
   }, [state.matches]);
 
   const tournament = state.tournament;
-  const currentStatus = tournament?.status || "upcoming";
-  const completedMatches = state.matches.filter((match) => match.status === "completed").length;
+  const completedMatches = state.matches.filter((m) => m.status === "completed").length;
 
   return (
-    <div className='relative min-h-screen overflow-hidden bg-[#090302] text-white'>
-      <div className='pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_left,_rgba(201,137,88,0.18),_transparent_35%),radial-gradient(circle_at_top_right,_rgba(147,2,3,0.22),_transparent_30%),linear-gradient(180deg,_rgba(15,6,4,0.96),_rgba(9,3,2,0.98))]' />
-      <div className='pointer-events-none absolute inset-0 opacity-[0.18] mix-blend-screen [background-image:linear-gradient(rgba(255,255,255,0.04)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.04)_1px,transparent_1px)] [background-size:48px_48px]' />
+    <div className="w-full h-screen overflow-hidden bg-gradient-to-br from-[#050505] to-[#0B0B0B] text-white flex flex-col p-3">
 
-      <main className='relative z-10 mx-auto flex min-h-screen w-full max-w-[1920px] flex-col px-6 py-6 xl:px-10'>
-        <header className='flex flex-col gap-4 rounded-[2rem] border border-[#C98958]/20 bg-black/35 px-6 py-5 shadow-2xl shadow-black/40 backdrop-blur-md xl:flex-row xl:items-end xl:justify-between'>
-          <div>
-            <p className='text-xs font-semibold uppercase tracking-[0.4em] text-white/45'>Live OBS Widget</p>
-            <h1 className='mt-2 text-3xl font-black tracking-tight text-white sm:text-5xl'>Tournament Brackets</h1>
-            <p className='mt-2 max-w-3xl text-sm text-white/65 sm:text-base'>
-              Stream-safe bracket view with live match status, winners, and slot selections.
-            </p>
-          </div>
-
-          <div className='grid gap-3 sm:grid-cols-3 xl:grid-cols-1'>
-            <StatPill label='Status' value={currentStatus} />
-            <StatPill label='Players' value={`${state.players.length}/${tournament?.playerLimit || 0}`} />
-            <StatPill label='Completed Matches' value={`${completedMatches}/${state.matches.length}`} />
-          </div>
-        </header>
-
-        <section className='mt-6 grid gap-4 sm:grid-cols-2 xl:grid-cols-4'>
-          <MetricCard label='Prize Pool' value={`$${Number(tournament?.prizePool || 0).toLocaleString()}`} />
-          <MetricCard label='Current Round' value={tournament ? `${tournament.currentRound + 1}` : "—"} />
-          <MetricCard label='Free Spots' value={`${state.availablePositions.length}`} />
-          <MetricCard label='Total Rounds' value={`${state.totalRounds || 0}`} />
-        </section>
-
-        <section className='mt-6 flex-1 overflow-hidden rounded-[2rem] border border-[#C98958]/20 bg-[#120b0a]/80 p-5 shadow-2xl shadow-black/40 backdrop-blur-md'>
-          {groupedMatches.length > 0 ? (
-            <div className='grid gap-4 xl:grid-cols-[repeat(auto-fit,minmax(280px,1fr))]'>
-              {groupedMatches.map((round) => (
-                <article key={round.roundIndex} className='rounded-3xl border border-[#C98958]/15 bg-black/25 p-4'>
-                  <div className='mb-4 flex items-end justify-between gap-3'>
-                    <div>
-                      <p className='text-xs uppercase tracking-[0.35em] text-white/40'>Round {round.roundIndex + 1}</p>
-                      <h2 className='mt-1 text-xl font-bold text-[#E7AC78]'>{round.roundLabel}</h2>
-                    </div>
-                    <span className='rounded-full border border-[#C98958]/20 bg-[#930203]/25 px-3 py-1 text-xs font-semibold text-[#E7AC78]'>
-                      {round.matches.length} matches
-                    </span>
-                  </div>
-
-                  <div className='space-y-3'>
-                    {round.matches.map((match) => {
-                      const selectionA = match.playerA?.slotSelections?.find((selection) => selection.roundIndex === match.roundIndex);
-                      const selectionB = match.playerB?.slotSelections?.find((selection) => selection.roundIndex === match.roundIndex);
-                      const winnerId = match.winner?._id;
-
-                      return (
-                        <div key={match._id} className='rounded-2xl border border-[#C98958]/15 bg-[#100705]/90 p-4'>
-                          <div className='flex items-center justify-between gap-3'>
-                            <div>
-                              <p className='text-[0.65rem] uppercase tracking-[0.3em] text-white/40'>Match {match.matchIndex + 1}</p>
-                            </div>
-                            <MatchPill status={match.status} />
-                          </div>
-
-                          <div className='mt-3 space-y-2'>
-                            <MatchLine
-                              side='A'
-                              playerName={match.playerA?.username}
-                              slotName={selectionA?.slotName}
-                              provider={selectionA?.provider}
-                              winner={winnerId === match.playerA?._id}
-                              score={match.multiplierA}
-                            />
-                            <MatchLine
-                              side='B'
-                              playerName={match.playerB?.username}
-                              slotName={selectionB?.slotName}
-                              provider={selectionB?.provider}
-                              winner={winnerId === match.playerB?._id}
-                              score={match.multiplierB}
-                            />
-                          </div>
-                        </div>
-                      );
-                    })}
-                  </div>
-                </article>
-              ))}
-            </div>
-          ) : (
-            <div className='flex min-h-[320px] items-center justify-center rounded-3xl border border-dashed border-[#C98958]/20 bg-black/20 p-8 text-center text-white/55'>
-              No tournament bracket is available yet.
-            </div>
-          )}
-        </section>
-      </main>
-    </div>
-  );
-}
-
-function StatPill({ label, value }: { label: string; value: string }) {
-  return (
-    <div className='rounded-2xl border border-[#C98958]/15 bg-black/30 px-4 py-3'>
-      <p className='text-[0.6rem] uppercase tracking-[0.35em] text-white/40'>{label}</p>
-      <p className='mt-1 text-lg font-bold text-[#E7AC78]'>{value}</p>
-    </div>
-  );
-}
-
-function MetricCard({ label, value }: { label: string; value: string }) {
-  return (
-    <div className='rounded-3xl border border-[#C98958]/15 bg-black/25 px-4 py-4 shadow-lg shadow-black/20'>
-      <p className='text-xs uppercase tracking-[0.3em] text-white/40'>{label}</p>
-      <p className='mt-2 text-2xl font-black text-white'>{value}</p>
-    </div>
-  );
-}
-
-function MatchPill({ status }: { status: TournamentMatch["status"] }) {
-  const label = status === "completed" ? "Completed" : status === "ready" ? "Ready" : "Waiting";
-  const className =
-    status === "completed"
-      ? "bg-[#C98958] text-white"
-      : status === "ready"
-        ? "bg-green-600 text-white"
-        : "bg-[#2c2f48] text-white/70";
-
-  return <span className={`rounded-full px-3 py-1 text-xs font-semibold ${className}`}>{label}</span>;
-}
-
-function MatchLine({
-  side,
-  playerName,
-  slotName,
-  provider,
-  winner,
-  score,
-}: {
-  side: "A" | "B";
-  playerName?: string;
-  slotName?: string;
-  provider?: string;
-  winner?: boolean;
-  score: number | null;
-}) {
-  return (
-    <div className={`rounded-xl border px-3 py-2 ${winner ? "border-[#C98958] bg-[#930203]/25" : "border-[#C98958]/10 bg-black/25"}`}>
-      <div className='flex items-center justify-between gap-3'>
+      {/* HEADER */}
+      <div className="flex items-center justify-between pb-2 mb-3 border-b border-white/10">
         <div>
-          <p className='text-[0.65rem] uppercase tracking-[0.3em] text-white/40'>
-            {side}: {playerName || "Bye (auto x0)"}
+          <h1 className="text-xl font-black text-[#E7AC78] tracking-wide">
+            TOURNAMENT BRACKET
+          </h1>
+          <p className="text-[10px] text-white/40">
+            OBS Live View
           </p>
-          <p className='mt-1 text-sm font-semibold text-white'>{slotName || "No slot selected yet"}</p>
-          <p className='text-xs text-white/45'>{provider || ""}</p>
         </div>
-        <div className='text-right'>
-          <p className='text-[0.65rem] uppercase tracking-[0.3em] text-white/40'>Multiplier</p>
-          <p className='mt-1 text-lg font-black text-[#E7AC78]'>{formatMultiplier(score)}x</p>
+
+        <div className="flex gap-2">
+          <Stat label="Status" value={tournament?.status || "—"} />
+          <Stat label="Players" value={`${state.players.length}/${tournament?.playerLimit || 0}`} />
+          <Stat label="Done" value={`${completedMatches}/${state.matches.length}`} />
         </div>
       </div>
+
+      {/* METRICS */}
+      <div className="grid grid-cols-4 gap-2 mb-3">
+        <Metric label="Prize" value={`$${tournament?.prizePool || 0}`} />
+        <Metric label="Round" value={`${(tournament?.currentRound ?? 0) + 1}`} />
+        <Metric label="Spots" value={`${state.availablePositions.length}`} />
+        <Metric label="Rounds" value={`${state.totalRounds}`} />
+      </div>
+
+      {/* BRACKET (NO SCROLL) */}
+      <div className="flex items-center justify-center flex-1">
+
+        <div
+          className="grid w-full h-full gap-3"
+          style={{
+            gridTemplateColumns: `repeat(${rounds.length}, minmax(0, 1fr))`,
+          }}
+        >
+
+          {rounds.map((round) => (
+            <div key={round.roundIndex} className="flex flex-col items-center justify-center">
+
+              {/* ROUND TITLE */}
+              <div className="mb-2 text-center">
+                <p className="text-[9px] text-white/40 tracking-widest">
+                  ROUND {round.roundIndex + 1}
+                </p>
+                <h2 className="text-xs font-bold text-[#E7AC78]">
+                  {round.roundLabel}
+                </h2>
+              </div>
+
+              {/* MATCHES */}
+              <div
+                className="flex flex-col justify-center w-full gap-3"
+                style={{ marginTop: round.roundIndex * 20 }}
+              >
+                {round.matches.map((match) => {
+                  const selectionA = match.playerA?.slotSelections?.find(
+                    (s) => s.roundIndex === match.roundIndex
+                  );
+                  const selectionB = match.playerB?.slotSelections?.find(
+                    (s) => s.roundIndex === match.roundIndex
+                  );
+
+                  const winnerId = match.winner?._id;
+                  const isLive = match.status === "ready";
+
+                  return (
+                    <div
+                      key={match._id}
+                      className={`rounded-lg p-2 w-full transition-all ${
+                        isLive
+                          ? "border border-green-500 shadow-[0_0_8px_rgba(34,197,94,0.5)] bg-[#0E0605]"
+                          : "border border-[#C98958]/20 bg-[#0E0605]"
+                      }`}
+                    >
+                      <div className="flex justify-between text-[9px] text-white/40 mb-1">
+                        <span>M{match.matchIndex + 1}</span>
+                        <MatchStatus status={match.status} />
+                      </div>
+
+                      <PlayerCard
+                        name={match.playerA?.username}
+                        slot={selectionA?.slotName}
+                        provider={selectionA?.provider}
+                        score={match.multiplierA}
+                        winner={winnerId === match.playerA?._id}
+                      />
+
+                      <div className="text-center text-[8px] text-[#C98958]/70 my-1">
+                        VS
+                      </div>
+
+                      <PlayerCard
+                        name={match.playerB?.username}
+                        slot={selectionB?.slotName}
+                        provider={selectionB?.provider}
+                        score={match.multiplierB}
+                        winner={winnerId === match.playerB?._id}
+                      />
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          ))}
+
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ───────── COMPONENTS ───────── */
+
+function PlayerCard({ name, slot, provider, score, winner }: any) {
+  const isBye = !name;
+
+  return (
+    <div
+      className={`p-2 rounded border ${
+        isBye
+          ? "border-white/5 bg-black/10 opacity-40"
+          : winner
+          ? "border-[#E7AC78] bg-[#C98958]/20 shadow-[0_0_6px_rgba(231,172,120,0.4)]"
+          : "border-white/10 bg-black/30"
+      }`}
+    >
+      <div className="flex justify-between">
+        <div>
+          <p className="text-xs font-semibold">{name || "BYE"}</p>
+          <p className="text-[9px] text-white/40">{slot || "No slot"}</p>
+          <p className="text-[8px] text-white/30">{provider || ""}</p>
+        </div>
+
+        <div className="text-right">
+          <p className="text-[8px] text-white/40">X</p>
+          <p className="text-sm text-[#E7AC78] font-bold">
+            {formatMultiplier(score)}
+          </p>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function MatchStatus({ status }: { status: string }) {
+  const map: any = {
+    completed: "bg-[#C98958]",
+    ready: "bg-green-500",
+    waiting: "bg-gray-600",
+  };
+
+  return (
+    <span className={`px-2 py-0.5 rounded text-[8px] ${map[status]}`}>
+      {status}
+    </span>
+  );
+}
+
+function Stat({ label, value }: any) {
+  return (
+    <div className="px-2 py-1 border rounded bg-white/5 border-white/10">
+      <p className="text-[8px] text-white/40">{label}</p>
+      <p className="text-[10px] font-bold text-[#E7AC78]">{value}</p>
+    </div>
+  );
+}
+
+function Metric({ label, value }: any) {
+  return (
+    <div className="p-2 border rounded bg-black/30 border-white/10">
+      <p className="text-[8px] text-white/40">{label}</p>
+      <p className="text-sm font-bold">{value}</p>
     </div>
   );
 }
