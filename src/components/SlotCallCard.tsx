@@ -11,6 +11,8 @@ interface SlotCallProps {
 	timestamp: string;
 	status: SlotCallStatus;
 	x250Hit?: boolean;
+	imageUrl?: string;
+	site?: string;
 	bonusCall?: { name: string; createdAt: string };
 	onAccept?: (id: string, x250Hit: boolean) => void;
 	onReject?: (id: string) => void;
@@ -29,6 +31,8 @@ export function SlotCallCard({
 	timestamp,
 	status,
 	x250Hit,
+	imageUrl,
+	site,
 	bonusCall,
 	onAccept,
 	onReject,
@@ -44,15 +48,42 @@ export function SlotCallCard({
 
 	return (
 		<div className='flex flex-col p-4 rounded-lg glass-card bg-[#0F0604] border border-[#C98958] text-[#E7AC78]'>
+			{/* Image */}
+			{imageUrl && (
+				<div className='mb-3 rounded-lg overflow-hidden'>
+					<img
+						src={imageUrl}
+						alt={slotName}
+						className='w-full h-32 object-cover'
+						onError={(e) => {
+							e.currentTarget.style.display = "none";
+						}}
+					/>
+				</div>
+			)}
+
 			{/* Header */}
 			<div className='flex items-start justify-between'>
-				<h3 className='text-lg font-bold'>{slotName}</h3>
+				<div className='flex-1'>
+					<h3 className='text-lg font-bold'>{slotName}</h3>
+				</div>
 				<StatusBadge status={status} />
 			</div>
 
 			{/* Requester */}
-			<div className='mt-2 text-sm text-[#C98958]'>
-				Requested by: <span className='text-[#E7AC78]'>{requester}</span>
+			<div className='mt-2 text-sm text-[#C98958] flex items-center gap-3'>
+				<div>
+					Requested by: <span className='text-[#E7AC78]'>{requester}</span>
+				</div>
+				{/* Quick indicators: expected points and 250x badge */}
+				<div className='ml-auto flex items-center gap-2'>
+					<span className='text-xs px-2 py-0.5 rounded-full bg-black/60 border border-[#C98958]'>+8 pts</span>
+					{ x250Hit && (
+						<span className='text-xs px-2 py-0.5 rounded-full bg-yellow-600/20 border border-yellow-500 text-yellow-300 flex items-center gap-1'>
+							<span className='font-bold'>250x</span>
+						</span>
+					)}
+				</div>
 			</div>
 
 			{/* Time */}

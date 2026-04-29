@@ -9,6 +9,7 @@ import { Input } from "@/components/ui/input";
 import { useAuthStore } from "@/store/useAuthStore";
 import { useToast } from "@/hooks/use-toast";
 import { Badge } from "@/components/ui/badge";
+import tournamentApi from "@/lib/tournamentApi";
 
 type TournamentStatus = "upcoming" | "ongoing" | "finished";
 
@@ -105,6 +106,7 @@ function TournamentPage() {
   const [myProgress, setMyProgress] = useState<TournamentPlayer | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isJoining, setIsJoining] = useState(false);
+  const [isStarting, setIsStarting] = useState(false);
   const [selectedPosition, setSelectedPosition] = useState<number | null>(null);
   const [slotQuery, setSlotQuery] = useState("");
   const [slotResults, setSlotResults] = useState<SlotSearchResult[]>([]);
@@ -114,6 +116,7 @@ function TournamentPage() {
   const [createPrizePool, setCreatePrizePool] = useState("0");
   const [isCreating, setIsCreating] = useState(false);
   const [matchInputs, setMatchInputs] = useState<Record<string, MatchInputState>>({});
+  const [deletingParticipantId, setDeletingParticipantId] = useState<string | null>(null);
 
   const isAdmin = user?.role === "admin";
   const currentRoundToPick = myProgress?.currentRound ?? null;
@@ -254,6 +257,37 @@ function TournamentPage() {
     }
   };
 
+  const startTournament = async () => {
+    if (!token || !state.tournament?._id) return;
+
+    setIsStarting(true);
+    try {
+      const res = await fetch(`${API_BASE}/api/tournaments/${state.tournament._id}/start`, {
+        method: "POST",
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      if (!res.ok) {
+        const errorData = await res.json();
+        throw new Error(errorData.message || "Failed to start tournament");
+      }
+
+      toast({
+        title: "Tournament started",
+        description: "The tournament is now live even if not every slot is filled.",
+      });
+      await loadState();
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: error instanceof Error ? error.message : "Failed to start tournament.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsStarting(false);
+    }
+  };
+
   const joinTournament = async () => {
     if (!token || !state.tournament?._id || !selectedPosition) {
       toast({
@@ -371,7 +405,30 @@ function TournamentPage() {
       });
     }
   };
+  const deleteParticipant = async (participantId: string) => {
+    if (!token || !state.tournament?._id) return;
+    if (!confirm("Are you sure you want to remove this participant from the tournament?")) return;
 
+    setDeletingParticipantId(participantId);
+    try {
+      const result = await tournamentApi.removeParticipant(state.tournament._id, participantId, token);
+      if (result.state) {
+        setState(result.state);
+      }
+      toast({ title: "Participant removed", description: "User has been removed from the tournament." });
+      await loadState();
+    } catch (error) {
+      console.error(error);
+      const errorMessage = error instanceof Error ? error.message : "Failed to remove participant.";
+      toast({
+        title: "Error",
+        description: errorMessage,
+        variant: "destructive",
+      });
+    } finally {
+      setDeletingParticipantId(null);
+    }
+  };
   return (
     <div className='relative flex flex-col min-h-screen overflow-hidden text-white'>
       <GraphicalBackground />
@@ -613,6 +670,18 @@ function TournamentPage() {
                       <InfoTile label='Prize Pool' value={Number(state.tournament?.prizePool || 0).toLocaleString()} />
                       <InfoTile label='Your Seed' value={myProgress?.position ? `#${myProgress.position}` : "—"} />
                     </div>
+                    {isAdmin && state.tournament?.status === "upcoming" && (
+                      <div className='mt-4 rounded-2xl border border-[#C98958]/15 bg-black/25 p-4'>
+                        <p className='text-sm text-white/55'>Start the tournament early even if not all spots are filled.</p>
+                        <Button
+                          onClick={startTournament}
+                          disabled={isStarting}
+                          className='mt-3 w-full bg-[#C98958] text-white hover:bg-[#930203]'
+                        >
+                          {isStarting ? "Starting..." : "Start Tournament"}
+                        </Button>
+                      </div>
+                    )}
                     {winner && (
                       <div className='mt-4 rounded-2xl border border-[#C98958]/20 bg-black/25 p-4'>
                         <p className='text-xs uppercase tracking-[0.2em] text-white/45'>Winner</p>
@@ -777,6 +846,43 @@ function TournamentPage() {
                           </div>
                         );
                       })}
+                    </div>
+                  </div>
+                )}
+
+                {isAdmin && state.tournament && (
+                  <div className='rounded-3xl border border-[#C98958]/20 bg-[#120b0a]/80 p-5 shadow-lg shadow-black/30'>
+                    <h2 className='text-xl font-bold text-white'>Manage Participants</h2>
+                    <p className='mt-2 text-sm text-white/50'>Remove players from the tournament.</p>
+
+                    <div className='mt-4 space-y-2 max-h-[400px] overflow-y-auto pr-1'>
+                      {state.players.length === 0 ? (
+                        <p className='text-sm text-white/45'>No participants yet.</p>
+                      ) : (
+                        state.players.map((player) => (
+                          <div
+                            key={player._id}
+                            className='flex items-center justify-between rounded-2xl border border-[#C98958]/15 bg-black/25 px-3 py-2'
+                          >
+                            <div className='flex-1 min-w-0'>
+                              <p className='text-sm font-semibold text-white truncate'>
+                                {player.username} <span className='text-white/50'>#{player.position}</span>
+                              </p>
+                              <p className='text-xs text-white/40'>
+                                Status: {player.status} | Round: {player.currentRound}
+                              </p>
+                            </div>
+                            <Button
+                              onClick={() => deleteParticipant(player._id)}
+                              disabled={deletingParticipantId === player._id}
+                              variant='destructive'
+                              className='ml-2 text-xs'
+                            >
+                              {deletingParticipantId === player._id ? 'Removing...' : 'Remove'}
+                            </Button>
+                          </div>
+                        ))
+                      )}
                     </div>
                   </div>
                 )}

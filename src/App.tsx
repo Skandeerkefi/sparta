@@ -20,6 +20,11 @@ import BethogMonthly from "./pages/BethogMonthly";
 import BethogMonthlyAdmin from "./pages/BethogMonthlyAdmin";
 import TournamentPage from "./pages/TournamentPage";
 import BonusHuntAdminPage from "./pages/BonusHuntAdminPage";
+import PointsDashboard from './pages/PointsDashboard';
+import PointsStore from './pages/PointsStore';
+import AdminRedemptions from './pages/AdminRedemptions';
+import AdminStorePage from './pages/AdminStorePage';
+import PointsLeaderboardPage from './pages/PointsLeaderboardPage';
 function App() {
 	const loadFromStorage = useAuthStore((state) => state.loadFromStorage);
 	const user = useAuthStore((state) => state.user);
@@ -60,6 +65,11 @@ function App() {
 					<Route path='/bethog-monthly/admin' element={<BethogMonthlyAdmin />} />
 					<Route path='/tournament' element={<TournamentPage />} />
 					<Route path='/tournaments' element={<TournamentPage />} />
+					<Route path='/points' element={<PointsDashboard />} />
+					<Route path='/store' element={<PointsStore />} />
+					<Route path='/admin/store' element={<AdminStorePage />} />
+					<Route path='/admin/redemptions' element={<AdminRedemptions />} />
+					<Route path='/admin/points-leaderboard' element={<PointsLeaderboardPage />} />
 				</Routes>
 			</BrowserRouter>
 			<Toaster />

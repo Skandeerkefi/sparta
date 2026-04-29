@@ -20,6 +20,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useAuthStore } from "@/store/useAuthStore";
 import { useDebounce } from "@/hooks/use-debounce";
 import GraphicalBackground from "@/components/GraphicalBackground";
+import { searchSlots, SlotSearchResult } from "@/lib/bonushuntApi";
 
 type FilterStatus = "all" | "pending" | "accepted" | "rejected" | "played";
 
@@ -53,11 +54,18 @@ function SlotCallsPage() {
 
 	const [searchQuery, setSearchQuery] = useState("");
 	const [slotName, setSlotName] = useState("");
+	const [slotImageUrl, setSlotImageUrl] = useState("");
 	const [filter, setFilter] = useState<FilterStatus>("all");
 	const [showOnly250Hit, setShowOnly250Hit] = useState(false);
 	const [isLoading, setIsLoading] = useState(true);
+	const [searchResults, setSearchResults] = useState<SlotSearchResult[]>([]);
+	const [isSearching, setIsSearching] = useState(false);
+	const [showSearchResults, setShowSearchResults] = useState(false);
+	const [newSlotSearchQuery, setNewSlotSearchQuery] = useState("");
+	const [selectedSlot, setSelectedSlot] = useState<SlotSearchResult | null>(null);
 
 	const debouncedSearchQuery = useDebounce(searchQuery, 300);
+	const debouncedNewSlotSearch = useDebounce(newSlotSearchQuery, 500);
 	const isAdmin = user?.role === "admin";
 
 	useEffect(() => {
@@ -66,7 +74,35 @@ function SlotCallsPage() {
 		} else {
 			setIsLoading(false);
 		}
-	}, [token]);
+	}, [token, fetchSlotCalls]);
+
+	// Search for slots from bonushunt API
+	useEffect(() => {
+		if (debouncedNewSlotSearch.trim()) {
+			const performSearch = async () => {
+				setIsSearching(true);
+				try {
+					const results = await searchSlots(debouncedNewSlotSearch);
+					setSearchResults(results);
+					setShowSearchResults(true);
+				} catch (error) {
+					console.error("Search failed:", error);
+					toast({
+						title: "Search Failed",
+						description: "Could not search slots. Please try again.",
+						variant: "destructive",
+					});
+					setSearchResults([]);
+				} finally {
+					setIsSearching(false);
+				}
+			};
+			performSearch();
+		} else {
+			setSearchResults([]);
+			setShowSearchResults(false);
+		}
+	}, [debouncedNewSlotSearch, toast]);
 
 	const filteredSlotCalls = useMemo(() => {
 		return slotCalls.filter((call) => {
@@ -92,10 +128,15 @@ function SlotCallsPage() {
 			return;
 		}
 
-		const result = await addSlotCall(slotName.trim());
+		const result = await addSlotCall(slotName.trim(), slotImageUrl, "Stake");
 		if (result.success) {
 			toast({ title: "Submitted", description: "Slot call sent!" });
 			setSlotName("");
+			setSlotImageUrl("");
+			setNewSlotSearchQuery("");
+			setSelectedSlot(null);
+			setShowSearchResults(false);
+			setSearchResults([]);
 			await fetchSlotCalls();
 		} else {
 			toast({
@@ -104,6 +145,14 @@ function SlotCallsPage() {
 				variant: "destructive",
 			});
 		}
+	};
+
+	const handleSelectSlot = (slot: SlotSearchResult) => {
+		setSlotName(slot.name);
+		setSlotImageUrl(slot.image);
+		setSelectedSlot(slot);
+		setNewSlotSearchQuery(slot.name);
+		setShowSearchResults(false);
 	};
 
 	const handleAccept = async (id: string, newX250Value: boolean) => {
@@ -200,22 +249,115 @@ function SlotCallsPage() {
 								<Plus className='w-4 h-4' /> New Slot Call
 							</Button>
 						</DialogTrigger>
-						<DialogContent className='bg-[#0F0604] text-white border border-[#C98958]'>
+						<DialogContent className='bg-[#0F0604] text-white border border-[#C98958] max-w-2xl'>
 							<DialogHeader>
 								<DialogTitle>New Slot Call</DialogTitle>
 								<DialogDescription>
-									Submit a new slot call to the system.
+									Search and select a slot from bonushunt.gg
 								</DialogDescription>
 							</DialogHeader>
-							<div className='flex flex-col gap-2'>
+							<div className='flex flex-col gap-4'>
+								{/* Search Input */}
 								<Input
-									placeholder='Slot Name'
-									value={slotName}
-									onChange={(e) => setSlotName(e.target.value)}
-									disabled={isSubmitting}
+									placeholder='Search slot names...'
+									value={newSlotSearchQuery}
+									onChange={(e) => setNewSlotSearchQuery(e.target.value)}
+									disabled={isSearching}
 									className='bg-[#E7AC78] text-black border border-[#C98958]'
 								/>
+
+								{selectedSlot && (
+									<div className='rounded-2xl border border-[#C98958]/30 bg-black/30 p-3'>
+										<p className='mb-2 text-sm font-medium text-[#C98958]'>Selected slot call</p>
+										<div className='grid gap-4 md:grid-cols-[280px_minmax(0,1fr)] md:items-center'>
+											<div className='overflow-hidden rounded-xl border border-[#C98958]/20 bg-black/40'>
+												<img
+													src={selectedSlot.image}
+													alt={selectedSlot.name}
+													className='h-64 w-full object-contain p-3'
+												/>
+											</div>
+											<div className='space-y-1'>
+												<p className='text-2xl font-semibold text-white'>{selectedSlot.name}</p>
+												<p className='text-xs text-white/45'>
+													Click another result to replace it, or submit this selection.
+												</p>
+											</div>
+										</div>
+									</div>
+								)}
+
+								{/* Search Results */}
+								{showSearchResults && (
+									<div className='border-t border-[#C98958]/30 pt-3'>
+										{isSearching ? (
+											<div className='text-center text-[#C98958]/70 py-4'>
+												Searching...
+											</div>
+										) : searchResults.length === 0 ? (
+											<div className='text-center text-[#C98958]/70 py-4'>
+												No slots found
+											</div>
+										) : (
+											<div className='grid grid-cols-2 gap-2 max-h-96 overflow-y-auto'>
+												{searchResults.map((slot, idx) => (
+													<button
+														key={idx}
+														type='button'
+														onClick={() => handleSelectSlot(slot)}
+														className={`p-2 rounded border transition text-left ${
+															selectedSlot?.name === slot.name
+																? "border-[#E7AC78] bg-[#C98958]/15"
+																: "border-[#C98958]/30 hover:border-[#C98958] hover:bg-[#C98958]/10"
+														}`}
+													>
+														{slot.image && (
+															<img
+																src={slot.image}
+																alt={slot.name}
+															className='w-full h-32 object-contain rounded mb-1 bg-black/30 p-2'
+															/>
+														)}
+														<p className='text-sm font-medium truncate'>{slot.name}</p>
+													</button>
+												))}
+											</div>
+										)}
+									</div>
+								)}
+
+								{/* Selected Slot Preview */}
+								{slotName && (
+									<div className='border-t border-[#C98958]/30 pt-3'>
+										<p className='text-sm text-[#C98958] mb-2'>Selected Slot:</p>
+										<div className='flex gap-3'>
+											{slotImageUrl && (
+												<img
+													src={slotImageUrl}
+													alt={slotName}
+													className='w-16 h-16 object-cover rounded'
+												/>
+											)}
+											<div className='flex-1'>
+												<p className='font-semibold'>{slotName}</p>
+											</div>
+										</div>
+									</div>
+								)}
+
 								<DialogFooter>
+									<Button
+										variant='outline'
+										onClick={() => {
+											setSlotName("");
+											setSlotImageUrl("");
+											setNewSlotSearchQuery("");
+											setShowSearchResults(false);
+										}}
+										className='text-[#C98958] border-[#C98958]'
+									>
+										Clear
+									</Button>
 									<Button
 										onClick={handleSubmit}
 										disabled={isSubmitting || !slotName.trim()}
@@ -304,6 +446,8 @@ function SlotCallsPage() {
 								timestamp={call.timestamp}
 								status={call.status}
 								x250Hit={call.x250Hit}
+								imageUrl={call.imageUrl}
+								site={call.site}
 								bonusCall={call.bonusCall}
 								isAdminView={isAdmin}
 								isUserView={!isAdmin}

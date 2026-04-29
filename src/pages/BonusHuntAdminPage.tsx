@@ -62,6 +62,12 @@ interface BonusHuntView {
   stats: BonusHuntStats | null;
 }
 
+interface BonusHuntHistoryItem {
+  hunt: BonusHuntSummary;
+  games: BonusHuntGame[];
+  stats: BonusHuntStats;
+}
+
 interface SlotSearchResult {
   slotName: string;
   provider?: string;
@@ -95,6 +101,7 @@ function BonusHuntAdminPage() {
   const isAdmin = user?.role === "admin";
   const [view, setView] = useState<BonusHuntView>(emptyView);
   const [historyCount, setHistoryCount] = useState(0);
+  const [historyItems, setHistoryItems] = useState<BonusHuntHistoryItem[]>([]);
   const [isCreating, setIsCreating] = useState(false);
 
   const [title, setTitle] = useState("Bethog Bonus Hunt");
@@ -120,10 +127,11 @@ function BonusHuntAdminPage() {
       ]);
 
       const currentData = (await currentRes.json()) as BonusHuntView;
-      const historyData = (await historyRes.json()) as { history?: unknown[] };
+      const historyData = (await historyRes.json()) as { history?: BonusHuntHistoryItem[] };
 
       setView({ ...emptyView, ...currentData });
       setHistoryCount(historyData.history?.length || 0);
+      setHistoryItems(historyData.history || []);
 
       const nextInputs: Record<string, string> = {};
       (currentData.games || []).forEach((game) => {
@@ -362,6 +370,31 @@ function BonusHuntAdminPage() {
       toast({
         title: "Error",
         description: getErrorMessage(error, "Failed to delete game."),
+        variant: "destructive",
+      });
+    }
+  };
+
+  const deleteHunt = async (huntId: string) => {
+    if (!token || !confirm("Delete this bonus hunt and all its games?")) return;
+
+    try {
+      const response = await fetch(`${API_BASE}/api/bonus-hunts/${huntId}`, {
+        method: "DELETE",
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || "Failed to delete bonus hunt");
+      }
+
+      toast({ title: "Bonus hunt deleted", description: "The previous hunt was removed." });
+      await loadView();
+    } catch (error: unknown) {
+      toast({
+        title: "Error",
+        description: getErrorMessage(error, "Failed to delete bonus hunt."),
         variant: "destructive",
       });
     }
@@ -722,6 +755,32 @@ function BonusHuntAdminPage() {
                     <Link to='/bonus-hunt' className='mt-4 inline-flex text-sm font-semibold text-[#E7AC78] underline'>
                       View public history page
                     </Link>
+
+                    <div className='mt-5 space-y-3'>
+                      {historyItems.length > 0 ? (
+                        historyItems.map((item) => (
+                          <div key={item.hunt._id} className='rounded-2xl border border-[#C98958]/15 bg-black/25 p-4'>
+                            <div className='flex items-start justify-between gap-3'>
+                              <div>
+                                <p className='font-semibold text-white'>{item.hunt.title}</p>
+                                <p className='text-xs text-white/45'>
+                                  {item.hunt.status} • {item.stats.completedGames}/{item.stats.totalGames} games
+                                </p>
+                              </div>
+                              <Button
+                                type='button'
+                                onClick={() => deleteHunt(item.hunt._id)}
+                                className='bg-[#930203] text-white hover:bg-[#C98958]'
+                              >
+                                Delete
+                              </Button>
+                            </div>
+                          </div>
+                        ))
+                      ) : (
+                        <p className='mt-4 text-sm text-white/45'>No previous hunts to delete.</p>
+                      )}
+                    </div>
                   </CardContent>
                 </Card>
               </section>

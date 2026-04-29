@@ -18,6 +18,7 @@ function GiveawaysPage() {
 		enterGiveaway,
 		createGiveaway,
 		drawWinner,
+		deleteGiveaway,
 	} = useGiveawayStore();
 	const { user } = useAuthStore();
 	const { toast } = useToast();
@@ -69,6 +70,11 @@ function GiveawaysPage() {
 
 	const handleDrawWinner = async (id: string) => {
 		await drawWinner(id, toast);
+	};
+
+	const handleDeleteGiveaway = async (id: string) => {
+		if (!confirm("Delete this giveaway? This cannot be undone.")) return;
+		await deleteGiveaway(id, toast);
 	};
 
 	return (
@@ -184,6 +190,15 @@ function GiveawaysPage() {
 											Draw Winner
 										</Button>
 									)}
+								{user?.role === "admin" && (
+									<Button
+										onClick={() => handleDeleteGiveaway(giveaway._id)}
+										variant='destructive'
+										className='w-full mt-2 bg-[#930203] hover:bg-[#C98958] text-white'
+									>
+										Delete Giveaway
+									</Button>
+								)}
 							</div>
 						))}
 					</div>

@@ -16,6 +16,7 @@ import {
 } from "lucide-react";
 import useMediaQuery from "@/hooks/use-media-query";
 import { useAuthStore } from "@/store/useAuthStore";
+import pointsApi from '@/lib/pointsApi';
 
 export function Navbar() {
 	const location = useLocation();
@@ -25,16 +26,20 @@ export function Navbar() {
 	const [viewerCount, setViewerCount] = useState<number | null>(null);
 
 	const { user, logout } = useAuthStore();
+	const token = useAuthStore((s) => s.token);
+	const [pointsBalance, setPointsBalance] = useState<number | null>(null);
 	const sidebarWidth = "18rem";
 
 	const mainMenuItems = useMemo(
 		() => [
-			{ path: "/", name: "Home", icon: <Dices className='h-5 w-5' /> },
-			{ path: "/tournament", name: "Tournament", icon: <Trophy className='h-5 w-5' /> },
-			{ path: "/bonus-hunt", name: "Bonus Hunt", icon: <Flame className='h-5 w-5' /> },
-			{ path: "/bethog-monthly", name: "Bethog Monthly", icon: <CalendarRange className='h-5 w-5' /> },
-			{ path: "/slot-calls", name: "Slot Calls", icon: <Users className='h-5 w-5' /> },
-			{ path: "/giveaways", name: "Giveaways", icon: <Gift className='h-5 w-5' /> },
+			{ path: "/", name: "Home", icon: <Dices className='w-5 h-5' /> },
+			{ path: "/tournament", name: "Tournament", icon: <Trophy className='w-5 h-5' /> },
+			{ path: "/bonus-hunt", name: "Bonus Hunt", icon: <Flame className='w-5 h-5' /> },
+			{ path: "/bethog-monthly", name: "Bethog Monthly", icon: <CalendarRange className='w-5 h-5' /> },
+			{ path: "/slot-calls", name: "Slot Calls", icon: <Users className='w-5 h-5' /> },
+			{ path: "/giveaways", name: "Giveaways", icon: <Gift className='w-5 h-5' /> },
+			{ path: "/points", name: "Points", icon: <Trophy className='w-5 h-5' /> },
+			{ path: "/store", name: "Store", icon: <Gift className='w-5 h-5' /> },
 		],
 		[]
 	);
@@ -43,9 +48,12 @@ export function Navbar() {
 		() =>
 			user?.role === "admin"
 				? [
-					{ path: "/bethog-monthly/admin", name: "Bethog Admin", icon: <CalendarRange className='h-5 w-5' /> },
-					{ path: "/bonus-hunt/admin", name: "Bonus Hunt Admin", icon: <Flame className='h-5 w-5' /> },
-				]
+						{ path: "/bethog-monthly/admin", name: "Bethog Admin", icon: <CalendarRange className='w-5 h-5' /> },
+						{ path: "/bonus-hunt/admin", name: "Bonus Hunt Admin", icon: <Flame className='w-5 h-5' /> },
+						{ path: "/admin/store", name: "Store Manager", icon: <Gift className='w-5 h-5' /> },
+						{ path: "/admin/redemptions", name: "Redemptions", icon: <Gift className='w-5 h-5' /> },
+						{ path: "/admin/points-leaderboard", name: "Points Leaderboard", icon: <Trophy className='w-5 h-5' /> },
+					]
 				: [],
 		[ user?.role ]
 	);
@@ -95,11 +103,31 @@ export function Navbar() {
 		return () => clearInterval(interval);
 	}, []);
 
+	useEffect(() => {
+		let mounted = true;
+		const loadBalance = async () => {
+			if (!user?.id || !token) return setPointsBalance(null);
+			try {
+				const data = await pointsApi.getUserPoints(user.id, token);
+				if (mounted) setPointsBalance(typeof data.balance === 'number' ? data.balance : null);
+			} catch (err) {
+				console.error('Failed to load points balance', err);
+				if (mounted) setPointsBalance(null);
+			}
+		};
+		loadBalance();
+		const id = setInterval(loadBalance, 60_000);
+		return () => {
+			mounted = false;
+			clearInterval(id);
+		};
+	}, [user?.id, token]);
+
 	return (
 		<>
 			{/* Desktop Sidebar */}
 			<aside className='hidden lg:fixed lg:inset-y-0 lg:left-0 lg:z-50 lg:flex lg:w-72 lg:flex-col border-r border-[#C98958]/20 bg-gradient-to-b from-[#0F0604] via-[#15111a] to-[#1a191f] shadow-2xl backdrop-blur-md'>
-				<div className='flex h-full flex-col px-4 py-5'>
+				<div className='flex flex-col h-full px-4 py-5'>
 					<Link to='/' className='flex items-center gap-3 rounded-2xl border border-[#C98958]/15 bg-black/20 px-4 py-3 transition hover:border-[#C98958]/35 hover:bg-black/35'>
 						<img
 							src='https://i.ibb.co/x8LZRrDq/3dgifmaker72872.gif'
@@ -120,7 +148,7 @@ export function Navbar() {
 						{isLive && <span className='text-xs text-[#E7AC78]'>{viewerCount !== null ? viewerCount : 0}</span>}
 					</div>
 
-					<nav className='mt-5 flex-1 overflow-y-auto pr-1'>
+					<nav className='flex-1 pr-1 mt-5 overflow-y-auto'>
 						<div className='space-y-2'>
 							{mainMenuItems.map((item) => (
 								<SidebarLink key={item.name} item={item} active={location.pathname === item.path} />
@@ -143,17 +171,24 @@ export function Navbar() {
 						{user ? (
 							<>
 								<Link
-									to='/profile'
+									to='/points'
 									className='flex items-center gap-3 rounded-2xl border border-[#C98958]/15 bg-black/20 px-4 py-3 text-sm font-semibold text-[#E7AC78] transition hover:border-[#C98958]/35 hover:bg-black/35 hover:text-[#C98958]'
 								>
-									<User className='h-4 w-4' />
-									<span className='truncate'>{user.kickUsername}</span>
+									<User className='w-4 h-4' />
+									<div className='flex items-center gap-3'>
+										<span className='truncate'>{user.kickUsername}</span>
+										{typeof pointsBalance === 'number' && (
+											<span className='ml-2 rounded-full bg-black/60 px-2 py-0.5 text-xs font-semibold border border-[#C98958] text-[#E7AC78]'>
+												{pointsBalance} pts
+											</span>
+										)}
+									</div>
 								</Link>
 								<button
 									onClick={logout}
 									className='flex w-full items-center justify-center gap-2 rounded-2xl bg-[#C98958] px-4 py-3 text-sm font-semibold text-white transition hover:bg-[#930203]'
 								>
-									<LogOut className='h-4 w-4' />
+									<LogOut className='w-4 h-4' />
 									Logout
 								</button>
 							</>
@@ -163,7 +198,7 @@ export function Navbar() {
 									to='/login'
 									className='flex items-center justify-center gap-2 rounded-2xl border border-[#C98958] px-4 py-3 text-sm font-semibold text-[#C98958] transition hover:bg-[#C98958] hover:text-white'
 								>
-									<LogIn className='h-4 w-4' />
+									<LogIn className='w-4 h-4' />
 									Login
 								</Link>
 								<Link
@@ -198,13 +233,20 @@ export function Navbar() {
 						>
 							{isLive ? `Live ${viewerCount !== null ? `(${viewerCount})` : ""}` : "Offline"}
 						</div>
+						{user && typeof pointsBalance === 'number' && (
+							<div className='items-center hidden gap-2 ml-2 sm:flex'>
+								<span className='text-xs px-2 py-1 rounded-full bg-black/60 border border-[#C98958] text-[#E7AC78]'>
+									{pointsBalance} pts
+								</span>
+							</div>
+						)}
 						<button
 							onClick={() => setIsOpen(!isOpen)}
 							aria-label='Toggle menu'
 							aria-expanded={isOpen}
 							className='flex h-10 w-10 items-center justify-center rounded-xl border border-[#C98958]/20 bg-black/25 text-white'
 						>
-							{isOpen ? <X className='h-5 w-5' /> : <Menu className='h-5 w-5' />}
+							{isOpen ? <X className='w-5 h-5' /> : <Menu className='w-5 h-5' />}
 						</button>
 					</div>
 				</div>
@@ -235,14 +277,14 @@ export function Navbar() {
 							className='absolute right-0 top-0 flex h-full w-[min(92vw,22rem)] flex-col border-l border-[#C98958]/20 bg-gradient-to-b from-[#0F0604] via-[#15111a] to-[#1a191f] p-4 shadow-2xl'
 							onClick={(e) => e.stopPropagation()}
 						>
-							<div className='mb-4 flex items-center justify-between'>
+							<div className='flex items-center justify-between mb-4'>
 								<div className='text-sm font-semibold uppercase tracking-[0.35em] text-white/35'>Menu</div>
 								<button onClick={() => setIsOpen(false)} className='rounded-lg border border-[#C98958]/20 p-2 text-white'>
-									<X className='h-4 w-4' />
+									<X className='w-4 h-4' />
 								</button>
 							</div>
 
-							<div className='space-y-2 overflow-y-auto pr-1'>
+							<div className='pr-1 space-y-2 overflow-y-auto'>
 								{allMenuItems.map((item) => (
 									<Link
 										key={item.name}
@@ -268,7 +310,7 @@ export function Navbar() {
 											onClick={() => setIsOpen(false)}
 											className='flex items-center gap-3 rounded-2xl border border-[#C98958]/15 bg-black/20 px-4 py-3 text-sm font-semibold text-[#E7AC78]'
 										>
-											<User className='h-4 w-4' />
+											<User className='w-4 h-4' />
 											<span className='truncate'>{user.kickUsername}</span>
 										</Link>
 										<button
@@ -278,7 +320,7 @@ export function Navbar() {
 										}}
 											className='flex w-full items-center justify-center gap-2 rounded-2xl bg-[#C98958] px-4 py-3 text-sm font-semibold text-white'
 										>
-											<LogOut className='h-4 w-4' />
+											<LogOut className='w-4 h-4' />
 											Logout
 										</button>
 									</>
@@ -289,7 +331,7 @@ export function Navbar() {
 											onClick={() => setIsOpen(false)}
 											className='flex items-center justify-center gap-2 rounded-2xl bg-[#C98958] px-4 py-3 text-sm font-semibold text-white'
 										>
-											<LogIn className='h-4 w-4' />
+											<LogIn className='w-4 h-4' />
 											Login
 										</Link>
 										<Link

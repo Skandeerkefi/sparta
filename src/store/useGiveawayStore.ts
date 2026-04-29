@@ -22,6 +22,7 @@ interface GiveawayState {
 	enterGiveaway: (id: string, toast: any) => Promise<void>;
 	createGiveaway: (title: string, endTime: string, toast: any) => Promise<void>;
 	drawWinner: (id: string, toast: any) => Promise<void>;
+	deleteGiveaway: (id: string, toast: any) => Promise<void>;
 }
 
 export const useGiveawayStore = create<GiveawayState>((set, get) => ({
@@ -105,6 +106,23 @@ export const useGiveawayStore = create<GiveawayState>((set, get) => ({
 			toast({
 				title: "Error",
 				description: "Failed to draw winner",
+				variant: "destructive",
+			});
+		}
+	},
+
+	deleteGiveaway: async (id, toast) => {
+		const token = useAuthStore.getState().token;
+		try {
+			await api.delete(`/api/gws/${id}`, {
+				headers: { Authorization: `Bearer ${token}` },
+			});
+			await get().fetchGiveaways();
+			toast({ title: "Giveaway deleted successfully" });
+		} catch {
+			toast({
+				title: "Error",
+				description: "Failed to delete giveaway",
 				variant: "destructive",
 			});
 		}

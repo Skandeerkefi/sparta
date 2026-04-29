@@ -11,6 +11,8 @@ export interface SlotCall {
 	timestamp: string;
 	status: SlotCallStatus;
 	x250Hit?: boolean;
+	imageUrl?: string;
+	site?: string;
 	bonusCall?: { name: string; createdAt: string };
 }
 
@@ -18,7 +20,9 @@ interface SlotCallState {
 	slotCalls: SlotCall[];
 	isSubmitting: boolean;
 	addSlotCall: (
-		slotName: string
+		slotName: string,
+		imageUrl?: string,
+		site?: string
 	) => Promise<{ success: boolean; error?: string }>;
 	submitBonusCall: (
 		id: string,
@@ -37,7 +41,7 @@ export const useSlotCallStore = create<SlotCallState>((set, get) => ({
 	slotCalls: [],
 	isSubmitting: false,
 
-	addSlotCall: async (slotName) => {
+	addSlotCall: async (slotName, imageUrl, site) => {
 		const token = useAuthStore.getState().token;
 		if (!token) return { success: false, error: "Not authenticated" };
 
@@ -49,7 +53,11 @@ export const useSlotCallStore = create<SlotCallState>((set, get) => ({
 						"Content-Type": "application/json",
 						Authorization: `Bearer ${token}`,
 					},
-					body: JSON.stringify({ name: slotName }),
+					body: JSON.stringify({ 
+						name: slotName,
+						imageUrl: imageUrl || null,
+						site: site || "Stake",
+					}),
 					credentials: "include",
 				}
 			);
@@ -71,6 +79,8 @@ export const useSlotCallStore = create<SlotCallState>((set, get) => ({
 						timestamp: new Date(newCall.createdAt).toLocaleString(),
 						status: newCall.status,
 						x250Hit: newCall.x250Hit,
+						imageUrl: newCall.imageUrl,
+						site: newCall.site,
 						bonusCall: newCall.bonusCall,
 					},
 					...state.slotCalls,
@@ -79,9 +89,10 @@ export const useSlotCallStore = create<SlotCallState>((set, get) => ({
 			}));
 
 			return { success: true };
-		} catch (error: any) {
+		} catch (error) {
 			set({ isSubmitting: false });
-			return { success: false, error: error.message };
+			const errorMessage = error instanceof Error ? error.message : "Unknown error";
+			return { success: false, error: errorMessage };
 		}
 	},
 
@@ -220,6 +231,8 @@ export const useSlotCallStore = create<SlotCallState>((set, get) => ({
 				timestamp: new Date(item.createdAt).toLocaleString(),
 				status: item.status,
 				x250Hit: item.x250Hit,
+				imageUrl: item.imageUrl,
+				site: item.site,
 				bonusCall: item.bonusCall,
 			}));
 
