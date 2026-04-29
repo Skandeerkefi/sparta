@@ -69,10 +69,12 @@ interface BonusHuntHistoryItem {
 }
 
 interface SlotSearchResult {
-  slotName: string;
-  provider?: string;
+  id: string;
+  name: string;
   image?: string;
-  url?: string;
+  site?: string;
+  provider?: string;
+  raw?: unknown;
 }
 
 const emptyView: BonusHuntView = {
@@ -238,11 +240,11 @@ function BonusHuntAdminPage() {
           Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({
-          slotId: selectedSlot.url || selectedSlot.slotName,
-          slotName: selectedSlot.slotName,
+          slotId: selectedSlot.id,
+          slotName: selectedSlot.name,
           provider: selectedSlot.provider,
           image: selectedSlot.image,
-          url: selectedSlot.url,
+          url: selectedSlot.id,
           betSize: Number(betSize),
           bonusType,
           note,
@@ -254,7 +256,7 @@ function BonusHuntAdminPage() {
         throw new Error(errorData.message || "Failed to add game");
       }
 
-      toast({ title: "Game added", description: `${selectedSlot.slotName} locked in the hunt.` });
+      toast({ title: "Game added", description: `${selectedSlot.name} locked in the hunt.` });
       setSelectedSlot(null);
       setSlotQuery("");
       setSlotResults([]);
@@ -508,7 +510,7 @@ function BonusHuntAdminPage() {
                       {selectedSlot && (
                         <div className='rounded-2xl border border-[#C98958]/20 bg-black/25 p-3'>
                           <p className='text-xs uppercase tracking-[0.25em] text-white/45'>Selected Slot</p>
-                          <p className='mt-1 font-semibold text-white'>{selectedSlot.slotName}</p>
+                          <p className='mt-1 font-semibold text-white'>{selectedSlot.name}</p>
                           <p className='text-sm text-white/45'>{selectedSlot.provider || "Unknown provider"}</p>
                         </div>
                       )}
@@ -519,25 +521,25 @@ function BonusHuntAdminPage() {
                         ) : slotResults.length > 0 ? (
                           slotResults.map((slot) => (
                             <button
-                              key={slot.url || slot.slotName}
+                              key={slot.id || slot.name}
                               type='button'
                               disabled={!canManageDraft}
                               onClick={() => setSelectedSlot(slot)}
                               className={`flex w-full gap-3 rounded-2xl border p-3 text-left transition ${
-                                selectedSlot?.slotName === slot.slotName
+                                selectedSlot?.name === slot.name
                                   ? "border-[#C98958] bg-[#930203]/25"
                                   : "border-[#C98958]/15 bg-black/25 hover:border-[#C98958]"
                               }`}
                             >
                               {slot.image ? (
-                                <img src={slot.image} alt={slot.slotName} className='object-cover w-16 h-16 rounded-xl' />
+                                <img src={slot.image} alt={slot.name} className='object-cover w-16 h-16 rounded-xl' />
                               ) : (
                                 <div className='flex h-16 w-16 items-center justify-center rounded-xl bg-black/30 text-[10px] text-white/35'>
                                   No image
                                 </div>
                               )}
                               <div className='flex-1 min-w-0'>
-                                <p className='font-semibold text-white truncate'>{slot.slotName}</p>
+                                <p className='font-semibold text-white truncate'>{slot.name}</p>
                                 <p className='text-sm text-white/45'>{slot.provider || "Unknown provider"}</p>
                               </div>
                             </button>
