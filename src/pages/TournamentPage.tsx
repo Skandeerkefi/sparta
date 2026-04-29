@@ -853,7 +853,7 @@ function TournamentPage() {
 
                             {match.status === "completed" && (
                               <div className='mt-3 rounded-xl border border-[#C98958]/20 bg-black/30 px-3 py-2 text-xs text-[#E7AC78]'>
-                                A: {match.betSizeA ?? "—"} / {match.payoutA ?? "—"} = {formatMultiplier(match.multiplierA)} | B: {match.betSizeB ?? "—"} / {match.payoutB ?? "—"} = {formatMultiplier(match.multiplierB)}
+                                A: {formatMultiplier(match.multiplierA)}x | B: {formatMultiplier(match.multiplierB)}x
                               </div>
                             )}
                           </div>
