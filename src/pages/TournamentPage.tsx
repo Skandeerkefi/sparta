@@ -49,6 +49,10 @@ interface TournamentMatch {
   status: "waiting" | "ready" | "completed";
   playerA: TournamentPlayer | null;
   playerB: TournamentPlayer | null;
+  betSizeA?: number | null;
+  payoutA?: number | null;
+  betSizeB?: number | null;
+  payoutB?: number | null;
   multiplierA: number | null;
   multiplierB: number | null;
   winner: TournamentPlayer | null;
@@ -70,8 +74,10 @@ interface SlotSearchResult {
 }
 
 interface MatchInputState {
-  multiplierA: string;
-  multiplierB: string;
+  betSizeA: string;
+  payoutA: string;
+  betSizeB: string;
+  payoutB: string;
 }
 
 const EMPTY_STATE: TournamentState = {
@@ -82,7 +88,12 @@ const EMPTY_STATE: TournamentState = {
   totalRounds: 0,
 };
 
-const emptyMatchInput = (): MatchInputState => ({ multiplierA: "", multiplierB: "" });
+const emptyMatchInput = (): MatchInputState => ({
+  betSizeA: "",
+  payoutA: "",
+  betSizeB: "",
+  payoutB: "",
+});
 
 const formatMultiplier = (value: number | null) =>
   value === null || Number.isNaN(Number(value)) ? "—" : Number(value).toLocaleString();
@@ -232,10 +243,10 @@ function TournamentPage() {
 
       toast({ title: "Tournament created", description: "Bracket skeleton generated." });
       await loadState();
-    } catch (error: any) {
+    } catch (error) {
       toast({
         title: "Error",
-        description: error.message || "Failed to create tournament.",
+        description: error instanceof Error ? error.message : "Failed to create tournament.",
         variant: "destructive",
       });
     } finally {
@@ -272,10 +283,10 @@ function TournamentPage() {
       toast({ title: "Joined tournament", description: `Position #${selectedPosition} locked.` });
       setSelectedPosition(null);
       await loadState();
-    } catch (error: any) {
+    } catch (error) {
       toast({
         title: "Error",
-        description: error.message || "Could not join tournament.",
+        description: error instanceof Error ? error.message : "Could not join tournament.",
         variant: "destructive",
       });
     } finally {
@@ -314,10 +325,10 @@ function TournamentPage() {
       setSlotQuery("");
       setSlotResults([]);
       await loadState();
-    } catch (error: any) {
+    } catch (error) {
       toast({
         title: "Error",
-        description: error.message || "Failed to save slot selection.",
+        description: error instanceof Error ? error.message : "Failed to save slot selection.",
         variant: "destructive",
       });
     }
@@ -337,8 +348,10 @@ function TournamentPage() {
             Authorization: `Bearer ${token}`,
           },
           body: JSON.stringify({
-            multiplierA: Number(inputs.multiplierA),
-            multiplierB: Number(inputs.multiplierB),
+            betSizeA: Number(inputs.betSizeA),
+            payoutA: Number(inputs.payoutA),
+            betSizeB: Number(inputs.betSizeB),
+            payoutB: Number(inputs.payoutB),
           }),
         }
       );
@@ -350,10 +363,10 @@ function TournamentPage() {
 
       toast({ title: "Match updated", description: `Result saved for ${match.roundLabel}.` });
       await loadState();
-    } catch (error: any) {
+    } catch (error) {
       toast({
         title: "Error",
-        description: error.message || "Failed to submit the match result.",
+        description: error instanceof Error ? error.message : "Failed to submit the match result.",
         variant: "destructive",
       });
     }
@@ -676,32 +689,76 @@ function TournamentPage() {
 
                             {match.status !== "completed" && match.playerA && match.playerB && (
                               <div className='mt-3 space-y-2'>
-                                <Input
-                                  value={inputs.multiplierA}
-                                  onChange={(event) =>
-                                    setMatchInputs((prev) => ({
-                                      ...prev,
-                                      [match._id]: { ...(prev[match._id] || emptyMatchInput()), multiplierA: event.target.value },
-                                    }))
-                                  }
-                                  placeholder='Multiplier A'
-                                  type='number'
-                                  step='0.01'
-                                  className='border-[#C98958]/25 bg-black/40 text-white placeholder:text-white/35'
-                                />
-                                <Input
-                                  value={inputs.multiplierB}
-                                  onChange={(event) =>
-                                    setMatchInputs((prev) => ({
-                                      ...prev,
-                                      [match._id]: { ...(prev[match._id] || emptyMatchInput()), multiplierB: event.target.value },
-                                    }))
-                                  }
-                                  placeholder='Multiplier B'
-                                  type='number'
-                                  step='0.01'
-                                  className='border-[#C98958]/25 bg-black/40 text-white placeholder:text-white/35'
-                                />
+                                <div className='grid grid-cols-2 gap-2'>
+                                  <div className='rounded-xl border border-[#C98958]/10 bg-black/20 p-2'>
+                                    <p className='text-[0.65rem] uppercase tracking-[0.25em] text-white/40'>A Bet Size</p>
+                                    <Input
+                                      value={inputs.betSizeA}
+                                      onChange={(event) =>
+                                        setMatchInputs((prev) => ({
+                                          ...prev,
+                                          [match._id]: { ...(prev[match._id] || emptyMatchInput()), betSizeA: event.target.value },
+                                        }))
+                                      }
+                                      placeholder='Bet size A'
+                                      type='number'
+                                      step='0.01'
+                                      min='0'
+                                      className='mt-2 border-[#C98958]/25 bg-black/40 text-white placeholder:text-white/35'
+                                    />
+                                  </div>
+                                  <div className='rounded-xl border border-[#C98958]/10 bg-black/20 p-2'>
+                                    <p className='text-[0.65rem] uppercase tracking-[0.25em] text-white/40'>A Payout</p>
+                                    <Input
+                                      value={inputs.payoutA}
+                                      onChange={(event) =>
+                                        setMatchInputs((prev) => ({
+                                          ...prev,
+                                          [match._id]: { ...(prev[match._id] || emptyMatchInput()), payoutA: event.target.value },
+                                        }))
+                                      }
+                                      placeholder='Payout A'
+                                      type='number'
+                                      step='0.01'
+                                      min='0'
+                                      className='mt-2 border-[#C98958]/25 bg-black/40 text-white placeholder:text-white/35'
+                                    />
+                                  </div>
+                                  <div className='rounded-xl border border-[#C98958]/10 bg-black/20 p-2'>
+                                    <p className='text-[0.65rem] uppercase tracking-[0.25em] text-white/40'>B Bet Size</p>
+                                    <Input
+                                      value={inputs.betSizeB}
+                                      onChange={(event) =>
+                                        setMatchInputs((prev) => ({
+                                          ...prev,
+                                          [match._id]: { ...(prev[match._id] || emptyMatchInput()), betSizeB: event.target.value },
+                                        }))
+                                      }
+                                      placeholder='Bet size B'
+                                      type='number'
+                                      step='0.01'
+                                      min='0'
+                                      className='mt-2 border-[#C98958]/25 bg-black/40 text-white placeholder:text-white/35'
+                                    />
+                                  </div>
+                                  <div className='rounded-xl border border-[#C98958]/10 bg-black/20 p-2'>
+                                    <p className='text-[0.65rem] uppercase tracking-[0.25em] text-white/40'>B Payout</p>
+                                    <Input
+                                      value={inputs.payoutB}
+                                      onChange={(event) =>
+                                        setMatchInputs((prev) => ({
+                                          ...prev,
+                                          [match._id]: { ...(prev[match._id] || emptyMatchInput()), payoutB: event.target.value },
+                                        }))
+                                      }
+                                      placeholder='Payout B'
+                                      type='number'
+                                      step='0.01'
+                                      min='0'
+                                      className='mt-2 border-[#C98958]/25 bg-black/40 text-white placeholder:text-white/35'
+                                    />
+                                  </div>
+                                </div>
                                 <Button
                                   type='button'
                                   onClick={() => submitMatchResult(match)}
@@ -714,7 +771,7 @@ function TournamentPage() {
 
                             {match.status === "completed" && (
                               <div className='mt-3 rounded-xl border border-[#C98958]/20 bg-black/30 px-3 py-2 text-xs text-[#E7AC78]'>
-                                Completed with {formatMultiplier(match.multiplierA)} vs {formatMultiplier(match.multiplierB)}
+                                A: {match.betSizeA ?? "—"} / {match.payoutA ?? "—"} = {formatMultiplier(match.multiplierA)} | B: {match.betSizeB ?? "—"} / {match.payoutB ?? "—"} = {formatMultiplier(match.multiplierB)}
                               </div>
                             )}
                           </div>
