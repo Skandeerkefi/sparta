@@ -11,6 +11,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useAuthStore } from "@/store/useAuthStore";
 import { useToast } from "@/hooks/use-toast";
+import WidgetLinkCard from "@/components/WidgetLinkCard";
 
 type HuntStatus = "draft" | "ongoing" | "finished";
 
@@ -120,6 +121,8 @@ function BonusHuntAdminPage() {
   const [note, setNote] = useState("");
 
   const [resultInputs, setResultInputs] = useState<Record<string, string>>({});
+
+  const bonusHuntWidgetUrl = "https://www.spartaaan.com/bonus-hunt-widget";
 
   const loadView = useCallback(async () => {
     try {
@@ -485,6 +488,12 @@ function BonusHuntAdminPage() {
                     )}
                   </CardContent>
                 </Card>
+
+                <WidgetLinkCard
+                  title='Bonus Hunt Widget'
+                  description='Use this URL in OBS to show the current hunt, stats, and live slot cards.'
+                  url={bonusHuntWidgetUrl}
+                />
 
                 <Card className='border-[#C98958]/20 bg-[#120b0a]/80 text-white shadow-lg shadow-black/30'>
                   <CardContent className='p-5 sm:p-6'>

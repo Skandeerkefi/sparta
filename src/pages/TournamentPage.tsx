@@ -9,6 +9,7 @@ import { Input } from "@/components/ui/input";
 import { useAuthStore } from "@/store/useAuthStore";
 import { useToast } from "@/hooks/use-toast";
 import { Badge } from "@/components/ui/badge";
+import WidgetLinkCard from "@/components/WidgetLinkCard";
 import tournamentApi from "@/lib/tournamentApi";
 
 type TournamentStatus = "upcoming" | "ongoing" | "finished";
@@ -117,6 +118,8 @@ function TournamentPage() {
   const [isCreating, setIsCreating] = useState(false);
   const [matchInputs, setMatchInputs] = useState<Record<string, MatchInputState>>({});
   const [deletingParticipantId, setDeletingParticipantId] = useState<string | null>(null);
+
+  const tournamentWidgetUrl = "https://www.spartaaan.com/tournament-widget";
 
   const isAdmin = user?.role === "admin";
   const currentRoundToPick = myProgress?.currentRound ?? null;
@@ -696,6 +699,8 @@ function TournamentPage() {
                 <div className='rounded-3xl border border-[#C98958]/20 bg-[#120b0a]/80 p-5 shadow-lg shadow-black/30'>
                   <h2 className='text-xl font-bold text-white'>Admin Tournament Creator</h2>
                   <p className='mt-2 text-sm text-white/50'>Define player count and prize pool, then the bracket skeleton is created automatically.</p>
+
+                  {isAdmin && <div className='mt-4'><WidgetLinkCard title='Tournament Bracket Widget' description='Use this URL in OBS to show the live bracket overlay.' url={tournamentWidgetUrl} /></div>}
 
                   {isAdmin ? (
                     <form onSubmit={createTournament} className='mt-4 space-y-3'>

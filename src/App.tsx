@@ -11,6 +11,8 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { useAuthStore } from "@/store/useAuthStore";
 import SlotOverlay from "@/pages/SlotOverlay";
 import BonusHuntPage from "./pages/BonusHuntPage";
+import TournamentWidgetPage from "@/pages/TournamentWidgetPage";
+import BonusHuntWidgetPage from "@/pages/BonusHuntWidgetPage";
 import RoobetPage from "@/pages/RoobetPage";
 import RainPage from "@/pages/RainPage";
 import CSGOLeadPage from "./pages/CSGOLead";
@@ -55,6 +57,8 @@ function App() {
 					<Route path='*' element={<NotFoundPage />} />
 					<Route path='/slot-overlay' element={<SlotOverlay />} />
 					<Route path='/bonus-hunt' element={<BonusHuntPage />} />
+					<Route path='/tournament-widget' element={<TournamentWidgetPage />} />
+					<Route path='/bonus-hunt-widget' element={<BonusHuntWidgetPage />} />
 					<Route path='/bonus-hunt/admin' element={<BonusHuntAdminPage />} />
 					<Route path='/leaderboards' element={<RoobetPage />} />
 					<Route path='/Leaderboards' element={<RoobetPage />} />
