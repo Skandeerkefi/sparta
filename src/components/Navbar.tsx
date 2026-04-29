@@ -13,6 +13,7 @@ import {
 	Menu,
 	X,
 	Radio,
+		MonitorPlay,
 } from "lucide-react";
 import useMediaQuery from "@/hooks/use-media-query";
 import { useAuthStore } from "@/store/useAuthStore";
@@ -53,6 +54,17 @@ export function Navbar() {
 						{ path: "/admin/store", name: "Store Manager", icon: <Gift className='w-5 h-5' /> },
 						{ path: "/admin/redemptions", name: "Redemptions", icon: <Gift className='w-5 h-5' /> },
 						{ path: "/admin/points-leaderboard", name: "Points Leaderboard", icon: <Trophy className='w-5 h-5' /> },
+					]
+				: [],
+		[ user?.role ]
+	);
+
+	const widgetMenuItems = useMemo(
+		() =>
+			user?.role === "admin"
+				? [
+						{ path: "/tournament-widget", name: "Tournament Widget", icon: <MonitorPlay className='w-5 h-5' /> },
+						{ path: "/bonus-hunt-widget", name: "Bonus Hunt Widget", icon: <MonitorPlay className='w-5 h-5' /> },
 					]
 				: [],
 		[ user?.role ]
@@ -160,6 +172,17 @@ export function Navbar() {
 								<div className='mb-3 text-xs font-semibold uppercase tracking-[0.3em] text-white/35'>Admin</div>
 								<div className='space-y-2'>
 									{adminMenuItems.map((item) => (
+										<SidebarLink key={item.name} item={item} active={location.pathname === item.path} />
+									))}
+								</div>
+							</div>
+						)}
+
+						{widgetMenuItems.length > 0 && (
+							<div className='mt-6 border-t border-[#C98958]/15 pt-4'>
+								<div className='mb-3 text-xs font-semibold uppercase tracking-[0.3em] text-white/35'>Widgets</div>
+								<div className='space-y-2'>
+									{widgetMenuItems.map((item) => (
 										<SidebarLink key={item.name} item={item} active={location.pathname === item.path} />
 									))}
 								</div>
@@ -300,6 +323,29 @@ export function Navbar() {
 										<span>{item.name}</span>
 									</Link>
 								))}
+
+								{widgetMenuItems.length > 0 && (
+									<div className='pt-4'>
+										<div className='mb-3 text-xs font-semibold uppercase tracking-[0.3em] text-white/35'>Widgets</div>
+										<div className='space-y-2'>
+											{widgetMenuItems.map((item) => (
+												<Link
+													key={item.name}
+													to={item.path}
+													onClick={() => setIsOpen(false)}
+													className={`flex items-center gap-3 rounded-2xl px-4 py-3 font-semibold transition ${
+														location.pathname === item.path
+															? "bg-[#C98958] text-white shadow-lg"
+															: "bg-black/20 text-[#E7AC78] hover:bg-[#930203] hover:text-[#C98958]"
+													}`}
+												>
+													{item.icon}
+													<span>{item.name}</span>
+												</Link>
+											))}
+										</div>
+									</div>
+								)}
 							</div>
 
 							<div className='mt-auto space-y-3 border-t border-[#C98958]/15 pt-4'>
