@@ -10,7 +10,7 @@ export interface SlotCall {
 	requester: string;
 	timestamp: string;
 	status: SlotCallStatus;
-	x250Hit?: boolean;
+	x1600Hit?: boolean;
 	imageUrl?: string;
 	site?: string;
 	bonusCall?: { name: string; createdAt: string };
@@ -31,7 +31,7 @@ interface SlotCallState {
 	updateSlotStatus: (
 		id: string,
 		status: SlotCallStatus,
-		x250Hit?: boolean
+		x1600Hit?: boolean
 	) => Promise<{ success: boolean; error?: string }>;
 	deleteSlotCall: (id: string) => Promise<{ success: boolean; error?: string }>;
 	fetchSlotCalls: () => Promise<void>;
@@ -78,7 +78,7 @@ export const useSlotCallStore = create<SlotCallState>((set, get) => ({
 						requester: useAuthStore.getState().user?.kickUsername || "You",
 						timestamp: new Date(newCall.createdAt).toLocaleString(),
 						status: newCall.status,
-						x250Hit: newCall.x250Hit,
+						x1600Hit: newCall.x1600Hit,
 						imageUrl: newCall.imageUrl,
 						site: newCall.site,
 						bonusCall: newCall.bonusCall,
@@ -131,7 +131,7 @@ export const useSlotCallStore = create<SlotCallState>((set, get) => ({
 		}
 	},
 
-	updateSlotStatus: async (id, status, x250Hit = false) => {
+	updateSlotStatus: async (id, status, x1600Hit = false) => {
 		const token = useAuthStore.getState().token;
 		if (!token) return { success: false, error: "Not authenticated" };
 
@@ -142,7 +142,7 @@ export const useSlotCallStore = create<SlotCallState>((set, get) => ({
 						"Content-Type": "application/json",
 						Authorization: `Bearer ${token}`,
 					},
-					body: JSON.stringify({ status, x250Hit }),
+					body: JSON.stringify({ status, x1600Hit }),
 					credentials: "include",
 				}
 			);
@@ -160,7 +160,7 @@ export const useSlotCallStore = create<SlotCallState>((set, get) => ({
 						? {
 								...call,
 								status: updated.status,
-								x250Hit: updated.x250Hit,
+								x1600Hit: updated.x1600Hit,
 						  }
 						: call
 				),
@@ -230,7 +230,7 @@ export const useSlotCallStore = create<SlotCallState>((set, get) => ({
 					"You",
 				timestamp: new Date(item.createdAt).toLocaleString(),
 				status: item.status,
-				x250Hit: item.x250Hit,
+				x1600Hit: item.x1600Hit,
 				imageUrl: item.imageUrl,
 				site: item.site,
 				bonusCall: item.bonusCall,

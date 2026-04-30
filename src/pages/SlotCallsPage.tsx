@@ -38,15 +38,15 @@ function SlotCallsPage() {
 	const { user, token } = useAuthStore();
 	const { toast } = useToast();
 
-	const handleToggleX250 = async (id: string, newValue: boolean) => {
+	const handleToggleX1600 = async (id: string, newValue: boolean) => {
 		const result = await updateSlotStatus(id, "played", newValue);
 		if (result.success) {
-			toast({ title: "Updated", description: "x250 hit toggled." });
+			toast({ title: "Updated", description: "x1600 hit toggled." });
 			await fetchSlotCalls();
 		} else {
 			toast({
 				title: "Error",
-				description: result.error || "Failed to toggle x250",
+				description: result.error || "Failed to toggle x1600",
 				variant: "destructive",
 			});
 		}
@@ -56,7 +56,7 @@ function SlotCallsPage() {
 	const [slotName, setSlotName] = useState("");
 	const [slotImageUrl, setSlotImageUrl] = useState("");
 	const [filter, setFilter] = useState<FilterStatus>("all");
-	const [showOnly250Hit, setShowOnly250Hit] = useState(false);
+	const [showOnly1600Hit, setShowOnly1600Hit] = useState(false);
 	const [isLoading, setIsLoading] = useState(true);
 	const [searchResults, setSearchResults] = useState<SlotSearchResult[]>([]);
 	const [isSearching, setIsSearching] = useState(false);
@@ -112,11 +112,11 @@ function SlotCallsPage() {
 				call.requester.toLowerCase().includes(query);
 
 			const matchesStatus = filter === "all" || call.status === filter;
-			const matches250 = !showOnly250Hit || call.x250Hit;
+			const matches1600 = !showOnly1600Hit || call.x1600Hit;
 
-			return matchesSearch && matchesStatus && matches250;
+			return matchesSearch && matchesStatus && matches1600;
 		});
-	}, [slotCalls, debouncedSearchQuery, filter, showOnly250Hit]);
+	}, [slotCalls, debouncedSearchQuery, filter, showOnly1600Hit]);
 
 	const handleSubmit = async () => {
 		if (!slotName.trim()) {
@@ -155,8 +155,8 @@ function SlotCallsPage() {
 		setShowSearchResults(false);
 	};
 
-	const handleAccept = async (id: string, newX250Value: boolean) => {
-		const result = await updateSlotStatus(id, "accepted", newX250Value);
+	const handleAccept = async (id: string, newX1600Value: boolean) => {
+		const result = await updateSlotStatus(id, "accepted", newX1600Value);
 		if (result.success) {
 			toast({ title: "Updated", description: "Slot status updated." });
 			await fetchSlotCalls();
@@ -421,11 +421,11 @@ function SlotCallsPage() {
 					<label className='flex items-center gap-2 text-sm text-[#E7AC78]'>
 						<input
 							type='checkbox'
-							checked={showOnly250Hit}
-							onChange={(e) => setShowOnly250Hit(e.target.checked)}
+							checked={showOnly1600Hit}
+							onChange={(e) => setShowOnly1600Hit(e.target.checked)}
 							className='accent-[#C98958]'
 						/>
-						Show only 1.600x Hit
+						Show only 1,600x Hit
 					</label>
 				</div>
 
@@ -445,7 +445,7 @@ function SlotCallsPage() {
 								requester={call.requester}
 								timestamp={call.timestamp}
 								status={call.status}
-								x250Hit={call.x250Hit}
+								x1600Hit={call.x1600Hit}
 								imageUrl={call.imageUrl}
 								site={call.site}
 								bonusCall={call.bonusCall}
@@ -456,7 +456,7 @@ function SlotCallsPage() {
 								onBonusSubmit={handleBonusSubmit}
 								onDelete={handleDelete}
 								onMarkPlayed={handleMarkPlayed}
-								onToggleX250={handleToggleX250}
+								onToggleX1600={handleToggleX1600}
 							/>
 						))}
 					</div>

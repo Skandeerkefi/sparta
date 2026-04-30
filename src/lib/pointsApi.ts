@@ -134,6 +134,28 @@ export const resetPointsConfigs = async (token: string) => {
   return res.data;
 };
 
+export const getAllUsers = async (token: string, limit = 500) => {
+  const res = await http.get('/api/points/admin/all-users', {
+    params: { limit },
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  return res.data;
+};
+
+export const adjustUserPoints = async (userId: string, amount: number, note: string, token: string) => {
+  const res = await http.post(`/api/points/users/${userId}/adjust`, { amount, note }, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  return res.data;
+};
+
+export const changeUserRole = async (userId: string, role: 'user' | 'admin', token: string) => {
+  const res = await http.patch(`/api/points/admin/users/${userId}/role`, { role }, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  return res.data;
+};
+
 export default {
   getUserPoints,
   claimDaily,
@@ -153,4 +175,7 @@ export default {
   updatePointsConfig,
   updateMultiplePointsConfigs,
   resetPointsConfigs,
+  getAllUsers,
+  adjustUserPoints,
+  changeUserRole,
 };

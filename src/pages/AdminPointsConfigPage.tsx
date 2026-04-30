@@ -50,7 +50,7 @@ const CATEGORIES = [
   {
     title: 'Other',
     icon: <Star className="w-5 h-5" />,
-    actions: ['slot-call-x250', 'daily-login'],
+    actions: ['slot-call-x1600', 'daily-login'],
     color: 'text-purple-400',
   },
 ];
@@ -207,9 +207,9 @@ export default function AdminPointsConfigPage() {
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
         <Navbar />
-        <div className="container mx-auto px-4 py-8">
+        <div className="container px-4 py-8 mx-auto">
           <div className="text-center">
-            <h1 className="text-2xl font-bold text-white mb-4">Access Denied</h1>
+            <h1 className="mb-4 text-2xl font-bold text-white">Access Denied</h1>
             <p className="text-gray-300">You need admin privileges to access this page.</p>
           </div>
         </div>
@@ -219,14 +219,14 @@ export default function AdminPointsConfigPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
+    <div className="min-h-screen bg-[#0F0604]">
       <GraphicalBackground />
       <Navbar />
-      <div className="container mx-auto px-4 py-8">
+      <div className="container relative z-10 px-4 py-8 mx-auto">
         <div className="max-w-4xl mx-auto">
-          <div className="mb-8 flex items-start justify-between">
+          <div className="flex items-start justify-between mb-8">
             <div>
-              <h1 className="text-3xl font-bold text-white mb-2">Points Configuration</h1>
+              <h1 className="mb-2 text-3xl font-bold text-white">Points Configuration</h1>
               <p className="text-gray-400">Manage point rewards for all system actions. Changes take effect immediately.</p>
             </div>
             <div className="flex gap-3">
@@ -241,7 +241,7 @@ export default function AdminPointsConfigPage() {
                 onClick={handleResetDefaults}
                 disabled={saving}
                 variant="outline"
-                className="border-red-500/50 text-red-400 hover:bg-red-500/20 hover:text-red-300"
+                className="text-red-400 border-red-500/50 hover:bg-red-500/20 hover:text-red-300"
               >
                 Reset Defaults
               </Button>
@@ -249,13 +249,13 @@ export default function AdminPointsConfigPage() {
           </div>
 
           {hasChanges && (
-            <div className="mb-6 rounded-lg border border-yellow-500/30 bg-yellow-500/10 px-4 py-3 text-sm text-yellow-300">
+            <div className="px-4 py-3 mb-6 text-sm text-yellow-300 border rounded-lg border-yellow-500/30 bg-yellow-500/10">
               You have unsaved changes. Click "Save All" to apply them.
             </div>
           )}
 
           {loading ? (
-            <div className="text-center py-12">
+            <div className="py-12 text-center">
               <div className="text-gray-400">Loading configurations...</div>
             </div>
           ) : (
@@ -271,7 +271,7 @@ export default function AdminPointsConfigPage() {
                   <div key={category.title}>
                     <div className={`flex items-center gap-2 mb-4 ${category.color}`}>
                       {category.icon}
-                      <h2 className="text-lg font-semibold uppercase tracking-wider">{category.title}</h2>
+                      <h2 className="text-lg font-semibold tracking-wider uppercase">{category.title}</h2>
                     </div>
                     <div className="grid gap-3">
                       {categoryConfigs.map(config => {
@@ -289,7 +289,7 @@ export default function AdminPointsConfigPage() {
                               <div className="flex items-center justify-between">
                                 <div className="flex items-center gap-3">
                                   <div>
-                                    <CardTitle className="text-white text-base capitalize">
+                                    <CardTitle className="text-base text-white capitalize">
                                       {config.actionType.replace(/-/g, ' ')}
                                     </CardTitle>
                                     <p className="text-sm text-gray-400 mt-0.5">{config.description}</p>

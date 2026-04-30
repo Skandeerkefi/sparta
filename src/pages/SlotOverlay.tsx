@@ -24,7 +24,7 @@ export default function SlotOverlay() {
 					slotName: call.name,
 					requester: call.user?.kickUsername || "Unknown",
 					betAmount: call.betAmount ?? null,
-					x250Hit: call.x250Hit ?? false,
+					x1600Hit: call.x1600Hit ?? false,
 					bonusCallName: call.bonusCall?.name ?? null,
 				}));
 
@@ -120,7 +120,7 @@ export default function SlotOverlay() {
 											</span>
 										</span>
 									)}
-									{call.x250Hit && (
+									{call.x1600Hit && (
 										<span
 											className='ml-auto text-xs font-bold rounded-full'
 											style={{
@@ -130,7 +130,7 @@ export default function SlotOverlay() {
 												boxShadow: "0 0 6px #930203",
 											}}
 										>
-											💥 250x HIT!
+											💥 1600x HIT!
 										</span>
 									)}
 								</div>

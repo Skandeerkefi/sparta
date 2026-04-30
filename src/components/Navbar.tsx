@@ -1,6 +1,6 @@
 import { Link, useLocation } from "react-router-dom";
 import { useEffect, useMemo, useState } from "react";
-import {
+	import {
 	Dices,
 	Flame,
 	Trophy,
@@ -14,6 +14,8 @@ import {
 	X,
 	Radio,
 		MonitorPlay,
+	Shield,
+	Coins,
 } from "lucide-react";
 import useMediaQuery from "@/hooks/use-media-query";
 import { useAuthStore } from "@/store/useAuthStore";
@@ -49,6 +51,8 @@ export function Navbar() {
 		() =>
 			user?.role === "admin"
 				? [
+						{ path: "/admin/users", name: "User Management", icon: <Shield className='w-5 h-5' /> },
+						{ path: "/admin/points-adjust", name: "Points Adjustment", icon: <Coins className='w-5 h-5' /> },
 						{ path: "/bethog-monthly/admin", name: "Bethog Admin", icon: <CalendarRange className='w-5 h-5' /> },
 						{ path: "/bonus-hunt/admin", name: "Bonus Hunt Admin", icon: <Flame className='w-5 h-5' /> },
 						{ path: "/admin/store", name: "Store Manager", icon: <Gift className='w-5 h-5' /> },

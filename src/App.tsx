@@ -28,6 +28,8 @@ import AdminRedemptions from './pages/AdminRedemptions';
 import AdminStorePage from './pages/AdminStorePage';
 import PointsLeaderboardPage from './pages/PointsLeaderboardPage';
 import AdminPointsConfigPage from './pages/AdminPointsConfigPage';
+import AdminUserManagementPage from './pages/AdminUserManagementPage';
+import AdminPointsAdjustmentPage from './pages/AdminPointsAdjustmentPage';
 function App() {
 	const loadFromStorage = useAuthStore((state) => state.loadFromStorage);
 	const user = useAuthStore((state) => state.user);
@@ -76,6 +78,8 @@ function App() {
 					<Route path='/admin/redemptions' element={<AdminRedemptions />} />
 					<Route path='/admin/points-leaderboard' element={<PointsLeaderboardPage />} />
 					<Route path='/admin/points-config' element={<AdminPointsConfigPage />} />
+					<Route path='/admin/users' element={<AdminUserManagementPage />} />
+					<Route path='/admin/points-adjust' element={<AdminPointsAdjustmentPage />} />
 				</Routes>
 			</BrowserRouter>
 			<Toaster />

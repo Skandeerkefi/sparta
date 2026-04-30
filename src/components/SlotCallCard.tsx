@@ -10,16 +10,16 @@ interface SlotCallProps {
 	requester: string;
 	timestamp: string;
 	status: SlotCallStatus;
-	x250Hit?: boolean;
+	x1600Hit?: boolean;
 	imageUrl?: string;
 	site?: string;
 	bonusCall?: { name: string; createdAt: string };
-	onAccept?: (id: string, x250Hit: boolean) => void;
+	onAccept?: (id: string, x1600Hit: boolean) => void;
 	onReject?: (id: string) => void;
 	onDelete?: (id: string) => void;
 	onBonusSubmit?: (id: string, bonusSlot: string) => void;
 	onMarkPlayed?: (id: string) => void;
-	onToggleX250?: (id: string, newValue: boolean) => void;
+	onToggleX1600?: (id: string, newValue: boolean) => void;
 	isAdminView?: boolean;
 	isUserView?: boolean;
 }
@@ -30,7 +30,7 @@ export function SlotCallCard({
 	requester,
 	timestamp,
 	status,
-	x250Hit,
+	x1600Hit,
 	imageUrl,
 	site,
 	bonusCall,
@@ -39,12 +39,12 @@ export function SlotCallCard({
 	onDelete,
 	onBonusSubmit,
 	onMarkPlayed,
-	onToggleX250,
+	onToggleX1600,
 	isAdminView = false,
 	isUserView = false,
 }: SlotCallProps) {
 	const [bonusInput, setBonusInput] = useState("");
-	const showBonusInput = isUserView && x250Hit && !bonusCall;
+	const showBonusInput = isUserView && x1600Hit && !bonusCall;
 
 	return (
 		<div className='flex flex-col p-4 rounded-lg glass-card bg-[#0F0604] border border-[#C98958] text-[#E7AC78]'>
@@ -78,7 +78,7 @@ export function SlotCallCard({
 				{/* Quick indicators: expected points and 250x badge */}
 				<div className='flex items-center gap-2 ml-auto'>
 					
-					{ x250Hit && (
+					{ x1600Hit && (
 						<span className='text-xs px-2 py-0.5 rounded-full bg-yellow-600/20 border border-yellow-500 text-yellow-300 flex items-center gap-1'>
 							<span className='font-bold'>1,600x</span>
 						</span>
@@ -98,8 +98,8 @@ export function SlotCallCard({
 					<label className='flex items-center gap-2 text-sm text-[#C98958]'>
 						<input
 							type='checkbox'
-							checked={x250Hit || false}
-							onChange={() => onToggleX250?.(id, !x250Hit)}
+							checked={x1600Hit || false}
+							onChange={() => onToggleX1600?.(id, !x1600Hit)}
 							disabled={status !== "played"}
 						/>
 						Mark as 1,600x Hit
@@ -108,7 +108,7 @@ export function SlotCallCard({
 					{status === "pending" && (
 						<div className='flex gap-2'>
 							<button
-								onClick={() => onAccept?.(id, x250Hit || false)}
+								onClick={() => onAccept?.(id, x1600Hit || false)}
 								className='flex items-center justify-center flex-1 gap-1 px-3 py-1 text-sm bg-green-600 rounded hover:bg-green-700'
 							>
 								<Check className='w-4 h-4' /> Accept
