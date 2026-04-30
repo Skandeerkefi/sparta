@@ -27,6 +27,7 @@ import PointsStore from './pages/PointsStore';
 import AdminRedemptions from './pages/AdminRedemptions';
 import AdminStorePage from './pages/AdminStorePage';
 import PointsLeaderboardPage from './pages/PointsLeaderboardPage';
+import AdminPointsConfigPage from './pages/AdminPointsConfigPage';
 function App() {
 	const loadFromStorage = useAuthStore((state) => state.loadFromStorage);
 	const user = useAuthStore((state) => state.user);
@@ -74,6 +75,7 @@ function App() {
 					<Route path='/admin/store' element={<AdminStorePage />} />
 					<Route path='/admin/redemptions' element={<AdminRedemptions />} />
 					<Route path='/admin/points-leaderboard' element={<PointsLeaderboardPage />} />
+					<Route path='/admin/points-config' element={<AdminPointsConfigPage />} />
 				</Routes>
 			</BrowserRouter>
 			<Toaster />

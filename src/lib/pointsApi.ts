@@ -99,6 +99,34 @@ export const syncStreamPoints = async (token: string, options?: { onlyUserId?: s
   return res.data;
 };
 
+export const getPointsConfigs = async (token: string) => {
+  const res = await http.get('/api/points-config', {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  return res.data;
+};
+
+export const updatePointsConfig = async (actionType: string, points: number, enabled: boolean, token: string) => {
+  const res = await http.post('/api/points-config/update', { actionType, points, enabled }, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  return res.data;
+};
+
+export const updateMultiplePointsConfigs = async (configs: { actionType: string; points: number }[], token: string) => {
+  const res = await http.post('/api/points-config/update-multiple', { configs }, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  return res.data;
+};
+
+export const resetPointsConfigs = async (token: string) => {
+  const res = await http.post('/api/points-config/reset-defaults', {}, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  return res.data;
+};
+
 export default {
   getUserPoints,
   claimDaily,
@@ -113,4 +141,8 @@ export default {
   getPointsLeaderboard,
   getStreamUsers,
   syncStreamPoints,
+  getPointsConfigs,
+  updatePointsConfig,
+  updateMultiplePointsConfigs,
+  resetPointsConfigs,
 };

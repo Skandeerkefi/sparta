@@ -54,6 +54,7 @@ export function Navbar() {
 						{ path: "/admin/store", name: "Store Manager", icon: <Gift className='w-5 h-5' /> },
 						{ path: "/admin/redemptions", name: "Redemptions", icon: <Gift className='w-5 h-5' /> },
 						{ path: "/admin/points-leaderboard", name: "Points Leaderboard", icon: <Trophy className='w-5 h-5' /> },
+						{ path: "/admin/points-config", name: "Points Config", icon: <Trophy className='w-5 h-5' /> },
 					]
 				: [],
 		[ user?.role ]
