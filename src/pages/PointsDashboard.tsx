@@ -11,6 +11,8 @@ export default function PointsDashboard() {
   const { user, token } = useAuthStore();
   const [balance, setBalance] = useState<number | null>(null);
   const [transactions, setTransactions] = useState<any[]>([]);
+  const [streamBaseline, setStreamBaseline] = useState<any | null>(null);
+  const [streamTotals, setStreamTotals] = useState<any | null>(null);
   const [loading, setLoading] = useState(false);
   const { toast } = useToast();
 
@@ -21,6 +23,8 @@ export default function PointsDashboard() {
       const data = await pointsApi.getUserPoints(user.id, token);
       setBalance(data.balance);
       setTransactions(data.transactions || []);
+      setStreamBaseline(data.streamPointsBaseline || null);
+      setStreamTotals(data.streamPointsTotals || null);
     } catch (err: any) {
       console.error('Failed to load points', err);
       toast({ title: 'Error', description: 'Failed to load points' });
@@ -62,6 +66,21 @@ export default function PointsDashboard() {
             <Button onClick={handleClaim} variant='secondary'>Claim Daily</Button>
           </div>
         </div>
+
+        <section className='mb-6 rounded-md border border-[#C98958] bg-black/40 p-4'>
+          <h2 className='text-lg font-semibold mb-2'>Stream Points Baseline</h2>
+          {streamBaseline ? (
+            <div className='space-y-1 text-sm text-[#E7AC78]'>
+              <div>Name: {streamBaseline.name || '—'}</div>
+              <div>Watchtime baseline: {streamBaseline.watchtime ?? 0}</div>
+              <div>Level baseline: {streamBaseline.level ?? 0}</div>
+              <div>Watchtime points earned: {streamTotals?.watchtime ?? 0}</div>
+              <div>Level points earned: {streamTotals?.level ?? 0}</div>
+            </div>
+          ) : (
+            <div className='text-sm text-[#C98958]'>No stream baseline synced yet.</div>
+          )}
+        </section>
 
         <section>
           <h2 className='text-lg font-semibold mb-2'>Recent Transactions</h2>

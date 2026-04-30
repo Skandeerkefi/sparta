@@ -84,6 +84,21 @@ export const getPointsLeaderboard = async (token: string, limit = 100) => {
   return res.data;
 };
 
+export const getStreamUsers = async (token: string, limit = 500) => {
+  const res = await http.get('/api/stream-points/admin', {
+    params: { limit },
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  return res.data;
+};
+
+export const syncStreamPoints = async (token: string, options?: { onlyUserId?: string; dryRun?: boolean; limit?: number }) => {
+  const res = await http.post('/api/stream-points/sync', options || {}, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  return res.data;
+};
+
 export default {
   getUserPoints,
   claimDaily,
@@ -96,4 +111,6 @@ export default {
   listRedemptions,
   updateRedemption,
   getPointsLeaderboard,
+  getStreamUsers,
+  syncStreamPoints,
 };
