@@ -5,6 +5,9 @@ import { Footer } from '@/components/Footer';
 import { useToast } from '@/hooks/use-toast';
 import { useAuthStore } from '@/store/useAuthStore';
 import pointsApi from '@/lib/pointsApi';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { RefreshCw, CheckCircle, XCircle } from 'lucide-react';
 
 type LeaderboardRow = {
   rank: number;
@@ -19,6 +22,20 @@ type SyncResult = {
   processed?: number;
   seeded?: number;
   updated?: number;
+  matched?: number;
+  unmatched?: number;
+  changes?: SyncChange[];
+};
+
+type SyncChange = {
+  userId: string;
+  kickUsername: string;
+  apiName?: string;
+  matched: boolean;
+  reason?: string;
+  appliedPoints?: number;
+  watchtimeDelta?: number;
+  levelDelta?: number;
 };
 
 type StreamRow = {
@@ -56,6 +73,8 @@ export default function PointsLeaderboardPage() {
   const [streamLoading, setStreamLoading] = useState(false);
   const [syncing, setSyncing] = useState(false);
   const [syncResult, setSyncResult] = useState<SyncResult | null>(null);
+  const [syncChanges, setSyncChanges] = useState<SyncChange[]>([]);
+  const [showUnmatchedOnly, setShowUnmatchedOnly] = useState(false);
 
   const isAdmin = user?.role === 'admin';
 
@@ -89,13 +108,17 @@ export default function PointsLeaderboardPage() {
     }
   }, [token, toast]);
 
-  const handleSyncStreamPoints = async () => {
+  const handleRefreshAndSync = async () => {
     if (!token) return;
     setSyncing(true);
     try {
-      const result = await pointsApi.syncStreamPoints(token, { limit: 500 });
+      const result = await pointsApi.syncAllStreamPoints(token, { limit: 500 });
       setSyncResult(result);
-      toast({ title: 'Synced', description: `Seeded ${result.seeded || 0}, updated ${result.updated || 0}` });
+      setSyncChanges(result.changes || []);
+      toast({
+        title: 'Sync Complete',
+        description: `Matched ${result.matched || 0}, Unmatched ${result.unmatched || 0}. Seeded ${result.seeded || 0}, updated ${result.updated || 0}`,
+      });
       await loadLeaderboard();
       await loadStreamRows();
     } catch (err: unknown) {
@@ -123,6 +146,10 @@ export default function PointsLeaderboardPage() {
     );
   }
 
+  const visibleChanges = showUnmatchedOnly
+    ? syncChanges.filter(c => !c.matched)
+    : syncChanges;
+
   return (
     <div className='relative flex flex-col min-h-screen text-white'>
       <GraphicalBackground />
@@ -135,27 +162,100 @@ export default function PointsLeaderboardPage() {
               className='rounded border border-[#C98958] bg-black/40 px-3 py-1.5 text-sm text-[#E7AC78] hover:bg-black/60'
               onClick={loadLeaderboard}
             >
-              Refresh
-            </button>
-            <button
-              className='rounded border border-[#C98958] bg-black/40 px-3 py-1.5 text-sm text-[#E7AC78] hover:bg-black/60'
-              onClick={loadStreamRows}
-            >
-              Refresh Live Data
+              Refresh Leaderboard
             </button>
             <button
               className='rounded border border-[#C98958] bg-[#C98958] px-3 py-1.5 text-sm font-semibold text-black hover:opacity-90 disabled:opacity-50'
-              onClick={handleSyncStreamPoints}
+              onClick={handleRefreshAndSync}
               disabled={syncing}
             >
-              {syncing ? 'Syncing...' : 'Sync Stream Points'}
+              <RefreshCw className={`w-4 h-4 mr-1.5 inline ${syncing ? 'animate-spin' : ''}`} />
+              {syncing ? 'Refreshing & Syncing...' : 'Refresh & Sync'}
             </button>
           </div>
         </div>
 
         {syncResult && (
-          <div className='mb-4 rounded border border-[#C98958]/40 bg-black/40 p-3 text-sm text-[#E7AC78]'>
-            Last sync: processed {syncResult.processed || 0}, seeded {syncResult.seeded || 0}, updated {syncResult.updated || 0}
+          <div className='mb-4 rounded-lg border border-[#C98958]/40 bg-black/50 p-4'>
+            <div className='flex items-center gap-4 flex-wrap text-sm'>
+              <span className='text-[#E7AC78]'>
+                Processed: <strong>{syncResult.processed || 0}</strong>
+              </span>
+              <span className='text-green-400'>
+                Matched: <strong>{syncResult.matched || 0}</strong>
+              </span>
+              <span className='text-red-400'>
+                Unmatched: <strong>{syncResult.unmatched || 0}</strong>
+              </span>
+              <span className='text-blue-400'>
+                Seeded: <strong>{syncResult.seeded || 0}</strong>
+              </span>
+              <span className='text-yellow-400'>
+                Updated: <strong>{syncResult.updated || 0}</strong>
+              </span>
+            </div>
+          </div>
+        )}
+
+        {syncChanges.length > 0 && (
+          <div className='mb-6 rounded-lg border border-[#C98958]/40 bg-black/45 p-4'>
+            <div className='flex items-center justify-between mb-3'>
+              <h3 className='text-sm font-semibold text-[#E7AC78]'>Sync Details</h3>
+              <div className='flex gap-2 items-center'>
+                <label className='flex items-center gap-2 text-xs text-gray-400 cursor-pointer'>
+                  <input
+                    type='checkbox'
+                    checked={showUnmatchedOnly}
+                    onChange={(e) => setShowUnmatchedOnly(e.target.checked)}
+                    className='rounded border-[#C98958]/30 bg-black/40'
+                  />
+                  Show unmatched only
+                </label>
+              </div>
+            </div>
+            <div className='max-h-64 overflow-y-auto space-y-1'>
+              {visibleChanges.map((change) => (
+                <div
+                  key={change.userId}
+                  className={`flex items-center justify-between px-3 py-2 rounded text-sm ${
+                    change.matched
+                      ? 'bg-green-500/10 border border-green-500/20'
+                      : 'bg-red-500/10 border border-red-500/20'
+                  }`}
+                >
+                  <div className='flex items-center gap-2'>
+                    {change.matched ? (
+                      <CheckCircle className='w-4 h-4 text-green-400' />
+                    ) : (
+                      <XCircle className='w-4 h-4 text-red-400' />
+                    )}
+                    <span className='font-medium text-white'>{change.kickUsername}</span>
+                    {change.matched && change.apiName && (
+                      <span className='text-xs text-gray-400'>
+                        → API: {change.apiName}
+                      </span>
+                    )}
+                  </div>
+                  <div className='flex items-center gap-3 text-xs'>
+                    {change.matched ? (
+                      <>
+                        {change.appliedPoints !== undefined && change.appliedPoints > 0 && (
+                          <span className='text-yellow-400'>+{change.appliedPoints} pts</span>
+                        )}
+                        {change.watchtimeDelta !== undefined && change.watchtimeDelta > 0 && (
+                          <span className='text-blue-400'>+{change.watchtimeDelta} wt</span>
+                        )}
+                        {change.levelDelta !== undefined && change.levelDelta > 0 && (
+                          <span className='text-purple-400'>+{change.levelDelta} lvl</span>
+                        )}
+                      </>
+                    ) : (
+                      <span className='text-red-400'>{change.reason || 'no match'}</span>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
         )}
 
@@ -169,7 +269,7 @@ export default function PointsLeaderboardPage() {
           </div>
 
           {streamRows.length === 0 ? (
-            <div className='text-sm text-[#C98958]'>No stream data loaded yet.</div>
+            <div className='text-sm text-[#C98958]'>No stream data loaded yet. Click "Refresh & Sync" to fetch and sync all users.</div>
           ) : (
             <div className='overflow-x-auto rounded border border-[#C98958]/30'>
               <table className='w-full min-w-[980px] text-sm'>

@@ -99,6 +99,13 @@ export const syncStreamPoints = async (token: string, options?: { onlyUserId?: s
   return res.data;
 };
 
+export const syncAllStreamPoints = async (token: string, options?: { dryRun?: boolean; limit?: number }) => {
+  const res = await http.post('/api/stream-points/sync-all', options || {}, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  return res.data;
+};
+
 export const getPointsConfigs = async (token: string) => {
   const res = await http.get('/api/points-config', {
     headers: { Authorization: `Bearer ${token}` },
@@ -141,6 +148,7 @@ export default {
   getPointsLeaderboard,
   getStreamUsers,
   syncStreamPoints,
+  syncAllStreamPoints,
   getPointsConfigs,
   updatePointsConfig,
   updateMultiplePointsConfigs,
