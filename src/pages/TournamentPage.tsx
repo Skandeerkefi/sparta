@@ -10,6 +10,7 @@ import { useAuthStore } from "@/store/useAuthStore";
 import { useToast } from "@/hooks/use-toast";
 import { Badge } from "@/components/ui/badge";
 import tournamentApi from "@/lib/tournamentApi";
+import pointsApi from "@/lib/pointsApi";
 
 type TournamentStatus = "upcoming" | "ongoing" | "finished";
 
@@ -211,6 +212,22 @@ function TournamentPage() {
   }, [myProgress, currentRoundToPick]);
 
   const winner = useMemo(() => state.players.find((player) => player.status === "winner") || null, [state.players]);
+
+  useEffect(() => {
+    if (!user || !token) return;
+    const won = winner && user.id === winner._id;
+    if (!won) return;
+
+    (async () => {
+      try {
+        const data = await pointsApi.getUserPoints(user.id, token);
+        const balance = typeof data.balance === 'number' ? data.balance : null;
+        toast({ title: 'You won!', description: balance !== null ? `Your points balance: ${balance}` : 'You won — check your points.' });
+      } catch (err) {
+        console.error('Failed to refresh points after win', err);
+      }
+    })();
+  }, [winner?._id, user?.id, token, toast]);
 
   const createTournament = async (event: React.FormEvent) => {
     event.preventDefault();
