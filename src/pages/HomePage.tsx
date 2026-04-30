@@ -48,7 +48,7 @@ function HomePage() {
 							className='h-14 w-full border-2 border-[#C98958]/60 bg-black/45 text-white hover:bg-[#930203]/50 sm:min-w-[210px]'
 							asChild
 						>
-							<Link to='/leaderboards'>Leaderboard</Link>
+							<Link to='/bethog-monthly'>Leaderboard</Link>
 						</Button>
 						<Button
 							className='h-14 w-full bg-[#C98958] text-white hover:bg-[#930203] sm:min-w-[210px]'
