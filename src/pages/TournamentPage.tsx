@@ -526,8 +526,9 @@ function TournamentPage() {
 
                           <div className='space-y-3'>
                             {round.matches.map((match) => {
-                              const selectionA = match.playerA?.slotSelections?.find((selection) => selection.roundIndex === match.roundIndex);
-                              const selectionB = match.playerB?.slotSelections?.find((selection) => selection.roundIndex === match.roundIndex);
+                              // Use first-round slot (index 0) for all rounds now
+                              const selectionA = match.playerA?.slotSelections?.find((selection) => selection.roundIndex === 0);
+                              const selectionB = match.playerB?.slotSelections?.find((selection) => selection.roundIndex === 0);
                               const winnerId = match.winner?._id;
 
                               return (
@@ -543,12 +544,14 @@ function TournamentPage() {
                                       player={match.playerA}
                                       selection={selectionA}
                                       winner={winnerId === match.playerA?._id}
+                                      isBye={!match.playerA}
                                     />
                                     <ParticipantRow
                                       label='B'
                                       player={match.playerB}
                                       selection={selectionB}
                                       winner={winnerId === match.playerB?._id}
+                                      isBye={!match.playerB}
                                     />
                                   </div>
 
@@ -598,24 +601,10 @@ function TournamentPage() {
 
                         {myProgress.status === "active" && currentRoundToPick !== null && currentRoundToPick < (state.totalRounds || 0) && (
                           <div className='rounded-2xl border border-[#C98958]/20 bg-black/25 p-4'>
-                            <p className='text-xs uppercase tracking-[0.2em] text-white/45'>Select Slot for Round {currentRoundToPick + 1}</p>
-                            {currentSelection ? (
-                              <div className='mt-3 overflow-hidden rounded-2xl border border-[#C98958]/20 bg-[#100705]'>
-                                {currentSelection.image && (
-                                  <img src={currentSelection.image} alt={currentSelection.slotName} className='object-cover w-full h-40' />
-                                )}
-                                <div className='p-4'>
-                                  <div className='flex items-center justify-between gap-3'>
-                                    <div>
-                                      <p className='font-bold text-white'>{currentSelection.slotName}</p>
-                                      <p className='text-sm text-white/50'>{currentSelection.provider || "Slot"}</p>
-                                    </div>
-                                    <Badge className='bg-[#C98958] text-white'>Locked</Badge>
-                                  </div>
-                                </div>
-                              </div>
-                            ) : (
+                            {myProgress.slotSelections.length === 0 ? (
                               <>
+                                <p className='text-xs uppercase tracking-[0.2em] text-white/45'>Select Your Slot for Round 1</p>
+                                <p className='mt-2 text-xs text-white/60'>This slot will be used for ALL rounds of the tournament. Choose wisely!</p>
                                 <Input
                                   value={slotQuery}
                                   onChange={(event) => setSlotQuery(event.target.value)}
@@ -650,6 +639,27 @@ function TournamentPage() {
                                   )}
                                 </div>
                               </>
+                            ) : (
+                              <div>
+                                <p className='text-xs uppercase tracking-[0.2em] text-white/45'>Your Locked Slot</p>
+                                <p className='mt-2 text-xs text-white/60'>This slot is locked in for all tournament rounds</p>
+                                {currentSelection && (
+                                  <div className='mt-3 overflow-hidden rounded-2xl border border-[#C98958]/20 bg-[#100705]'>
+                                    {currentSelection.image && (
+                                      <img src={currentSelection.image} alt={currentSelection.slotName} className='object-cover w-full h-40' />
+                                    )}
+                                    <div className='p-4'>
+                                      <div className='flex items-center justify-between gap-3'>
+                                        <div>
+                                          <p className='font-bold text-white'>{currentSelection.slotName}</p>
+                                          <p className='text-sm text-white/50'>{currentSelection.provider || "Slot"}</p>
+                                        </div>
+                                        <Badge className='bg-[#C98958] text-white'>Locked</Badge>
+                                      </div>
+                                    </div>
+                                  </div>
+                                )}
+                              </div>
                             )}
                           </div>
                         )}
@@ -757,9 +767,9 @@ function TournamentPage() {
                         value={createLimit}
                         onChange={(event) => setCreateLimit(event.target.value)}
                         type='number'
-                        min='4'
-                        step='4'
-                        placeholder='Player limit'
+                        min='2'
+                        step='1'
+                        placeholder='Player limit (any number 2+)'
                         className='border-[#C98958]/25 bg-black/40 text-white placeholder:text-white/35'
                       />
                       <Input
@@ -972,11 +982,13 @@ function ParticipantRow({
   player,
   selection,
   winner,
+  isBye,
 }: {
   label: string;
   player: TournamentPlayer | null;
   selection?: SlotSelection | null;
   winner?: boolean;
+  isBye?: boolean;
 }) {
   return (
     <div className={`rounded-xl border px-3 py-2 ${winner ? "border-[#C98958] bg-[#930203]/25" : "border-[#C98958]/10 bg-black/25"}`}>
@@ -991,15 +1003,18 @@ function ParticipantRow({
           )}
           <div className='min-w-0'>
             <p className='text-[0.65rem] uppercase tracking-[0.25em] text-white/40'>{label}</p>
-            <p className='text-sm font-semibold text-white truncate'>{player?.username || "TBD"}</p>
+            <p className='text-sm font-semibold text-white truncate'>{player?.username || (isBye ? "BYE" : "TBD")}</p>
           </div>
         </div>
         {winner && <Badge className='bg-[#C98958] text-white'>Winner</Badge>}
+        {isBye && <Badge className='bg-purple-600 text-white'>Auto-Advance</Badge>}
       </div>
       <div className='flex flex-wrap items-center gap-2 mt-2 text-xs text-white/50'>
-        <span>Seed #{player?.position || "—"}</span>
-        <span>•</span>
-        <span className='truncate max-w-[180px]'>{selection?.slotName || "No slot selected yet"}</span>
+        {player?.position && <span>Seed #{player.position}</span>}
+        {player?.position && (selection || isBye) && <span>•</span>}
+        <span className='truncate max-w-[180px]'>
+          {isBye ? "Bye - Auto advances" : selection?.slotName || "No slot selected yet"}
+        </span>
       </div>
     </div>
   );
