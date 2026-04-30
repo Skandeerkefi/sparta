@@ -6,6 +6,7 @@ import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
+import { useAuthStore } from "@/store/useAuthStore";
 
 type HuntStatus = "draft" | "ongoing" | "finished";
 
@@ -82,6 +83,7 @@ const formatMultiplier = (value: number | null | undefined) =>
     : Number(value).toFixed(2);
 
 function BonusHuntPage() {
+  const { user } = useAuthStore();
   const [current, setCurrent] = useState<BonusHuntView>(emptyView);
   const [history, setHistory] = useState<BonusHuntHistoryItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -331,14 +333,16 @@ function BonusHuntPage() {
                   </CardContent>
                 </Card>
 
-                <div className='rounded-3xl border border-[#C98958]/20 bg-[#120b0a]/80 p-5 shadow-lg shadow-black/30'>
-                  <p className='text-sm text-white/50'>Admins can manage the hunt start-to-finish from the control panel.</p>
-                  <div className='mt-4'>
-                    <Link to='/bonus-hunt/admin' className='inline-flex w-full items-center justify-center rounded-xl bg-[#C98958] px-4 py-3 font-semibold text-white transition hover:bg-[#930203]'>
-                      Admin Panel
-                    </Link>
+                {user?.role === "admin" && (
+                  <div className='rounded-3xl border border-[#C98958]/20 bg-[#120b0a]/80 p-5 shadow-lg shadow-black/30'>
+                    <p className='text-sm text-white/50'>Admins can manage the hunt start-to-finish from the control panel.</p>
+                    <div className='mt-4'>
+                      <Link to='/bonus-hunt/admin' className='inline-flex w-full items-center justify-center rounded-xl bg-[#C98958] px-4 py-3 font-semibold text-white transition hover:bg-[#930203]'>
+                        Admin Panel
+                      </Link>
+                    </div>
                   </div>
-                </div>
+                )}
               </aside>
             </div>
           </div>
