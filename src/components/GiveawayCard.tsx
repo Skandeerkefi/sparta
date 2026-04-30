@@ -48,6 +48,11 @@ export function GiveawayCard({
 					<span className='text-lg font-semibold'>{prize}</span>
 				</div>
 
+				{/* Points info: entry and winner rewards */}
+				<div className='mt-2 text-sm text-[#E7AC78]'>
+					Entry: +5 pts • Winner: +200 pts
+				</div>
+
 				<div className='mt-4 space-y-3'>
 					<div className='flex justify-between text-sm text-[#E7AC78]'>
 						<div className='flex items-center gap-1.5'>
