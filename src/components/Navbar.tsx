@@ -254,7 +254,9 @@ export function Navbar() {
 								isLive ? "bg-[#C98958] text-white" : "bg-gray-700/40 text-gray-400"
 							}`}
 						>
-							{isLive ? `Live ${viewerCount !== null ? `(${viewerCount})` : ""}` : "Offline"}
+							{isLive
+								? `Live ${viewerCount !== null ? `(${viewerCount})` : ""}`
+								: user?.kickUsername || "Offline"}
 						</div>
 						{user && typeof pointsBalance === 'number' && (
 							<div className='items-center hidden gap-2 ml-2 sm:flex'>
