@@ -407,12 +407,43 @@ function TournamentPage() {
         }
       );
 
+      const data = await (async () => {
+        try {
+          return await res.json();
+        } catch (_) {
+          return null;
+        }
+      })();
+
       if (!res.ok) {
-        const errorData = await res.json();
-        throw new Error(errorData.message || "Failed to submit result");
+        const errorMsg = data?.message || "Failed to submit result";
+        throw new Error(errorMsg);
+      }
+
+      // Surface awarded points if backend returns them and refresh balance for the winner
+      let awardedPoints: number | null = null;
+      if (data) {
+        if (typeof data.awardedPoints === "number") awardedPoints = data.awardedPoints;
+        else if (typeof data.awarded === "number") awardedPoints = data.awarded;
+        else if (Array.isArray(data.transactions)) {
+          const tx = data.transactions.find((t: any) => typeof t.amount === "number" && /tournament/i.test(t.type || ""));
+          if (tx) awardedPoints = tx.amount;
+        }
       }
 
       toast({ title: "Match updated", description: `Result saved for ${match.roundLabel}.` });
+
+      if (awardedPoints !== null) {
+        toast({ title: "Points awarded", description: `Winner awarded ${awardedPoints} points.` });
+        if (user && token) {
+          try {
+            await pointsApi.getUserPoints(user.id, token);
+          } catch (err) {
+            console.error('Failed to refresh points after awarding', err);
+          }
+        }
+      }
+
       await loadState();
     } catch (error) {
       toast({
