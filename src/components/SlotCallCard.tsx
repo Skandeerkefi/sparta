@@ -80,7 +80,7 @@ export function SlotCallCard({
 					
 					{ x1600Hit && (
 						<span className='text-xs px-2 py-0.5 rounded-full bg-yellow-600/20 border border-yellow-500 text-yellow-300 flex items-center gap-1'>
-							<span className='font-bold'>1,600x</span>
+							<span className='font-bold'>x4 bonus buy</span>
 						</span>
 					)}
 				</div>
@@ -102,7 +102,7 @@ export function SlotCallCard({
 							onChange={() => onToggleX1600?.(id, !x1600Hit)}
 							disabled={status !== "played"}
 						/>
-						Mark as 1,600x Hit
+						Mark as x4 bonus buy
 					</label>
 
 					{status === "pending" && (

@@ -79,7 +79,33 @@ export default function TournamentWidgetPage() {
     return () => clearInterval(i);
   }, []);
 
-  /* ───────── GROUP ROUNDS ───────── */
+  /* ───────── GET CURRENT MATCHUP ───────── */
+
+  const currentMatchup = useMemo(() => {
+    return state.matches.find((m) => m.status !== "completed") || null;
+  }, [state.matches]);
+
+  /* ───────── GET MATCH PROGRESS ───────── */
+
+  const matchProgress = useMemo(() => {
+    if (!currentMatchup) return { current: 0, total: 0, roundMatches: 0 };
+
+    const currentRoundMatches = state.matches.filter(
+      (m) => m.roundIndex === currentMatchup.roundIndex
+    );
+    const allMatchesBefore = state.matches.filter(
+      (m) => m.roundIndex < currentMatchup.roundIndex || (m.roundIndex === currentMatchup.roundIndex && m.matchIndex < currentMatchup.matchIndex)
+    );
+
+    return {
+      current: allMatchesBefore.length + 1,
+      total: state.matches.length,
+      roundMatches: currentRoundMatches.length,
+      roundCurrent: currentRoundMatches.filter(m => m.matchIndex <= currentMatchup.matchIndex).length,
+    };
+  }, [currentMatchup, state.matches]);
+
+  /* ───────── GROUP ROUNDS (FOR REFERENCE) ───────── */
 
   const rounds = useMemo(() => {
     const grouped: Record<number, TournamentMatch[]> = {};
@@ -102,20 +128,20 @@ export default function TournamentWidgetPage() {
   const completedMatches = state.matches.filter((m) => m.status === "completed").length;
 
   return (
-    <div className="w-full h-screen overflow-hidden bg-gradient-to-br from-[#050505] to-[#0B0B0B] text-white flex flex-col p-3">
+    <div className="w-full h-screen overflow-hidden bg-gradient-to-br from-[#050505] to-[#0B0B0B] text-white flex flex-col p-8">
 
       {/* HEADER */}
-      <div className="flex items-center justify-between pb-2 mb-3 border-b border-white/10">
+      <div className="flex flex-col xl:flex-row items-start xl:items-center justify-between pb-5 mb-5 border-b border-white/10 gap-4">
         <div>
-          <h1 className="text-xl font-black text-[#E7AC78] tracking-wide">
+          <h1 className="text-4xl xl:text-5xl font-black text-[#E7AC78] tracking-wide">
             TOURNAMENT BRACKET
           </h1>
-          <p className="text-[10px] text-white/40">
+          <p className="text-base text-white/40 mt-1">
             OBS Live View
           </p>
         </div>
 
-        <div className="flex gap-2">
+        <div className="flex flex-wrap gap-4">
           <Stat label="Status" value={tournament?.status || "—"} />
           <Stat label="Players" value={`${state.players.length}/${tournament?.playerLimit || 0}`} />
           <Stat label="Done" value={`${completedMatches}/${state.matches.length}`} />
@@ -123,99 +149,137 @@ export default function TournamentWidgetPage() {
       </div>
 
       {/* METRICS */}
-      <div className="grid grid-cols-4 gap-2 mb-3">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
         <Metric label="Prize" value={`$${tournament?.prizePool || 0}`} />
         <Metric label="Round" value={`${(tournament?.currentRound ?? 0) + 1}`} />
         <Metric label="Spots" value={`${state.availablePositions.length}`} />
-        <Metric label="Rounds" value={`${state.totalRounds}`} />
+        <Metric label="Progress" value={`${matchProgress.current}/${matchProgress.total}`} />
       </div>
 
-      {/* BRACKET (NO SCROLL) */}
-      <div className="flex items-center justify-center flex-1">
+      {/* CURRENT MATCHUP (CENTERED) */}
+      {currentMatchup ? (
+        <div className="flex flex-col items-center justify-center flex-1 gap-8">
 
-        <div
-          className="grid w-full h-full gap-3"
-          style={{
-            gridTemplateColumns: `repeat(${rounds.length}, minmax(0, 1fr))`,
-          }}
-        >
+          {/* ROUND LABEL */}
+          <div className="text-center mb-5">
+            <p className="text-2xl lg:text-3xl text-white/40 tracking-widest mb-3">
+              {currentMatchup.roundLabel}
+            </p>
+            <p className="text-xl lg:text-2xl text-white/60">
+              Match {matchProgress.roundCurrent} of {matchProgress.roundMatches}
+            </p>
+          </div>
 
-          {rounds.map((round) => (
-            <div key={round.roundIndex} className="flex flex-col items-center justify-center">
+          {/* CURRENT MATCH - LARGE */}
+          {(() => {
+            const selectionA = currentMatchup.playerA?.slotSelections?.find(
+              (s) => s.roundIndex === currentMatchup.roundIndex
+            );
+            const selectionB = currentMatchup.playerB?.slotSelections?.find(
+              (s) => s.roundIndex === currentMatchup.roundIndex
+            );
 
-              {/* ROUND TITLE */}
-              <div className="mb-2 text-center">
-                <p className="text-[9px] text-white/40 tracking-widest">
-                  ROUND {round.roundIndex + 1}
-                </p>
-                <h2 className="text-xs font-bold text-[#E7AC78]">
-                  {round.roundLabel}
-                </h2>
-              </div>
+            const winnerId = currentMatchup.winner?._id;
+            const isLive = currentMatchup.status === "ready";
 
-              {/* MATCHES */}
+            return (
               <div
-                className="flex flex-col justify-center w-full gap-3"
-                style={{ marginTop: round.roundIndex * 20 }}
+                className={`rounded-3xl p-8 w-full max-w-2xl transition-all ${
+                  isLive
+                    ? "border-2 border-green-500 shadow-[0_0_18px_rgba(34,197,94,0.6)] bg-[#0E0605]"
+                    : "border border-[#C98958]/20 bg-[#0E0605]"
+                }`}
               >
-                {round.matches.map((match) => {
-                  const selectionA = match.playerA?.slotSelections?.find(
-                    (s) => s.roundIndex === match.roundIndex
-                  );
-                  const selectionB = match.playerB?.slotSelections?.find(
-                    (s) => s.roundIndex === match.roundIndex
-                  );
+                <div className="flex justify-between text-xl lg:text-2xl text-white/40 mb-6">
+                  <span className="font-semibold">Match #{currentMatchup.matchIndex + 1}</span>
+                  <MatchStatus status={currentMatchup.status} />
+                </div>
 
-                  const winnerId = match.winner?._id;
-                  const isLive = match.status === "ready";
+                <PlayerCardLarge
+                  name={currentMatchup.playerA?.username}
+                  slot={selectionA?.slotName}
+                  provider={selectionA?.provider}
+                  score={currentMatchup.multiplierA}
+                  winner={winnerId === currentMatchup.playerA?._id}
+                  image={selectionA?.image}
+                />
 
-                  return (
-                    <div
-                      key={match._id}
-                      className={`rounded-lg p-2 w-full transition-all ${
-                        isLive
-                          ? "border border-green-500 shadow-[0_0_8px_rgba(34,197,94,0.5)] bg-[#0E0605]"
-                          : "border border-[#C98958]/20 bg-[#0E0605]"
-                      }`}
-                    >
-                      <div className="flex justify-between text-[9px] text-white/40 mb-1">
-                        <span>M{match.matchIndex + 1}</span>
-                        <MatchStatus status={match.status} />
-                      </div>
+                <div className="text-center text-3xl lg:text-4xl text-[#C98958] my-6 font-semibold">
+                  VS
+                </div>
 
-                      <PlayerCard
-                        name={match.playerA?.username}
-                        slot={selectionA?.slotName}
-                        provider={selectionA?.provider}
-                        score={match.multiplierA}
-                        winner={winnerId === match.playerA?._id}
-                      />
-
-                      <div className="text-center text-[8px] text-[#C98958]/70 my-1">
-                        VS
-                      </div>
-
-                      <PlayerCard
-                        name={match.playerB?.username}
-                        slot={selectionB?.slotName}
-                        provider={selectionB?.provider}
-                        score={match.multiplierB}
-                        winner={winnerId === match.playerB?._id}
-                      />
-                    </div>
-                  );
-                })}
+                <PlayerCardLarge
+                  name={currentMatchup.playerB?.username}
+                  slot={selectionB?.slotName}
+                  provider={selectionB?.provider}
+                  score={currentMatchup.multiplierB}
+                  winner={winnerId === currentMatchup.playerB?._id}
+                  image={selectionB?.image}
+                />
               </div>
-            </div>
-          ))}
+            );
+          })()}
 
         </div>
-      </div>
+      ) : (
+        <div className="flex items-center justify-center flex-1">
+          <div className="text-center">
+            <p className="text-3xl lg:text-4xl text-[#E7AC78] font-bold mb-5">Tournament Complete!</p>
+            <p className="text-2xl lg:text-3xl text-white/60">All matches have been played.</p>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
 
 /* ───────── COMPONENTS ───────── */
+
+function PlayerCardLarge({ name, slot, provider, score, winner, image }: any) {
+  const isBye = !name;
+
+  return (
+    <div
+      className={`p-6 rounded-3xl border mb-4 ${
+        isBye
+          ? "border-white/5 bg-black/10 opacity-40"
+          : winner
+          ? "border-[#E7AC78] bg-[#C98958]/20 shadow-[0_0_12px_rgba(231,172,120,0.5)]"
+          : "border-white/10 bg-black/30"
+      }`}
+    >
+      <div className="flex gap-6 items-start">
+        {/* SLOT IMAGE */}
+        {image && (
+          <div className="flex-shrink-0">
+            <img
+              src={image}
+              alt={slot}
+              className="w-32 h-32 rounded object-cover border border-white/10"
+            />
+          </div>
+        )}
+
+        <div className="flex-1">
+          <div className="flex justify-between items-start gap-6">
+            <div>
+              <p className="text-2xl lg:text-3xl font-semibold">{name || "BYE"}</p>
+              <p className="text-lg text-white/40 mt-1">{slot || "No slot"}</p>
+              <p className="text-sm text-white/30 mt-1">{provider || ""}</p>
+            </div>
+
+            <div className="text-right">
+              <p className="text-base text-white/40 mb-2">Multiplier</p>
+              <p className="text-4xl lg:text-5xl font-bold text-[#E7AC78]">
+                {formatMultiplier(score)}
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
 
 function PlayerCard({ name, slot, provider, score, winner }: any) {
   const isBye = !name;
@@ -256,26 +320,26 @@ function MatchStatus({ status }: { status: string }) {
   };
 
   return (
-    <span className={`px-2 py-0.5 rounded text-[8px] ${map[status]}`}>
-      {status}
+    <span className={`px-3 py-1 rounded text-sm font-semibold ${map[status]}`}>
+      {status.toUpperCase()}
     </span>
   );
 }
 
 function Stat({ label, value }: any) {
   return (
-    <div className="px-2 py-1 border rounded bg-white/5 border-white/10">
-      <p className="text-[8px] text-white/40">{label}</p>
-      <p className="text-[10px] font-bold text-[#E7AC78]">{value}</p>
+    <div className="px-3 py-2 border rounded bg-white/5 border-white/10">
+      <p className="text-sm text-white/40">{label}</p>
+      <p className="text-lg font-bold text-[#E7AC78]">{value}</p>
     </div>
   );
 }
 
 function Metric({ label, value }: any) {
   return (
-    <div className="p-2 border rounded bg-black/30 border-white/10">
-      <p className="text-[8px] text-white/40">{label}</p>
-      <p className="text-sm font-bold">{value}</p>
+    <div className="p-3 border rounded bg-black/30 border-white/10">
+      <p className="text-sm text-white/40">{label}</p>
+      <p className="text-xl font-bold">{value}</p>
     </div>
   );
 }

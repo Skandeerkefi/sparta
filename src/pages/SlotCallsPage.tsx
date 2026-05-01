@@ -41,12 +41,12 @@ function SlotCallsPage() {
 	const handleToggleX1600 = async (id: string, newValue: boolean) => {
 		const result = await updateSlotStatus(id, "played", newValue);
 		if (result.success) {
-			toast({ title: "Updated", description: "x1600 hit toggled." });
+			toast({ title: "Updated", description: "x4 bonus buy toggled." });
 			await fetchSlotCalls();
 		} else {
 			toast({
 				title: "Error",
-				description: result.error || "Failed to toggle x1600",
+				description: result.error || "Failed to toggle x4 bonus buy",
 				variant: "destructive",
 			});
 		}
@@ -425,7 +425,7 @@ function SlotCallsPage() {
 							onChange={(e) => setShowOnly1600Hit(e.target.checked)}
 							className='accent-[#C98958]'
 						/>
-						Show only 1,600x Hit
+						Show only x4 bonus buy
 					</label>
 				</div>
 
