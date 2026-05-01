@@ -42,6 +42,7 @@ export function Navbar() {
 			{ path: "/slot-calls", name: "Slot Calls", icon: <Users className='w-5 h-5' /> },
 			{ path: "/giveaways", name: "Giveaways", icon: <Gift className='w-5 h-5' /> },
 			{ path: "/points", name: "Points", icon: <Trophy className='w-5 h-5' /> },
+			{ path: "/guess-balance", name: "Guess Balance", icon: <Trophy className='w-5 h-5 text-yellow-400' /> },
 			{ path: "/store", name: "Store", icon: <Gift className='w-5 h-5' /> },
 		],
 		[]
@@ -51,9 +52,10 @@ export function Navbar() {
 		() =>
 			user?.role === "admin"
 				? [
-						{ path: "/admin/users", name: "User Management", icon: <Shield className='w-5 h-5' /> },
-						{ path: "/admin/points-adjust", name: "Points Adjustment", icon: <Coins className='w-5 h-5' /> },
-						{ path: "/bethog-monthly/admin", name: "Bethog Admin", icon: <CalendarRange className='w-5 h-5' /> },
+					{ path: "/admin/users", name: "User Management", icon: <Shield className='w-5 h-5' /> },
+					{ path: "/admin/points-adjust", name: "Points Adjustment", icon: <Coins className='w-5 h-5' /> },
+					{ path: "/admin/guess-balance", name: "Guess Balance", icon: <Trophy className='w-5 h-5' /> },
+					{ path: "/bethog-monthly/admin", name: "Bethog Admin", icon: <CalendarRange className='w-5 h-5' /> },
 						{ path: "/bonus-hunt/admin", name: "Bonus Hunt Admin", icon: <Flame className='w-5 h-5' /> },
 						{ path: "/admin/store", name: "Store Manager", icon: <Gift className='w-5 h-5' /> },
 						{ path: "/admin/redemptions", name: "Redemptions", icon: <Gift className='w-5 h-5' /> },
@@ -331,28 +333,47 @@ export function Navbar() {
 									</Link>
 								))}
 
-								{widgetMenuItems.length > 0 && (
-									<div className='pt-4'>
-										<div className='mb-3 text-xs font-semibold uppercase tracking-[0.3em] text-white/35'>Widgets</div>
-										<div className='space-y-2'>
-											{widgetMenuItems.map((item) => (
-												<Link
-													key={item.name}
-													to={item.path}
-													onClick={() => setIsOpen(false)}
-													className={`flex items-center gap-3 rounded-2xl px-4 py-3 font-semibold transition ${
-														location.pathname === item.path
-															? "bg-[#C98958] text-white shadow-lg"
-															: "bg-black/20 text-[#E7AC78] hover:bg-[#930203] hover:text-[#C98958]"
-													}`}
-												>
-													{item.icon}
-													<span>{item.name}</span>
-												</Link>
-											))}
-										</div>
-									</div>
-								)}
+				{widgetMenuItems.length > 0 && (
+					<div className='pt-4'>
+						<div className='mb-3 text-xs font-semibold uppercase tracking-[0.3em] text-white/35'>Widgets</div>
+						<div className='space-y-2'>
+							{widgetMenuItems.map((item) => (
+								<Link
+									key={item.name}
+									to={item.path}
+									onClick={() => setIsOpen(false)}
+									className={`flex items-center gap-3 rounded-2xl px-4 py-3 font-semibold transition ${
+										location.pathname === item.path
+											? "bg-[#C98958] text-white shadow-lg"
+											: "bg-black/20 text-[#E7AC78] hover:bg-[#930203] hover:text-[#C98958]"
+									}`}
+								>
+									{item.icon}
+									<span>{item.name}</span>
+								</Link>
+							))}
+						</div>
+					</div>
+				)}
+				{user?.role === 'admin' && (
+					<div className='pt-4'>
+						<div className='mb-3 text-xs font-semibold uppercase tracking-[0.3em] text-white/35'>Admin Tools</div>
+						<div className='space-y-2'>
+							<Link
+								to='/admin/guess-balance'
+								onClick={() => setIsOpen(false)}
+								className={`flex items-center gap-3 rounded-2xl px-4 py-3 font-semibold transition ${
+									location.pathname === '/admin/guess-balance'
+										? "bg-[#C98958] text-white shadow-lg"
+										: "bg-black/20 text-[#E7AC78] hover:bg-[#930203] hover:text-[#C98958]"
+								}`}
+							>
+								<Trophy className='w-4 h-4' />
+								<span>Guess Balance</span>
+							</Link>
+						</div>
+					</div>
+				)}
 							</div>
 
 							<div className='mt-auto space-y-3 border-t border-[#C98958]/15 pt-4'>
