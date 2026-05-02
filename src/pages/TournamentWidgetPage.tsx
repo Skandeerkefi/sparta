@@ -18,6 +18,7 @@ interface SlotSelection {
   roundIndex: number;
   slotName: string;
   provider?: string;
+  image?: string;
 }
 
 interface TournamentPlayer {
@@ -131,12 +132,12 @@ export default function TournamentWidgetPage() {
     <div className="w-full h-screen overflow-hidden bg-gradient-to-br from-[#050505] to-[#0B0B0B] text-white flex flex-col p-8">
 
       {/* HEADER */}
-      <div className="flex flex-col xl:flex-row items-start xl:items-center justify-between pb-5 mb-5 border-b border-white/10 gap-4">
+      <div className="flex flex-col items-start justify-between gap-4 pb-5 mb-5 border-b xl:flex-row xl:items-center border-white/10">
         <div>
           <h1 className="text-4xl xl:text-5xl font-black text-[#E7AC78] tracking-wide">
             TOURNAMENT BRACKET
           </h1>
-          <p className="text-base text-white/40 mt-1">
+          <p className="mt-1 text-base text-white/40">
             OBS Live View
           </p>
         </div>
@@ -149,7 +150,7 @@ export default function TournamentWidgetPage() {
       </div>
 
       {/* METRICS */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+      <div className="grid grid-cols-2 gap-4 mb-6 lg:grid-cols-4">
         <Metric label="Prize" value={`$${tournament?.prizePool || 0}`} />
         <Metric label="Round" value={`${(tournament?.currentRound ?? 0) + 1}`} />
         <Metric label="Spots" value={`${state.availablePositions.length}`} />
@@ -161,8 +162,8 @@ export default function TournamentWidgetPage() {
         <div className="flex flex-col items-center justify-center flex-1 gap-8">
 
           {/* ROUND LABEL */}
-          <div className="text-center mb-5">
-            <p className="text-2xl lg:text-3xl text-white/40 tracking-widest mb-3">
+          <div className="mb-5 text-center">
+            <p className="mb-3 text-2xl tracking-widest lg:text-3xl text-white/40">
               {currentMatchup.roundLabel}
             </p>
             <p className="text-xl lg:text-2xl text-white/60">
@@ -172,50 +173,54 @@ export default function TournamentWidgetPage() {
 
           {/* CURRENT MATCH - LARGE */}
           {(() => {
-            const selectionA = currentMatchup.playerA?.slotSelections?.find(
-              (s) => s.roundIndex === currentMatchup.roundIndex
-            );
-            const selectionB = currentMatchup.playerB?.slotSelections?.find(
-              (s) => s.roundIndex === currentMatchup.roundIndex
-            );
+            const selectionA =
+              currentMatchup.playerA?.slotSelections?.find(
+                (s) => s.roundIndex === currentMatchup.roundIndex
+              ) || currentMatchup.playerA?.slotSelections?.[0] || null;
+            const selectionB =
+              currentMatchup.playerB?.slotSelections?.find(
+                (s) => s.roundIndex === currentMatchup.roundIndex
+              ) || currentMatchup.playerB?.slotSelections?.[0] || null;
 
             const winnerId = currentMatchup.winner?._id;
             const isLive = currentMatchup.status === "ready";
 
             return (
               <div
-                className={`rounded-3xl p-8 w-full max-w-2xl transition-all ${
+                className={`rounded-3xl p-8 w-full max-w-[1400px] transition-all ${
                   isLive
                     ? "border-2 border-green-500 shadow-[0_0_18px_rgba(34,197,94,0.6)] bg-[#0E0605]"
                     : "border border-[#C98958]/20 bg-[#0E0605]"
                 }`}
               >
-                <div className="flex justify-between text-xl lg:text-2xl text-white/40 mb-6">
+                <div className="flex justify-between mb-6 text-xl lg:text-2xl text-white/40">
                   <span className="font-semibold">Match #{currentMatchup.matchIndex + 1}</span>
                   <MatchStatus status={currentMatchup.status} />
                 </div>
 
-                <PlayerCardLarge
-                  name={currentMatchup.playerA?.username}
-                  slot={selectionA?.slotName}
-                  provider={selectionA?.provider}
-                  score={currentMatchup.multiplierA}
-                  winner={winnerId === currentMatchup.playerA?._id}
-                  image={selectionA?.image}
-                />
+                <div className="grid items-center gap-6 lg:grid-cols-[1fr_auto_1fr]">
+                  <PlayerCardLarge
+                    name={currentMatchup.playerA?.username}
+                    slot={selectionA?.slotName}
+                    provider={selectionA?.provider}
+                    score={currentMatchup.multiplierA}
+                    winner={winnerId === currentMatchup.playerA?._id}
+                    image={selectionA?.image}
+                  />
 
-                <div className="text-center text-3xl lg:text-4xl text-[#C98958] my-6 font-semibold">
-                  VS
+                  <div className="text-center text-3xl lg:text-4xl text-[#C98958] font-semibold">
+                    VS
+                  </div>
+
+                  <PlayerCardLarge
+                    name={currentMatchup.playerB?.username}
+                    slot={selectionB?.slotName}
+                    provider={selectionB?.provider}
+                    score={currentMatchup.multiplierB}
+                    winner={winnerId === currentMatchup.playerB?._id}
+                    image={selectionB?.image}
+                  />
                 </div>
-
-                <PlayerCardLarge
-                  name={currentMatchup.playerB?.username}
-                  slot={selectionB?.slotName}
-                  provider={selectionB?.provider}
-                  score={currentMatchup.multiplierB}
-                  winner={winnerId === currentMatchup.playerB?._id}
-                  image={selectionB?.image}
-                />
               </div>
             );
           })()}
@@ -248,28 +253,28 @@ function PlayerCardLarge({ name, slot, provider, score, winner, image }: any) {
           : "border-white/10 bg-black/30"
       }`}
     >
-      <div className="flex gap-6 items-start">
+      <div className="flex items-start gap-6">
         {/* SLOT IMAGE */}
         {image && (
           <div className="flex-shrink-0">
             <img
               src={image}
               alt={slot}
-              className="w-32 h-32 rounded object-cover border border-white/10"
+              className="object-cover w-32 h-32 border rounded border-white/10"
             />
           </div>
         )}
 
         <div className="flex-1">
-          <div className="flex justify-between items-start gap-6">
+          <div className="flex items-start justify-between gap-6">
             <div>
-              <p className="text-2xl lg:text-3xl font-semibold">{name || "BYE"}</p>
-              <p className="text-lg text-white/40 mt-1">{slot || "No slot"}</p>
-              <p className="text-sm text-white/30 mt-1">{provider || ""}</p>
+              <p className="text-2xl font-semibold lg:text-3xl">{name || "BYE"}</p>
+              <p className="mt-1 text-lg text-white/40">{slot || "No slot"}</p>
+              <p className="mt-1 text-sm text-white/30">{provider || ""}</p>
             </div>
 
             <div className="text-right">
-              <p className="text-base text-white/40 mb-2">Multiplier</p>
+              <p className="mb-2 text-base text-white/40">Multiplier</p>
               <p className="text-4xl lg:text-5xl font-bold text-[#E7AC78]">
                 {formatMultiplier(score)}
               </p>
