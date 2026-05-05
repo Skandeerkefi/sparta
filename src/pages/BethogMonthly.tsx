@@ -17,6 +17,44 @@ export default function BethogMonthly() {
   });
   const [entries, setEntries] = useState<MonthlyEntryItem[]>([]);
   const [prizes, setPrizes] = useState<number[]>([]);
+  const [nowMs, setNowMs] = useState<number>(Date.now());
+
+  useEffect(() => {
+    const id = window.setInterval(() => {
+      setNowMs(Date.now());
+    }, 1000);
+
+    return () => window.clearInterval(id);
+  }, []);
+
+  const monthEndMs = useMemo(() => {
+    const [yearStr, monthStr] = month.split("-");
+    const year = Number(yearStr);
+    const monthNumber = Number(monthStr);
+
+    if (!Number.isFinite(year) || !Number.isFinite(monthNumber) || monthNumber < 1 || monthNumber > 12) {
+      return null;
+    }
+
+    // Last instant of the selected month in local time
+    const endDate = new Date(year, monthNumber, 0, 23, 59, 59, 999);
+    return endDate.getTime();
+  }, [month]);
+
+  const countdownLabel = useMemo(() => {
+    if (!monthEndMs) return "Invalid month";
+
+    const diff = monthEndMs - nowMs;
+    if (diff <= 0) return "Ended";
+
+    const totalSeconds = Math.floor(diff / 1000);
+    const days = Math.floor(totalSeconds / 86400);
+    const hours = Math.floor((totalSeconds % 86400) / 3600);
+    const minutes = Math.floor((totalSeconds % 3600) / 60);
+    const seconds = totalSeconds % 60;
+
+    return `${days}d ${String(hours).padStart(2, "0")}h ${String(minutes).padStart(2, "0")}m ${String(seconds).padStart(2, "0")}s`;
+  }, [monthEndMs, nowMs]);
 
   const totalPrize = useMemo(
     () => prizes.reduce((sum: number, prize: number) => sum + (Number(prize) || 0), 0),
@@ -65,6 +103,11 @@ export default function BethogMonthly() {
               <div className="rounded-2xl border border-[#C98958]/20 bg-black/30 p-4">
                 <p className="text-xs uppercase tracking-[0.25em] text-white/45">Prize Pool</p>
                 <p className="mt-2 text-2xl font-bold text-[#C98958]">{totalPrize.toLocaleString()}</p>
+              </div>
+
+              <div className="rounded-2xl border border-[#C98958]/20 bg-black/30 p-4">
+                <p className="text-xs uppercase tracking-[0.25em] text-white/45">Time Left</p>
+                <p className="mt-2 text-2xl font-bold text-[#E7AC78]">{countdownLabel}</p>
               </div>
             </div>
 
