@@ -44,7 +44,7 @@ const CATEGORIES = [
   {
     title: 'Stream',
     icon: <Eye className="w-5 h-5" />,
-    actions: ['stream-watchtime', 'stream-level'],
+    actions: ['stream-watchtime', 'stream-level', 'kick-subscribed'],
     color: 'text-blue-400',
   },
   {

@@ -16,6 +16,7 @@ type User = {
   rainbetUsername: string;
   pointsBalance: number;
   role: 'user' | 'admin';
+  kickSubscribed?: boolean;
 };
 
 export default function AdminUserManagementPage() {
@@ -56,6 +57,24 @@ export default function AdminUserManagementPage() {
     } catch (err: unknown) {
       console.error(err);
       toast({ title: 'Error', description: 'Failed to change role', variant: 'destructive' });
+    } finally {
+      setSaving(null);
+    }
+  };
+
+  const handleToggleSubscribed = async (userId: string, currentSubscribed?: boolean) => {
+    if (!token) return;
+    const newState = !currentSubscribed;
+    if (!confirm(`Set subscribed = ${newState} for this user?`)) return;
+
+    setSaving(userId);
+    try {
+      await pointsApi.setUserSubscription(userId, newState, token);
+      toast({ title: 'Success', description: `Subscription updated` });
+      await loadUsers();
+    } catch (err: unknown) {
+      console.error(err);
+      toast({ title: 'Error', description: 'Failed to update subscription', variant: 'destructive' });
     } finally {
       setSaving(null);
     }
@@ -144,6 +163,7 @@ export default function AdminUserManagementPage() {
                   <th className="px-4 py-3">Platform Username</th>
                   <th className="px-4 py-3">Points</th>
                   <th className="px-4 py-3">Role</th>
+                  <th className="px-4 py-3">Subscribed</th>
                   <th className="px-4 py-3 text-right">Actions</th>
                 </tr>
               </thead>
@@ -158,18 +178,33 @@ export default function AdminUserManagementPage() {
                         {u.role === 'admin' ? <><Shield className="w-3 h-3 mr-1" />Admin</> : <><ShieldOff className="w-3 h-3 mr-1" />User</>}
                       </Badge>
                     </td>
+                    <td className="px-4 py-3">
+                      <div className="text-sm text-gray-200">{u.kickSubscribed ? 'Yes' : 'No'}</div>
+                    </td>
                     <td className="px-4 py-3 text-right">
-                      <Button
-                        size="sm"
-                        onClick={() => handleChangeRole(u._id, u.role)}
-                        disabled={saving === u._id}
-                        variant={u.role === 'admin' ? 'outline' : 'default'}
-                        className={u.role === 'admin'
-                          ? 'border-green-600/50 text-green-400 hover:bg-green-600/20 h-7 px-3'
-                          : 'bg-red-600 hover:bg-red-700 h-7 px-3'}
-                      >
-                        {saving === u._id ? '...' : u.role === 'admin' ? 'Demote' : 'Promote'}
-                      </Button>
+                      <div className="flex items-center justify-end gap-2">
+                        <Button
+                          size="sm"
+                          onClick={() => handleToggleSubscribed(u._id, u.kickSubscribed)}
+                          disabled={saving === u._id}
+                          variant={u.kickSubscribed ? 'outline' : 'default'}
+                          className={u.kickSubscribed ? 'border-[#C98958]/30 text-[#E7AC78] h-7 px-3' : 'bg-[#C98958] hover:bg-[#930203] h-7 px-3'}
+                        >
+                          {saving === u._id ? '...' : u.kickSubscribed ? 'Unsubscribe' : 'Subscribe'}
+                        </Button>
+
+                        <Button
+                          size="sm"
+                          onClick={() => handleChangeRole(u._id, u.role)}
+                          disabled={saving === u._id}
+                          variant={u.role === 'admin' ? 'outline' : 'default'}
+                          className={u.role === 'admin'
+                            ? 'border-green-600/50 text-green-400 hover:bg-green-600/20 h-7 px-3'
+                            : 'bg-red-600 hover:bg-red-700 h-7 px-3'}
+                        >
+                          {saving === u._id ? '...' : u.role === 'admin' ? 'Demote' : 'Promote'}
+                        </Button>
+                      </div>
                     </td>
                   </tr>
                 ))}

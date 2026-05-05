@@ -156,6 +156,13 @@ export const changeUserRole = async (userId: string, role: 'user' | 'admin', tok
   return res.data;
 };
 
+export const setUserSubscription = async (userId: string, kickSubscribed: boolean, token: string) => {
+  const res = await http.patch(`/api/points/admin/users/${userId}/subscribed`, { kickSubscribed }, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  return res.data;
+};
+
 export const getActiveGuessEvent = async () => {
   const res = await http.get('/api/guess-balance/active');
   return res.data;
@@ -232,6 +239,7 @@ export default {
   getAllUsers,
   adjustUserPoints,
   changeUserRole,
+  setUserSubscription,
   getActiveGuessEvent,
   submitGuess,
   getAllGuessEvents,
