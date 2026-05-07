@@ -43,6 +43,25 @@ interface TournamentPlayer {
   slotSelections: SlotSelection[];
 }
 
+interface TournamentBetTarget {
+  _id: string;
+  username: string;
+  position: number;
+  status: "active" | "eliminated" | "winner";
+  currentRound: number;
+}
+
+interface TournamentBet {
+  _id: string;
+  stake: number;
+  potentialPayout: number;
+  status: "pending" | "won" | "lost";
+  targetUsername?: string;
+  targetProgress?: TournamentBetTarget | null;
+  resolvedReason?: string | null;
+  resolvedAt?: string | null;
+}
+
 interface TournamentMatch {
   _id: string;
   roundIndex: number;
@@ -112,6 +131,11 @@ function TournamentPage() {
   const [slotQuery, setSlotQuery] = useState("");
   const [slotResults, setSlotResults] = useState<SlotSearchResult[]>([]);
   const [slotLoading, setSlotLoading] = useState(false);
+  const [pointsBalance, setPointsBalance] = useState<number | null>(null);
+  const [myBet, setMyBet] = useState<TournamentBet | null>(null);
+  const [betStake, setBetStake] = useState("250");
+  const [betTargetId, setBetTargetId] = useState("");
+  const [isPlacingBet, setIsPlacingBet] = useState(false);
   const [createTitle, setCreateTitle] = useState("Bethog Slot Tournament");
   const [createLimit, setCreateLimit] = useState("8");
   const [createPrizePool, setCreatePrizePool] = useState("0");
@@ -121,6 +145,10 @@ function TournamentPage() {
 
   const isAdmin = user?.role === "admin";
   const currentRoundToPick = myProgress?.currentRound ?? null;
+  const bettablePlayers = useMemo(
+    () => state.players.filter((player) => player.status === "active"),
+    [state.players]
+  );
 
   const loadState = useCallback(async () => {
     try {
@@ -129,14 +157,27 @@ function TournamentPage() {
       const data = await res.json();
       setState({ ...EMPTY_STATE, ...data });
 
-      if (token && data?.tournament?._id) {
-        const meRes = await fetch(`${API_BASE}/api/tournaments/${data.tournament._id}/me`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        const meData = await meRes.json();
+      if (token && data?.tournament?._id && user?.id) {
+        const [meData, betData, pointsData] = await Promise.all([
+          fetch(`${API_BASE}/api/tournaments/${data.tournament._id}/me`, {
+            headers: { Authorization: `Bearer ${token}` },
+          }).then((response) => response.json()),
+          fetch(`${API_BASE}/api/tournaments/${data.tournament._id}/bets/me`, {
+            headers: { Authorization: `Bearer ${token}` },
+          }).then((response) => response.json()),
+          pointsApi.getUserPoints(user.id, token).catch((error) => {
+            console.error("Failed to load balance", error);
+            return null;
+          }),
+        ]);
+
         setMyProgress(meData.progress || null);
+        setMyBet(betData.bet || null);
+        setPointsBalance(typeof pointsData?.balance === "number" ? pointsData.balance : null);
       } else {
         setMyProgress(null);
+        setMyBet(null);
+        setPointsBalance(null);
       }
     } catch (error) {
       console.error(error);
@@ -148,7 +189,7 @@ function TournamentPage() {
     } finally {
       setIsLoading(false);
     }
-  }, [token, toast]);
+  }, [token, toast, user?.id]);
 
   useEffect(() => {
     loadState();
@@ -180,6 +221,12 @@ function TournamentPage() {
 
     return () => clearTimeout(timer);
   }, [slotQuery, token, state.tournament?._id, myProgress]);
+
+  useEffect(() => {
+    if (!betTargetId && bettablePlayers.length > 0) {
+      setBetTargetId(bettablePlayers[0]._id);
+    }
+  }, [betTargetId, bettablePlayers]);
 
   useEffect(() => {
     const nextInputs: Record<string, MatchInputState> = {};
@@ -382,6 +429,92 @@ function TournamentPage() {
         description: error instanceof Error ? error.message : "Failed to save slot selection.",
         variant: "destructive",
       });
+    }
+  };
+
+  const placeBet = async (event: React.FormEvent) => {
+    event.preventDefault();
+
+    if (!token || !user || !state.tournament?._id) {
+      return;
+    }
+
+    if (myProgress) {
+      toast({
+        title: "Betting unavailable",
+        description: "Tournament participants cannot place spectator bets.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (myBet) {
+      toast({
+        title: "Bet already placed",
+        description: "You can only place one bet per tournament.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    const stake = Number(betStake);
+    if (!Number.isInteger(stake) || stake < 1 || stake > 250) {
+      toast({
+        title: "Invalid stake",
+        description: "Use an integer between 1 and 250 points.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (pointsBalance !== null && stake > pointsBalance) {
+      toast({
+        title: "Insufficient points",
+        description: "You do not have enough points for that bet.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    const target = bettablePlayers.find((player) => player._id === betTargetId);
+    if (!target) {
+      toast({
+        title: "Pick a player",
+        description: "Select an active tournament player to bet on.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setIsPlacingBet(true);
+    try {
+      const result = await tournamentApi.placeTournamentBet(
+        state.tournament._id,
+        {
+          targetParticipantId: target._id,
+          stake,
+        },
+        token
+      );
+
+      if (typeof result.balance === "number") {
+        setPointsBalance(result.balance);
+      }
+
+      toast({
+        title: "Bet placed",
+        description: `You staked ${stake} points on ${target.username}.`,
+      });
+
+      await loadState();
+    } catch (error) {
+      toast({
+        title: "Bet failed",
+        description: error instanceof Error ? error.message : "Could not place bet.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsPlacingBet(false);
     }
   };
 
@@ -716,6 +849,100 @@ function TournamentPage() {
                             </Button>
                           </>
                         )}
+                      </div>
+                    )}
+                  </div>
+
+                  <div className='rounded-3xl border border-[#C98958]/20 bg-[#120b0a]/80 p-5 shadow-lg shadow-black/30'>
+                    <h2 className='text-xl font-bold text-white'>Spectator Bet</h2>
+                    <p className='mt-2 text-sm text-white/50'>Non-players can bet up to 250 points on one active tournament player. Winning pays 2x the stake, elimination loses the stake.</p>
+
+                    {!token ? (
+                      <div className='mt-4 rounded-2xl border border-dashed border-[#C98958]/25 bg-black/25 p-4 text-sm text-white/55'>
+                        Sign in to place a tournament bet. <Link className='text-[#E7AC78] underline' to='/login'>Login</Link>
+                      </div>
+                    ) : myProgress ? (
+                      <div className='mt-4 rounded-2xl border border-dashed border-[#C98958]/25 bg-black/25 p-4 text-sm text-white/55'>
+                        You joined this tournament, so spectator betting is disabled for your account.
+                      </div>
+                    ) : myBet ? (
+                      <div className='mt-4 space-y-3'>
+                        <div className='rounded-2xl border border-[#C98958]/20 bg-black/25 p-4'>
+                          <p className='text-xs uppercase tracking-[0.2em] text-white/45'>Your Bet</p>
+                          <p className='mt-1 text-2xl font-bold text-[#E7AC78]'>{myBet.stake} points</p>
+                          <p className='mt-1 text-sm text-white/60'>Payout: {myBet.potentialPayout} points</p>
+                        </div>
+
+                        <div className='rounded-2xl border border-[#C98958]/20 bg-black/25 p-4'>
+                          <p className='text-xs uppercase tracking-[0.2em] text-white/45'>Target</p>
+                          <p className='mt-1 text-lg font-semibold text-white'>
+                            {myBet.targetProgress?.username || myBet.targetUsername || 'Unknown player'}
+                          </p>
+                          <p className='mt-1 text-sm text-white/60'>
+                            Status: <span className='font-semibold text-[#E7AC78]'>{myBet.status.toUpperCase()}</span>
+                          </p>
+                          {myBet.resolvedReason && (
+                            <p className='mt-1 text-sm text-white/45'>{myBet.resolvedReason.replace(/-/g, ' ')}</p>
+                          )}
+                        </div>
+
+                        <div className='rounded-2xl border border-[#C98958]/20 bg-black/25 p-4 text-sm text-white/55'>
+                          Balance: {pointsBalance !== null ? `${pointsBalance} points` : 'Loading...'}
+                        </div>
+                      </div>
+                    ) : state.tournament?.status === "finished" ? (
+                      <div className='mt-4 rounded-2xl border border-dashed border-[#C98958]/25 bg-black/25 p-4 text-sm text-white/55'>
+                        This tournament is already finished, so betting is closed.
+                      </div>
+                    ) : bettablePlayers.length > 0 ? (
+                      <form onSubmit={placeBet} className='mt-4 space-y-3'>
+                        <div className='rounded-2xl border border-[#C98958]/20 bg-black/25 p-4'>
+                          <p className='text-xs uppercase tracking-[0.2em] text-white/45'>Balance</p>
+                          <p className='mt-1 text-2xl font-bold text-[#E7AC78]'>
+                            {pointsBalance !== null ? `${pointsBalance} points` : 'Loading...'}
+                          </p>
+                        </div>
+
+                        <label className='block space-y-2'>
+                          <span className='text-sm text-white/60'>Pick a player</span>
+                          <select
+                            value={betTargetId}
+                            onChange={(event) => setBetTargetId(event.target.value)}
+                            className='w-full rounded-xl border border-[#C98958]/25 bg-black/40 px-3 py-3 text-white outline-none'
+                          >
+                            {bettablePlayers.map((player) => (
+                              <option key={player._id} value={player._id}>
+                                {player.username} #{player.position}
+                              </option>
+                            ))}
+                          </select>
+                        </label>
+
+                        <label className='block space-y-2'>
+                          <span className='text-sm text-white/60'>Stake amount</span>
+                          <Input
+                            value={betStake}
+                            onChange={(event) => setBetStake(event.target.value)}
+                            type='number'
+                            min='1'
+                            max='250'
+                            step='1'
+                            placeholder='1-250 points'
+                            className='border-[#C98958]/25 bg-black/40 text-white placeholder:text-white/35'
+                          />
+                        </label>
+
+                        <Button
+                          type='submit'
+                          disabled={isPlacingBet}
+                          className='w-full bg-[#C98958] text-white hover:bg-[#930203]'
+                        >
+                          {isPlacingBet ? 'Placing bet...' : 'Place Bet'}
+                        </Button>
+                      </form>
+                    ) : (
+                      <div className='mt-4 rounded-2xl border border-dashed border-[#C98958]/25 bg-black/25 p-4 text-sm text-white/55'>
+                        No active players are available to bet on yet.
                       </div>
                     )}
                   </div>
