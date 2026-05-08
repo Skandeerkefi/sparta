@@ -10,7 +10,7 @@ interface MonthlyEntryItem {
   wagering: number;
 }
 
-export default function BethogMonthlyAdmin() {
+export default function ShuffleMonthlyAdmin() {
   const [month, setMonth] = useState(() => {
     const d = new Date();
     return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
@@ -132,7 +132,7 @@ export default function BethogMonthlyAdmin() {
           <div className="overflow-hidden rounded-[2rem] border border-[#C98958]/25 bg-black/55 shadow-2xl shadow-black/40 backdrop-blur-md">
             <div className="border-b border-[#C98958]/20 bg-gradient-to-r from-[#930203] to-[#C98958]/70 px-6 py-8 sm:px-10">
               <p className="text-xs font-semibold uppercase tracking-[0.35em] text-white/75">Admin Control</p>
-              <h1 className="mt-2 text-3xl font-black tracking-tight text-white sm:text-5xl">Bethog Monthly Manager</h1>
+              <h1 className="mt-2 text-3xl font-black tracking-tight text-white sm:text-5xl">Shuffle Monthly Manager</h1>
               <p className="mt-3 max-w-3xl text-sm text-white/80 sm:text-base">
                 Add players manually, adjust wagering, and publish prize amounts without relying on an external API.
               </p>

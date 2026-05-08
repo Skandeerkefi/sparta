@@ -84,7 +84,7 @@ function SignupPage() {
 							</CardTitle>
 						</div>
 						<CardDescription className='text-center text-[#0F0604]'>
-							Enter your Kick and Bethog usernames to register and join the
+							Enter your Kick and Shuffle usernames to register and join the
 							community
 						</CardDescription>
 					</CardHeader>
@@ -109,11 +109,11 @@ function SignupPage() {
 							{/* Rainbet Username */}
 							<div className='space-y-2'>
 								<Label htmlFor='rainbetUsername' className='text-[#0F0604]'>
-									Bethog Username
+									Shuffle Username
 								</Label>
 								<Input
 									id='rainbetUsername'
-									placeholder='Enter your Bethog username'
+									placeholder='Enter your Shuffle username'
 									value={rainbetUsername}
 									onChange={(e) => setRainbetUsername(e.target.value)}
 									required

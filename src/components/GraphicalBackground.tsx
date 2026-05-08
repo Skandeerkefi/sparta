@@ -68,8 +68,8 @@ export function GraphicalBackground() {
 		}
 
 		const iconUrls = [
-			"https://i.ibb.co/5WZLnF0M/Screenshot-2026-04-20-184836-removebg-preview.png",
 			"https://i.ibb.co/39RpzLRD/Screenshot-2026-04-20-185215-removebg-preview.png",
+			"https://i.ibb.co/k2pTVL1m/Shuffle-removebg-preview.png",
 		];
 
 		const iconImages = iconUrls.map((url) => {

@@ -136,12 +136,14 @@ function TournamentPage() {
   const [betStake, setBetStake] = useState("250");
   const [betTargetId, setBetTargetId] = useState("");
   const [isPlacingBet, setIsPlacingBet] = useState(false);
-  const [createTitle, setCreateTitle] = useState("Bethog Slot Tournament");
+  const [createTitle, setCreateTitle] = useState("Shuffle Slot Tournament");
   const [createLimit, setCreateLimit] = useState("8");
   const [createPrizePool, setCreatePrizePool] = useState("0");
   const [isCreating, setIsCreating] = useState(false);
   const [matchInputs, setMatchInputs] = useState<Record<string, MatchInputState>>({});
   const [deletingParticipantId, setDeletingParticipantId] = useState<string | null>(null);
+  const [playerWagers, setPlayerWagers] = useState<Record<string, number>>({}); // Maps playerId to total wager amount
+  const [isTogglingBets, setIsTogglingBets] = useState(false);
 
   const isAdmin = user?.role === "admin";
   const currentRoundToPick = myProgress?.currentRound ?? null;
@@ -158,7 +160,7 @@ function TournamentPage() {
       setState({ ...EMPTY_STATE, ...data });
 
       if (token && data?.tournament?._id && user?.id) {
-        const [meData, betData, pointsData] = await Promise.all([
+        const [meData, betData, pointsData, betSummaryData] = await Promise.all([
           fetch(`${API_BASE}/api/tournaments/${data.tournament._id}/me`, {
             headers: { Authorization: `Bearer ${token}` },
           }).then((response) => response.json()),
@@ -169,11 +171,21 @@ function TournamentPage() {
             console.error("Failed to load balance", error);
             return null;
           }),
+          fetch(`${API_BASE}/api/tournaments/${data.tournament._id}/bets/summary`).then((response) => response.json()),
         ]);
 
         setMyProgress(meData.progress || null);
         setMyBet(betData.bet || null);
         setPointsBalance(typeof pointsData?.balance === "number" ? pointsData.balance : null);
+        
+        // Build wager map from bet summary
+        const wagerMap: Record<string, number> = {};
+        if (betSummaryData?.betSummary) {
+          betSummaryData.betSummary.forEach((summary: any) => {
+            wagerMap[summary.playerId] = summary.totalWagered;
+          });
+        }
+        setPlayerWagers(wagerMap);
       } else {
         setMyProgress(null);
         setMyBet(null);
@@ -349,6 +361,38 @@ function TournamentPage() {
       });
     } finally {
       setIsStarting(false);
+    }
+  };
+
+  const toggleBetsOpen = async () => {
+    if (!token || !state.tournament?._id) return;
+
+    setIsTogglingBets(true);
+    try {
+      const res = await fetch(`${API_BASE}/api/tournaments/${state.tournament._id}/toggle-bets`, {
+        method: "POST",
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      if (!res.ok) {
+        const errorData = await res.json();
+        throw new Error(errorData.message || "Failed to toggle bets");
+      }
+
+      const data = await res.json();
+      toast({
+        title: "Bets toggled",
+        description: data.message,
+      });
+      await loadState();
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: error instanceof Error ? error.message : "Failed to toggle bets.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsTogglingBets(false);
     }
   };
 
@@ -622,7 +666,7 @@ function TournamentPage() {
               <p className='text-xs font-semibold uppercase tracking-[0.35em] text-white/75'>Tournament Mode</p>
               <div className='mt-4 grid gap-6 xl:grid-cols-[minmax(0,1.3fr)_360px] xl:items-end'>
                 <div>
-                  <h1 className='text-4xl font-black tracking-tight text-white sm:text-5xl lg:text-6xl'>Bethog Slot Tournament</h1>
+                  <h1 className='text-4xl font-black tracking-tight text-white sm:text-5xl lg:text-6xl'>Shuffle Slot Tournament</h1>
                   <p className='max-w-3xl mt-4 text-sm leading-6 text-white/85 sm:text-base'>
                     Players join a fixed bracket, choose one slot for each round, and advance by posting the strongest multiplier.
                     The layout below separates the bracket, player progress, and admin tools so the flow is easier to follow.
@@ -855,7 +899,7 @@ function TournamentPage() {
 
                   <div className='rounded-3xl border border-[#C98958]/20 bg-[#120b0a]/80 p-5 shadow-lg shadow-black/30'>
                     <h2 className='text-xl font-bold text-white'>Spectator Bet</h2>
-                    <p className='mt-2 text-sm text-white/50'>Non-players can bet up to 250 points on one active tournament player. Winning pays 2x the stake, elimination loses the stake.</p>
+                    <p className='mt-2 text-sm text-white/50'>Non-players can bet up to 250 points on one active tournament player. Winning pays 3x the stake, elimination loses the stake.</p>
 
                     {!token ? (
                       <div className='mt-4 rounded-2xl border border-dashed border-[#C98958]/25 bg-black/25 p-4 text-sm text-white/55'>
@@ -893,6 +937,10 @@ function TournamentPage() {
                     ) : state.tournament?.status === "finished" ? (
                       <div className='mt-4 rounded-2xl border border-dashed border-[#C98958]/25 bg-black/25 p-4 text-sm text-white/55'>
                         This tournament is already finished, so betting is closed.
+                      </div>
+                    ) : !state.tournament?.betsOpen ? (
+                      <div className='mt-4 rounded-2xl border border-dashed border-[#C98958]/25 bg-black/25 p-4 text-sm text-white/55'>
+                        Betting is currently closed for this tournament.
                       </div>
                     ) : bettablePlayers.length > 0 ? (
                       <form onSubmit={placeBet} className='mt-4 space-y-3'>
@@ -967,6 +1015,22 @@ function TournamentPage() {
                         </Button>
                       </div>
                     )}
+                    {isAdmin && state.tournament && (
+                      <div className='mt-4 rounded-2xl border border-[#C98958]/15 bg-black/25 p-4'>
+                        <p className='text-sm text-white/55'>Toggle betting status for this tournament.</p>
+                        <div className='mt-2 flex items-center justify-between'>
+                          <span className='text-sm font-semibold text-white'>Bets: {state.tournament?.betsOpen ? "OPEN" : "CLOSED"}</span>
+                          <Button
+                            onClick={toggleBetsOpen}
+                            disabled={isTogglingBets}
+                            className={`${state.tournament?.betsOpen ? 'bg-red-600 hover:bg-red-700' : 'bg-green-600 hover:bg-green-700'} text-white`}
+                            size='sm'
+                          >
+                            {isTogglingBets ? "..." : state.tournament?.betsOpen ? "Close Bets" : "Open Bets"}
+                          </Button>
+                        </div>
+                      </div>
+                    )}
                     {winner && (
                       <div className='mt-4 rounded-2xl border border-[#C98958]/20 bg-black/25 p-4'>
                         <p className='text-xs uppercase tracking-[0.2em] text-white/45'>Winner</p>
@@ -974,6 +1038,29 @@ function TournamentPage() {
                       </div>
                     )}
                   </div>
+
+                  {Object.keys(playerWagers).length > 0 && (
+                    <div className='rounded-3xl border border-[#C98958]/20 bg-[#120b0a]/80 p-5 shadow-lg shadow-black/30 mt-6'>
+                      <h2 className='text-xl font-bold text-white'>Player Wagers</h2>
+                      <p className='mt-2 text-sm text-white/50'>Total points wagered on each active player.</p>
+                      <div className='mt-4 space-y-2'>
+                        {state.players
+                          .filter(player => playerWagers[player._id])
+                          .map(player => (
+                            <div key={player._id} className='rounded-xl border border-[#C98958]/20 bg-black/40 px-4 py-3 flex items-center justify-between'>
+                              <div>
+                                <p className='text-sm font-semibold text-white'>{player.username}</p>
+                                <p className='text-xs text-white/50'>#{player.position}</p>
+                              </div>
+                              <div className='text-right'>
+                                <p className='text-lg font-bold text-[#E7AC78]'>{playerWagers[player._id]}</p>
+                                <p className='text-xs text-white/50'>points wagered</p>
+                              </div>
+                            </div>
+                          ))}
+                      </div>
+                    </div>
+                  )}
                 </div>
               </section>
 

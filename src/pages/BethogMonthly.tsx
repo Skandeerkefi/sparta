@@ -10,7 +10,7 @@ interface MonthlyEntryItem {
   wagering: number;
 }
 
-export default function BethogMonthly() {
+export default function ShuffleMonthly() {
   const [month, setMonth] = useState(() => {
     const d = new Date();
     return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
@@ -87,7 +87,7 @@ export default function BethogMonthly() {
         <section className="w-full mx-auto max-w-7xl">
           <div className="overflow-hidden rounded-[2rem] border border-[#C98958]/25 bg-black/55 shadow-2xl shadow-black/40 backdrop-blur-md">
             <div className="border-b border-[#C98958]/20 bg-gradient-to-r from-[#930203] to-[#C98958]/70 px-6 py-8 sm:px-10">
-              <p className="text-xs font-semibold uppercase tracking-[0.35em] text-white/75">Bethog Monthly</p>
+              <p className="text-xs font-semibold uppercase tracking-[0.35em] text-white/75">Shuffle Monthly</p>
               <h1 className="mt-2 text-3xl font-black tracking-tight text-white sm:text-5xl">Monthly Leaderboard</h1>
               <p className="max-w-3xl mt-3 text-sm text-white/80 sm:text-base">
                 Manual monthly standings, prize distribution, and ranking updates controlled from the admin panel.

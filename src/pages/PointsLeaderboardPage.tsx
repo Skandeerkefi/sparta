@@ -319,7 +319,7 @@ export default function PointsLeaderboardPage() {
                 <tr>
                   <th className='px-3 py-2'>Rank</th>
                   <th className='px-3 py-2'>Kick Username</th>
-                  <th className='px-3 py-2'>Bethog Username</th>
+                  <th className='px-3 py-2'>Shuffle Username</th>
                   <th className='px-3 py-2'>Points</th>
                 </tr>
               </thead>

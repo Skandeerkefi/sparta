@@ -106,7 +106,7 @@ function BonusHuntAdminPage() {
   const [historyItems, setHistoryItems] = useState<BonusHuntHistoryItem[]>([]);
   const [isCreating, setIsCreating] = useState(false);
 
-  const [title, setTitle] = useState("Bethog Bonus Hunt");
+  const [title, setTitle] = useState("Shuffle Bonus Hunt");
   const [startCost, setStartCost] = useState("0");
   const [targetProfit, setTargetProfit] = useState("");
 
@@ -455,7 +455,7 @@ function BonusHuntAdminPage() {
                             value={title}
                             onChange={(event) => setTitle(event.target.value)}
                             className='border-[#C98958]/25 bg-black/40 text-white placeholder:text-white/35'
-                            placeholder='Bethog Bonus Hunt'
+                            placeholder='Shuffle Bonus Hunt'
                           />
                         </div>
                         <div>
