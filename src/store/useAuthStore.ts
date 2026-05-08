@@ -12,10 +12,12 @@ interface AuthState {
 	user: User | null;
 	token: string | null;
 	isLoading: boolean;
+	hasHydrated: boolean;
 
 	setUser: (user: User | null) => void;
 	setToken: (token: string | null) => void;
 	setIsLoading: (loading: boolean) => void;
+	setHasHydrated: (hasHydrated: boolean) => void;
 
 	login: (
 		kickUsername: string,
@@ -33,14 +35,16 @@ interface AuthState {
 	loadFromStorage: () => void;
 }
 
-export const useAuthStore = create<AuthState>((set, get) => ({
+export const useAuthStore = create<AuthState>((set) => ({
 	user: null,
 	token: null,
 	isLoading: false,
+	hasHydrated: false,
 
 	setUser: (user) => set({ user }),
 	setToken: (token) => set({ token }),
 	setIsLoading: (loading) => set({ isLoading: loading }),
+	setHasHydrated: (hasHydrated) => set({ hasHydrated }),
 
 	login: async (kickUsername, password) => {
 		try {
@@ -68,9 +72,12 @@ export const useAuthStore = create<AuthState>((set, get) => ({
 			localStorage.setItem("user", JSON.stringify(data.user));
 
 			return { success: true };
-		} catch (error: any) {
+		} catch (error: unknown) {
 			console.error("❌ Login error:", error);
-			return { success: false, error: error.message };
+			return {
+				success: false,
+				error: error instanceof Error ? error.message : "Login failed",
+			};
 		}
 	},
 
@@ -96,9 +103,9 @@ export const useAuthStore = create<AuthState>((set, get) => ({
 
 			set({ isLoading: false });
 			return true;
-		} catch (error: any) {
+		} catch (error: unknown) {
 			set({ isLoading: false });
-			throw error;
+			throw error instanceof Error ? error : new Error("Signup failed");
 		}
 	},
 
@@ -128,14 +135,14 @@ export const useAuthStore = create<AuthState>((set, get) => ({
 
 				console.log("✅ Parsed user from storage:", user);
 
-				set({ token, user });
+				set({ token, user, hasHydrated: true });
 			} catch (err) {
 				console.error("❌ Failed to parse user from localStorage", err);
-				set({ token: null, user: null });
+				set({ token: null, user: null, hasHydrated: true });
 			}
 		} else {
 			console.warn("ℹ️ No user or token found in storage.");
-			set({ token: null, user: null });
+			set({ token: null, user: null, hasHydrated: true });
 		}
 	},
 }));

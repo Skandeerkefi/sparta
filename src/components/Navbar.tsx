@@ -201,7 +201,7 @@ export function Navbar() {
 						{user ? (
 							<>
 								<Link
-									to='/points'
+									to='/profile'
 									className='flex items-center gap-3 rounded-2xl border border-[#C98958]/15 bg-black/20 px-4 py-3 text-sm font-semibold text-[#E7AC78] transition hover:border-[#C98958]/35 hover:bg-black/35 hover:text-[#C98958]'
 								>
 									<User className='w-4 h-4' />

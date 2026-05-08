@@ -33,6 +33,7 @@ import AdminUserManagementPage from './pages/AdminUserManagementPage';
 import AdminPointsAdjustmentPage from './pages/AdminPointsAdjustmentPage';
 import GuessBalancePage from './pages/GuessBalancePage';
 import AdminGuessBalancePage from './pages/AdminGuessBalancePage';
+import ProfilePage from './pages/ProfilePage';
 function App() {
 	const loadFromStorage = useAuthStore((state) => state.loadFromStorage);
 	const user = useAuthStore((state) => state.user);
@@ -60,6 +61,7 @@ function App() {
 					<Route path='/giveaways' element={<GiveawaysPage />} />
 					<Route path='/login' element={<LoginPage />} />
 					<Route path='/signup' element={<SignupPage />} />
+					<Route path='/profile' element={<ProfilePage />} />
 					<Route path='*' element={<NotFoundPage />} />
 					<Route path='/slot-overlay' element={<SlotOverlay />} />
 					<Route path='/bonus-hunt' element={<BonusHuntPage />} />
