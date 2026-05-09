@@ -31,11 +31,12 @@ export function Footer() {
 							>
 								Home
 							</Link>
-							{/* <Link
-						to='/shuffle-monthly'
+							<Link
+								to='/shuffle-leaderboard'
+								className='text-sm text-white/70 transition-colors hover:text-[#C98958]'
 							>
-								Leaderboard
-							</Link> */}
+								Shuffle Leaderboard
+							</Link>
 							
 							
 						</div>

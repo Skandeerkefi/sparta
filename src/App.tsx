@@ -18,9 +18,8 @@ import RainPage from "@/pages/RainPage";
 import CSGOLeadPage from "./pages/CSGOLead";
 import PackdrawPage from "./pages/PackdrawPage";
 import ClashLeaderboardPage from "./pages/ClashLeaderboardPage";
-// Shuffle Monthly hidden from frontend
-// import ShuffleMonthly from "./pages/ShuffleMonthly";
-// import ShuffleMonthlyAdmin from "./pages/ShuffleMonthlyAdmin";
+import ShuffleMonthly from "./pages/BethogMonthly";
+import ShuffleMonthlyAdmin from "./pages/BethogMonthlyAdmin";
 import TournamentPage from "./pages/TournamentPage";
 import BonusHuntAdminPage from "./pages/BonusHuntAdminPage";
 import PointsDashboard from './pages/PointsDashboard';
@@ -73,9 +72,10 @@ function App() {
 					<Route path='/rain' element={<RainPage />} />
 					<Route path='/clash' element={<ClashLeaderboardPage />} />
 					<Route path='/packdraw' element={<PackdrawPage />} />
-					{/* Shuffle Monthly routes hidden */}
-					{/* <Route path='/shuffle-monthly' element={<ShuffleMonthly />} /> */}
-					{/* <Route path='/shuffle-monthly/admin' element={<ShuffleMonthlyAdmin />} /> */}
+					<Route path='/shuffle-leaderboard' element={<ShuffleMonthly />} />
+					<Route path='/shuffle-leaderboard/admin' element={<ShuffleMonthlyAdmin />} />
+					<Route path='/shuffle-monthly' element={<ShuffleMonthly />} />
+					<Route path='/shuffle-monthly/admin' element={<ShuffleMonthlyAdmin />} />
 					<Route path='/tournament' element={<TournamentPage />} />
 					<Route path='/tournaments' element={<TournamentPage />} />
 					<Route path='/points' element={<PointsDashboard />} />
