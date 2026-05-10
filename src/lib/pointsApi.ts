@@ -149,6 +149,17 @@ export const adjustUserPoints = async (userId: string, amount: number, note: str
   return res.data;
 };
 
+export const listTransactions = async (
+  token: string,
+  options?: { user?: string; userId?: string; type?: string; limit?: number }
+) => {
+  const res = await http.get('/api/points/transactions', {
+    headers: { Authorization: `Bearer ${token}` },
+    params: options,
+  });
+  return res.data;
+};
+
 export const changeUserRole = async (userId: string, role: 'user' | 'admin', token: string) => {
   const res = await http.patch(`/api/points/admin/users/${userId}/role`, { role }, {
     headers: { Authorization: `Bearer ${token}` },
@@ -238,6 +249,7 @@ export default {
   resetPointsConfigs,
   getAllUsers,
   adjustUserPoints,
+  listTransactions,
   changeUserRole,
   setUserSubscription,
   getActiveGuessEvent,

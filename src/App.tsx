@@ -30,6 +30,7 @@ import PointsLeaderboardPage from './pages/PointsLeaderboardPage';
 import AdminPointsConfigPage from './pages/AdminPointsConfigPage';
 import AdminUserManagementPage from './pages/AdminUserManagementPage';
 import AdminPointsAdjustmentPage from './pages/AdminPointsAdjustmentPage';
+import AdminTransactionLogsPage from './pages/AdminTransactionLogsPage';
 import GuessBalancePage from './pages/GuessBalancePage';
 import AdminGuessBalancePage from './pages/AdminGuessBalancePage';
 import ProfilePage from './pages/ProfilePage';
@@ -86,6 +87,7 @@ function App() {
 					<Route path='/admin/points-config' element={<AdminPointsConfigPage />} />
 					<Route path='/admin/users' element={<AdminUserManagementPage />} />
 					<Route path='/admin/points-adjust' element={<AdminPointsAdjustmentPage />} />
+					<Route path='/admin/points-transactions' element={<AdminTransactionLogsPage />} />
 					<Route path='/guess-balance' element={<GuessBalancePage />} />
 					<Route path='/admin/guess-balance' element={<AdminGuessBalancePage />} />
 				</Routes>
