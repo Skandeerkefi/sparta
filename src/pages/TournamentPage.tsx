@@ -133,7 +133,7 @@ function TournamentPage() {
   const [slotLoading, setSlotLoading] = useState(false);
   const [pointsBalance, setPointsBalance] = useState<number | null>(null);
   const [myBet, setMyBet] = useState<TournamentBet | null>(null);
-  const [betStake, setBetStake] = useState("250");
+  const [betStake, setBetStake] = useState("500");
   const [betTargetId, setBetTargetId] = useState("");
   const [isPlacingBet, setIsPlacingBet] = useState(false);
   const [createTitle, setCreateTitle] = useState("Shuffle Slot Tournament");
@@ -502,10 +502,10 @@ function TournamentPage() {
     }
 
     const stake = Number(betStake);
-    if (!Number.isInteger(stake) || stake < 1 || stake > 250) {
+    if (!Number.isInteger(stake) || stake < 1 || stake > 500) {
       toast({
         title: "Invalid stake",
-        description: "Use an integer between 1 and 250 points.",
+        description: "Use an integer between 1 and 500 points.",
         variant: "destructive",
       });
       return;
@@ -899,7 +899,7 @@ function TournamentPage() {
 
                   <div className='rounded-3xl border border-[#C98958]/20 bg-[#120b0a]/80 p-5 shadow-lg shadow-black/30'>
                     <h2 className='text-xl font-bold text-white'>Spectator Bet</h2>
-                    <p className='mt-2 text-sm text-white/50'>Non-players can bet up to 250 points on one active tournament player. Winning pays 3x the stake, elimination loses the stake.</p>
+                    <p className='mt-2 text-sm text-white/50'>Non-players can bet up to 500 points on one active tournament player. Winning pays 3x the stake, elimination loses the stake.</p>
 
                     {!token ? (
                       <div className='mt-4 rounded-2xl border border-dashed border-[#C98958]/25 bg-black/25 p-4 text-sm text-white/55'>
@@ -973,9 +973,9 @@ function TournamentPage() {
                             onChange={(event) => setBetStake(event.target.value)}
                             type='number'
                             min='1'
-                            max='250'
+                            max='500'
                             step='1'
-                            placeholder='1-250 points'
+                            placeholder='1-500 points'
                             className='border-[#C98958]/25 bg-black/40 text-white placeholder:text-white/35'
                           />
                         </label>
