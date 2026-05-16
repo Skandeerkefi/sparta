@@ -54,6 +54,7 @@ export function Navbar() {
 			user?.role === "admin"
 				? [
 					{ path: "/admin/users", name: "User Management", icon: <Shield className='w-5 h-5' /> },
+					{ path: "/admin/stream-config", name: "Stream Schedule", icon: <CalendarRange className='w-5 h-5' /> },
 					{ path: "/admin/points-adjust", name: "Points Adjustment", icon: <Coins className='w-5 h-5' /> },
 						{ path: "/admin/points-transactions", name: "Transaction Logs", icon: <History className='w-5 h-5' /> },
 					{ path: "/admin/guess-balance", name: "Guess Balance", icon: <Trophy className='w-5 h-5' /> },

@@ -5,14 +5,63 @@ import { Link } from "react-router-dom";
 import { ArrowRight, ArrowDown } from "lucide-react";
 import { FaKickstarterK, FaXTwitter } from "react-icons/fa6";
 import GraphicalBackground from "@/components/GraphicalBackground";
-import { useRef } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { FaYoutube } from "react-icons/fa";
+import streamConfigApi from "@/lib/streamConfigApi";
+
+const getCountdownText = (target: string | null, now: number) => {
+  if (!target) return "Not scheduled";
+  const targetMs = new Date(target).getTime();
+  if (Number.isNaN(targetMs)) return "Not scheduled";
+
+  const diffMs = targetMs - now;
+  if (diffMs <= 0) return "Starting now";
+
+  const totalSeconds = Math.floor(diffMs / 1000);
+  const days = Math.floor(totalSeconds / 86400);
+  const hours = Math.floor((totalSeconds % 86400) / 3600);
+  const minutes = Math.floor((totalSeconds % 3600) / 60);
+  const seconds = totalSeconds % 60;
+
+  return `${days}d ${hours}h ${minutes}m ${seconds}s`;
+};
+
 function HomePage() {
 	const liveRef = useRef<HTMLDivElement>(null);
+	const [nextStreamAt, setNextStreamAt] = useState<string | null>(null);
+	const [now, setNow] = useState(Date.now());
 
 	const handleScrollClick = () => {
 		liveRef.current?.scrollIntoView({ behavior: "smooth" });
 	};
+
+	useEffect(() => {
+		const load = async () => {
+			try {
+				const data = await streamConfigApi.getPublicStreamConfig();
+				setNextStreamAt(data.nextStreamAt || null);
+			} catch (error) {
+				console.error("Failed to load stream config", error);
+			}
+		};
+
+		load();
+		const refresh = setInterval(load, 60_000);
+		return () => clearInterval(refresh);
+	}, []);
+
+	useEffect(() => {
+		const id = setInterval(() => setNow(Date.now()), 1000);
+		return () => clearInterval(id);
+	}, []);
+
+	const countdown = useMemo(() => getCountdownText(nextStreamAt, now), [nextStreamAt, now]);
+	const formattedNextStream = useMemo(() => {
+		if (!nextStreamAt) return "Not scheduled";
+		const date = new Date(nextStreamAt);
+		if (Number.isNaN(date.getTime())) return "Not scheduled";
+		return date.toLocaleString();
+	}, [nextStreamAt]);
 
 	return (
 		<div className='relative flex flex-col min-h-screen overflow-x-hidden text-white'>
@@ -75,6 +124,12 @@ function HomePage() {
 					<p className='mt-4 text-base text-center text-white/65 sm:text-lg'>
 						Watch Spartaaan live and catch exclusive giveaways during streams
 					</p>
+
+					<div className='mx-auto mt-8 max-w-2xl rounded-3xl border border-[#C98958]/30 bg-black/45 px-5 py-4 text-center'>
+						<p className='text-xs uppercase tracking-[0.3em] text-white/45'>Next Stream Countdown</p>
+						<p className='mt-2 text-2xl font-bold text-[#E7AC78] sm:text-3xl'>{countdown}</p>
+						<p className='mt-2 text-sm text-white/65'>Scheduled: {formattedNextStream}</p>
+					</div>
 
 					<div className='mt-10 overflow-hidden border shadow-2xl rounded-3xl bg-black/55 border-[#C98958]/35 p-3'>
 						<div className='overflow-hidden border rounded-2xl border-[#C98958]/40 aspect-video'>

@@ -21,6 +21,14 @@ interface TournamentSummary {
   prizePool: number;
   status: TournamentStatus;
   currentRound: number;
+  betsOpen?: boolean;
+  startingBalance?: number | null;
+  endingBalance?: number | null;
+  profitAmount?: number | null;
+  wasProfit?: boolean | null;
+  winnerBalanceBonusPoints?: number | null;
+  participantProfitBonusPoints?: number | null;
+  balanceSettlementProcessed?: boolean;
 }
 
 interface SlotSelection {
@@ -144,6 +152,9 @@ function TournamentPage() {
   const [deletingParticipantId, setDeletingParticipantId] = useState<string | null>(null);
   const [playerWagers, setPlayerWagers] = useState<Record<string, number>>({}); // Maps playerId to total wager amount
   const [isTogglingBets, setIsTogglingBets] = useState(false);
+  const [startingBalanceInput, setStartingBalanceInput] = useState("");
+  const [endingBalanceInput, setEndingBalanceInput] = useState("");
+  const [isSavingBalances, setIsSavingBalances] = useState(false);
 
   const isAdmin = user?.role === "admin";
   const currentRoundToPick = myProgress?.currentRound ?? null;
@@ -239,6 +250,13 @@ function TournamentPage() {
       setBetTargetId(bettablePlayers[0]._id);
     }
   }, [betTargetId, bettablePlayers]);
+
+  useEffect(() => {
+    const startingValue = state.tournament?.startingBalance;
+    const endingValue = state.tournament?.endingBalance;
+    setStartingBalanceInput(Number.isFinite(Number(startingValue)) ? String(startingValue) : "");
+    setEndingBalanceInput(Number.isFinite(Number(endingValue)) ? String(endingValue) : "");
+  }, [state.tournament?.startingBalance, state.tournament?.endingBalance]);
 
   useEffect(() => {
     const nextInputs: Record<string, MatchInputState> = {};
@@ -393,6 +411,54 @@ function TournamentPage() {
       });
     } finally {
       setIsTogglingBets(false);
+    }
+  };
+
+  const saveTournamentBalances = async () => {
+    if (!token || !state.tournament?._id) return;
+
+    const startingBalance = Number(startingBalanceInput);
+    const endingBalance = Number(endingBalanceInput);
+
+    if (!Number.isFinite(startingBalance) || !Number.isFinite(endingBalance)) {
+      toast({
+        title: "Invalid balances",
+        description: "Starting and ending balance must be valid numbers.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setIsSavingBalances(true);
+    try {
+      const result = await tournamentApi.updateTournamentBalances(
+        state.tournament._id,
+        { startingBalance, endingBalance },
+        token
+      );
+
+      if (result?.state) {
+        setState(result.state);
+      }
+
+      if (result?.settlement?.settled) {
+        const settlementText = result.settlement.wasProfit
+          ? `Profit detected. Winner +${result.settlement.winnerPoints} and each participant +${result.settlement.participantBonusPoints} points.`
+          : `No profit. Winner +${result.settlement.winnerPoints} points.`;
+        toast({ title: "Balances saved and settled", description: settlementText });
+      } else {
+        toast({ title: "Balances saved", description: "Starting and ending balances updated." });
+      }
+
+      await loadState();
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: error instanceof Error ? error.message : "Failed to save balances.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSavingBalances(false);
     }
   };
 
@@ -1029,6 +1095,63 @@ function TournamentPage() {
                             {isTogglingBets ? "..." : state.tournament?.betsOpen ? "Close Bets" : "Open Bets"}
                           </Button>
                         </div>
+                      </div>
+                    )}
+                    {isAdmin && state.tournament && (
+                      <div className='mt-4 rounded-2xl border border-[#C98958]/15 bg-black/25 p-4'>
+                        <p className='text-sm text-white/55'>Set starting and ending balance to settle profit points manually.</p>
+                        <div className='mt-3 grid gap-2 sm:grid-cols-2'>
+                          <Input
+                            value={startingBalanceInput}
+                            onChange={(event) => setStartingBalanceInput(event.target.value)}
+                            type='number'
+                            step='0.01'
+                            placeholder='Starting balance'
+                            className='border-[#C98958]/25 bg-black/40 text-white placeholder:text-white/35'
+                            disabled={Boolean(state.tournament.balanceSettlementProcessed)}
+                          />
+                          <Input
+                            value={endingBalanceInput}
+                            onChange={(event) => setEndingBalanceInput(event.target.value)}
+                            type='number'
+                            step='0.01'
+                            placeholder='Ending balance'
+                            className='border-[#C98958]/25 bg-black/40 text-white placeholder:text-white/35'
+                            disabled={Boolean(state.tournament.balanceSettlementProcessed)}
+                          />
+                        </div>
+                        <Button
+                          onClick={saveTournamentBalances}
+                          disabled={isSavingBalances || Boolean(state.tournament.balanceSettlementProcessed)}
+                          className='mt-3 w-full bg-[#C98958] text-white hover:bg-[#930203]'
+                        >
+                          {state.tournament.balanceSettlementProcessed
+                            ? "Balances Settled"
+                            : isSavingBalances
+                            ? "Saving..."
+                            : "Save Balances"}
+                        </Button>
+
+                        {state.tournament.balanceSettlementProcessed && (
+                          <p className='mt-3 text-xs text-[#E7AC78]'>
+                            Settlement complete: {state.tournament.wasProfit ? "profit" : "no profit"}.
+                            Winner +{state.tournament.winnerBalanceBonusPoints || 0} points.
+                            {state.tournament.wasProfit ? ` Participants +${state.tournament.participantProfitBonusPoints || 0} points each.` : ""}
+                          </p>
+                        )}
+                      </div>
+                    )}
+                    {state.tournament && Number.isFinite(Number(state.tournament.startingBalance)) && Number.isFinite(Number(state.tournament.endingBalance)) && (
+                      <div className='mt-4 rounded-2xl border border-[#C98958]/20 bg-black/25 p-4'>
+                        <p className='text-xs uppercase tracking-[0.2em] text-white/45'>Balance Summary</p>
+                        <p className='mt-1 text-sm text-white/70'>
+                          Start: {Number(state.tournament.startingBalance).toLocaleString()} | End: {Number(state.tournament.endingBalance).toLocaleString()}
+                        </p>
+                        {Number.isFinite(Number(state.tournament.profitAmount)) && (
+                          <p className='mt-1 text-sm text-[#E7AC78]'>
+                            {state.tournament.wasProfit ? "Profit" : "No profit"}: {Number(state.tournament.profitAmount).toLocaleString()}
+                          </p>
+                        )}
                       </div>
                     )}
                     {winner && (

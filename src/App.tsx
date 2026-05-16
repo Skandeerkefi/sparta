@@ -34,6 +34,7 @@ import AdminTransactionLogsPage from './pages/AdminTransactionLogsPage';
 import GuessBalancePage from './pages/GuessBalancePage';
 import AdminGuessBalancePage from './pages/AdminGuessBalancePage';
 import ProfilePage from './pages/ProfilePage';
+import AdminStreamConfigPage from './pages/AdminStreamConfigPage';
 function App() {
 	const loadFromStorage = useAuthStore((state) => state.loadFromStorage);
 	const user = useAuthStore((state) => state.user);
@@ -90,6 +91,7 @@ function App() {
 					<Route path='/admin/points-transactions' element={<AdminTransactionLogsPage />} />
 					<Route path='/guess-balance' element={<GuessBalancePage />} />
 					<Route path='/admin/guess-balance' element={<AdminGuessBalancePage />} />
+					<Route path='/admin/stream-config' element={<AdminStreamConfigPage />} />
 				</Routes>
 			</BrowserRouter>
 			<Toaster />

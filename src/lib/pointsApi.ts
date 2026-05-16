@@ -120,7 +120,10 @@ export const updatePointsConfig = async (actionType: string, points: number, ena
   return res.data;
 };
 
-export const updateMultiplePointsConfigs = async (configs: { actionType: string; points: number }[], token: string) => {
+export const updateMultiplePointsConfigs = async (
+  configs: { actionType: string; points: number; enabled?: boolean; description?: string }[],
+  token: string
+) => {
   const res = await http.post('/api/points-config/update-multiple', { configs }, {
     headers: { Authorization: `Bearer ${token}` },
   });

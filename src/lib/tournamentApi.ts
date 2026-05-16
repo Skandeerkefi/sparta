@@ -26,8 +26,20 @@ export const placeTournamentBet = async (
   return res.data;
 };
 
+export const updateTournamentBalances = async (
+  tournamentId: string,
+  payload: { startingBalance: number; endingBalance: number },
+  token: string
+) => {
+  const res = await http.post(`/api/tournaments/${tournamentId}/balances`, payload, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  return res.data;
+};
+
 export default {
   removeParticipant,
   getMyTournamentBet,
   placeTournamentBet,
+  updateTournamentBalances,
 };

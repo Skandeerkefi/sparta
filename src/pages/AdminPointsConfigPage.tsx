@@ -38,7 +38,14 @@ const CATEGORIES = [
   {
     title: 'Tournaments',
     icon: <Trophy className="w-5 h-5" />,
-    actions: ['tournament-join', 'tournament-match-win', 'tournament-win'],
+    actions: [
+      'tournament-join',
+      'tournament-match-win',
+      'tournament-win',
+      'tournament-profit-winner',
+      'tournament-no-profit-winner',
+      'tournament-profit-participant',
+    ],
     color: 'text-yellow-400',
   },
   {
