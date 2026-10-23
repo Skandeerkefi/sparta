@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+﻿import { useCallback, useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { API_BASE } from "@/lib/api";
 import GraphicalBackground from "@/components/GraphicalBackground";
@@ -10,7 +10,6 @@ import { useAuthStore } from "@/store/useAuthStore";
 import { useToast } from "@/hooks/use-toast";
 import { Badge } from "@/components/ui/badge";
 import tournamentApi from "@/lib/tournamentApi";
-import pointsApi from "@/lib/pointsApi";
 
 type TournamentStatus = "upcoming" | "ongoing" | "finished";
 
@@ -125,7 +124,7 @@ const emptyMatchInput = (): MatchInputState => ({
 });
 
 const formatMultiplier = (value: number | null) =>
-  value === null || Number.isNaN(Number(value)) ? "—" : Number(value).toLocaleString();
+  value === null || Number.isNaN(Number(value)) ? "â€”" : Number(value).toLocaleString();
 
 function TournamentPage() {
   const { user, token } = useAuthStore();
@@ -139,7 +138,6 @@ function TournamentPage() {
   const [slotQuery, setSlotQuery] = useState("");
   const [slotResults, setSlotResults] = useState<SlotSearchResult[]>([]);
   const [slotLoading, setSlotLoading] = useState(false);
-  const [pointsBalance, setPointsBalance] = useState<number | null>(null);
   const [myBet, setMyBet] = useState<TournamentBet | null>(null);
   const [betStake, setBetStake] = useState("500");
   const [betTargetId, setBetTargetId] = useState("");
@@ -171,24 +169,18 @@ function TournamentPage() {
       setState({ ...EMPTY_STATE, ...data });
 
       if (token && data?.tournament?._id && user?.id) {
-        const [meData, betData, pointsData, betSummaryData] = await Promise.all([
+        const [meData, betData, betSummaryData] = await Promise.all([
           fetch(`${API_BASE}/api/tournaments/${data.tournament._id}/me`, {
             headers: { Authorization: `Bearer ${token}` },
           }).then((response) => response.json()),
           fetch(`${API_BASE}/api/tournaments/${data.tournament._id}/bets/me`, {
             headers: { Authorization: `Bearer ${token}` },
           }).then((response) => response.json()),
-          pointsApi.getUserPoints(user.id, token).catch((error) => {
-            console.error("Failed to load balance", error);
-            return null;
-          }),
           fetch(`${API_BASE}/api/tournaments/${data.tournament._id}/bets/summary`).then((response) => response.json()),
         ]);
 
         setMyProgress(meData.progress || null);
         setMyBet(betData.bet || null);
-        setPointsBalance(typeof pointsData?.balance === "number" ? pointsData.balance : null);
-        
         // Build wager map from bet summary
         const wagerMap: Record<string, number> = {};
         if (betSummaryData?.betSummary) {
@@ -200,7 +192,6 @@ function TournamentPage() {
       } else {
         setMyProgress(null);
         setMyBet(null);
-        setPointsBalance(null);
       }
     } catch (error) {
       console.error(error);
@@ -295,15 +286,6 @@ function TournamentPage() {
     const won = winner && user.id === winner._id;
     if (!won) return;
 
-    (async () => {
-      try {
-        const data = await pointsApi.getUserPoints(user.id, token);
-        const balance = typeof data.balance === 'number' ? data.balance : null;
-        toast({ title: 'You won!', description: balance !== null ? `Your points balance: ${balance}` : 'You won — check your points.' });
-      } catch (err) {
-        console.error('Failed to refresh points after win', err);
-      }
-    })();
   }, [winner?._id, user?.id, token, toast]);
 
   const createTournament = async (event: React.FormEvent) => {
@@ -443,8 +425,8 @@ function TournamentPage() {
 
       if (result?.settlement?.settled) {
         const settlementText = result.settlement.wasProfit
-          ? `Profit detected. Winner +${result.settlement.winnerPoints} and each participant +${result.settlement.participantBonusPoints} points.`
-          : `No profit. Winner +${result.settlement.winnerPoints} points.`;
+          ? `Profit detected. Winner +${result.settlement.winnerPoints} and each participant +${result.settlement.participantBonusPoints}.`
+          : `No profit. Winner +${result.settlement.winnerPoints}.`;
         toast({ title: "Balances saved and settled", description: settlementText });
       } else {
         toast({ title: "Balances saved", description: "Starting and ending balances updated." });
@@ -571,16 +553,7 @@ function TournamentPage() {
     if (!Number.isInteger(stake) || stake < 1 || stake > 500) {
       toast({
         title: "Invalid stake",
-        description: "Use an integer between 1 and 500 points.",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    if (pointsBalance !== null && stake > pointsBalance) {
-      toast({
-        title: "Insufficient points",
-        description: "You do not have enough points for that bet.",
+        description: "Use an integer between 1 and 500.",
         variant: "destructive",
       });
       return;
@@ -607,13 +580,9 @@ function TournamentPage() {
         token
       );
 
-      if (typeof result.balance === "number") {
-        setPointsBalance(result.balance);
-      }
-
       toast({
         title: "Bet placed",
-        description: `You staked ${stake} points on ${target.username}.`,
+        description: `You staked ${stake} on ${target.username}.`,
       });
 
       await loadState();
@@ -663,29 +632,7 @@ function TournamentPage() {
         throw new Error(errorMsg);
       }
 
-      // Surface awarded points if backend returns them and refresh balance for the winner
-      let awardedPoints: number | null = null;
-      if (data) {
-        if (typeof data.awardedPoints === "number") awardedPoints = data.awardedPoints;
-        else if (typeof data.awarded === "number") awardedPoints = data.awarded;
-        else if (Array.isArray(data.transactions)) {
-          const tx = data.transactions.find((t: any) => typeof t.amount === "number" && /tournament/i.test(t.type || ""));
-          if (tx) awardedPoints = tx.amount;
-        }
-      }
-
       toast({ title: "Match updated", description: `Result saved for ${match.roundLabel}.` });
-
-      if (awardedPoints !== null) {
-        toast({ title: "Points awarded", description: `Winner awarded ${awardedPoints} points.` });
-        if (user && token) {
-          try {
-            await pointsApi.getUserPoints(user.id, token);
-          } catch (err) {
-            console.error('Failed to refresh points after awarding', err);
-          }
-        }
-      }
 
       await loadState();
     } catch (error) {
@@ -965,7 +912,7 @@ function TournamentPage() {
 
                   <div className='rounded-3xl border border-[#C98958]/20 bg-[#120b0a]/80 p-5 shadow-lg shadow-black/30'>
                     <h2 className='text-xl font-bold text-white'>Spectator Bet</h2>
-                    <p className='mt-2 text-sm text-white/50'>Non-players can bet up to 500 points on one active tournament player. Winning pays 3x the stake, elimination loses the stake.</p>
+                    <p className='mt-2 text-sm text-white/50'>Non-players can bet up to 500 on one active tournament player. Winning pays 3x the stake, elimination loses the stake.</p>
 
                     {!token ? (
                       <div className='mt-4 rounded-2xl border border-dashed border-[#C98958]/25 bg-black/25 p-4 text-sm text-white/55'>
@@ -979,8 +926,8 @@ function TournamentPage() {
                       <div className='mt-4 space-y-3'>
                         <div className='rounded-2xl border border-[#C98958]/20 bg-black/25 p-4'>
                           <p className='text-xs uppercase tracking-[0.2em] text-white/45'>Your Bet</p>
-                          <p className='mt-1 text-2xl font-bold text-[#E7AC78]'>{myBet.stake} points</p>
-                          <p className='mt-1 text-sm text-white/60'>Payout: {myBet.potentialPayout} points</p>
+                          <p className='mt-1 text-2xl font-bold text-[#E7AC78]'>{myBet.stake}</p>
+                          <p className='mt-1 text-sm text-white/60'>Payout: {myBet.potentialPayout}</p>
                         </div>
 
                         <div className='rounded-2xl border border-[#C98958]/20 bg-black/25 p-4'>
@@ -995,10 +942,6 @@ function TournamentPage() {
                             <p className='mt-1 text-sm text-white/45'>{myBet.resolvedReason.replace(/-/g, ' ')}</p>
                           )}
                         </div>
-
-                        <div className='rounded-2xl border border-[#C98958]/20 bg-black/25 p-4 text-sm text-white/55'>
-                          Balance: {pointsBalance !== null ? `${pointsBalance} points` : 'Loading...'}
-                        </div>
                       </div>
                     ) : state.tournament?.status === "finished" ? (
                       <div className='mt-4 rounded-2xl border border-dashed border-[#C98958]/25 bg-black/25 p-4 text-sm text-white/55'>
@@ -1010,13 +953,6 @@ function TournamentPage() {
                       </div>
                     ) : bettablePlayers.length > 0 ? (
                       <form onSubmit={placeBet} className='mt-4 space-y-3'>
-                        <div className='rounded-2xl border border-[#C98958]/20 bg-black/25 p-4'>
-                          <p className='text-xs uppercase tracking-[0.2em] text-white/45'>Balance</p>
-                          <p className='mt-1 text-2xl font-bold text-[#E7AC78]'>
-                            {pointsBalance !== null ? `${pointsBalance} points` : 'Loading...'}
-                          </p>
-                        </div>
-
                         <label className='block space-y-2'>
                           <span className='text-sm text-white/60'>Pick a player</span>
                           <select
@@ -1041,7 +977,7 @@ function TournamentPage() {
                             min='1'
                             max='500'
                             step='1'
-                            placeholder='1-500 points'
+                            placeholder='1-500'
                             className='border-[#C98958]/25 bg-black/40 text-white placeholder:text-white/35'
                           />
                         </label>
@@ -1067,7 +1003,7 @@ function TournamentPage() {
                       <InfoTile label='Players' value={`${state.players.length}/${state.tournament?.playerLimit || 0}`} />
                       <InfoTile label='Rounds' value={state.totalRounds || 0} />
                       <InfoTile label='Prize Pool' value={Number(state.tournament?.prizePool || 0).toLocaleString()} />
-                      <InfoTile label='Your Seed' value={myProgress?.position ? `#${myProgress.position}` : "—"} />
+                      <InfoTile label='Your Seed' value={myProgress?.position ? `#${myProgress.position}` : "â€”"} />
                     </div>
                     {isAdmin && state.tournament?.status === "upcoming" && (
                       <div className='mt-4 rounded-2xl border border-[#C98958]/15 bg-black/25 p-4'>
@@ -1099,7 +1035,7 @@ function TournamentPage() {
                     )}
                     {isAdmin && state.tournament && (
                       <div className='mt-4 rounded-2xl border border-[#C98958]/15 bg-black/25 p-4'>
-                        <p className='text-sm text-white/55'>Set starting and ending balance to settle profit points manually.</p>
+                        <p className='text-sm text-white/55'>Set starting and ending balance to settle profit manually.</p>
                         <div className='mt-3 grid gap-2 sm:grid-cols-2'>
                           <Input
                             value={startingBalanceInput}
@@ -1135,8 +1071,8 @@ function TournamentPage() {
                         {state.tournament.balanceSettlementProcessed && (
                           <p className='mt-3 text-xs text-[#E7AC78]'>
                             Settlement complete: {state.tournament.wasProfit ? "profit" : "no profit"}.
-                            Winner +{state.tournament.winnerBalanceBonusPoints || 0} points.
-                            {state.tournament.wasProfit ? ` Participants +${state.tournament.participantProfitBonusPoints || 0} points each.` : ""}
+                            Winner +{state.tournament.winnerBalanceBonusPoints || 0} currency.
+                            {state.tournament.wasProfit ? ` Participants +${state.tournament.participantProfitBonusPoints || 0} currency each.` : ""}
                           </p>
                         )}
                       </div>
@@ -1165,7 +1101,7 @@ function TournamentPage() {
                   {Object.keys(playerWagers).length > 0 && (
                     <div className='rounded-3xl border border-[#C98958]/20 bg-[#120b0a]/80 p-5 shadow-lg shadow-black/30 mt-6'>
                       <h2 className='text-xl font-bold text-white'>Player Wagers</h2>
-                      <p className='mt-2 text-sm text-white/50'>Total points wagered on each active player.</p>
+                      <p className='mt-2 text-sm text-white/50'>Total wagered on each active player.</p>
                       <div className='mt-4 space-y-2'>
                         {state.players
                           .filter(player => playerWagers[player._id])
@@ -1177,7 +1113,7 @@ function TournamentPage() {
                               </div>
                               <div className='text-right'>
                                 <p className='text-lg font-bold text-[#E7AC78]'>{playerWagers[player._id]}</p>
-                                <p className='text-xs text-white/50'>points wagered</p>
+                                <p className='text-xs text-white/50'>wagered</p>
                               </div>
                             </div>
                           ))}
@@ -1448,7 +1384,7 @@ function ParticipantRow({
       </div>
       <div className='flex flex-wrap items-center gap-2 mt-2 text-xs text-white/50'>
         {player?.position && <span>Seed #{player.position}</span>}
-        {player?.position && (selection || isBye) && <span>•</span>}
+        {player?.position && (selection || isBye) && <span>â€¢</span>}
         <span className='truncate max-w-[180px]'>
           {isBye ? "Bye - Auto advances" : selection?.slotName || "No slot selected yet"}
         </span>
@@ -1493,3 +1429,15 @@ function InfoTile({ label, value }: { label: string; value: string | number }) {
 }
 
 export default TournamentPage;
+
+
+
+
+
+
+
+
+
+
+
+

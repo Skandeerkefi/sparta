@@ -20,7 +20,6 @@ import { useEffect, useMemo, useState } from "react";
 } from "lucide-react";
 import useMediaQuery from "@/hooks/use-media-query";
 import { useAuthStore } from "@/store/useAuthStore";
-import pointsApi from '@/lib/pointsApi';
 
 export function Navbar() {
 	const location = useLocation();
@@ -31,7 +30,6 @@ export function Navbar() {
 
 	const { user, logout } = useAuthStore();
 	const token = useAuthStore((s) => s.token);
-	const [pointsBalance, setPointsBalance] = useState<number | null>(null);
 	const sidebarWidth = "18rem";
 
 	const mainMenuItems = useMemo(

@@ -161,7 +161,6 @@ export default function AdminUserManagementPage() {
                 <tr className="text-left text-[#E7AC78]">
                   <th className="px-4 py-3">Kick Username</th>
                   <th className="px-4 py-3">Platform Username</th>
-                  <th className="px-4 py-3">Points</th>
                   <th className="px-4 py-3">Role</th>
                   <th className="px-4 py-3">Subscribed</th>
                   <th className="px-4 py-3 text-right">Actions</th>
@@ -172,7 +171,6 @@ export default function AdminUserManagementPage() {
                   <tr key={u._id} className="border-b border-slate-700/30 hover:bg-slate-800/30">
                     <td className="px-4 py-3 font-medium text-white">{u.kickUsername}</td>
                     <td className="px-4 py-3 text-gray-400">{u.rainbetUsername || '-'}</td>
-                    <td className="px-4 py-3 text-[#E7AC78]">{u.pointsBalance || 0}</td>
                     <td className="px-4 py-3">
                       <Badge variant={u.role === 'admin' ? 'default' : 'secondary'} className={u.role === 'admin' ? 'bg-red-600/20 text-red-400 border-red-600/30' : 'bg-green-600/20 text-green-400 border-green-600/30'}>
                         {u.role === 'admin' ? <><Shield className="w-3 h-3 mr-1" />Admin</> : <><ShieldOff className="w-3 h-3 mr-1" />User</>}

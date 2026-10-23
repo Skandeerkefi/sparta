@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+﻿import { useEffect } from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import HomePage from "@/pages/HomePage";
 import SlotCallsPage from "@/pages/SlotCallsPage";
@@ -9,94 +9,50 @@ import NotFoundPage from "@/pages/NotFoundPage";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { useAuthStore } from "@/store/useAuthStore";
-import SlotOverlay from "@/pages/SlotOverlay";
 import BonusHuntPage from "./pages/BonusHuntPage";
 import TournamentWidgetPage from "@/pages/TournamentWidgetPage";
 import BonusHuntWidgetPage from "@/pages/BonusHuntWidgetPage";
-import RoobetPage from "@/pages/RoobetPage";
-import RainPage from "@/pages/RainPage";
-import CSGOLeadPage from "./pages/CSGOLead";
-import PackdrawPage from "./pages/PackdrawPage";
-import ClashLeaderboardPage from "./pages/ClashLeaderboardPage";
-import ShuffleMonthly from "./pages/BethogMonthly";
-import ShuffleMonthlyAdmin from "./pages/BethogMonthlyAdmin";
-import TournamentPage from "./pages/TournamentPage";
 import BonusHuntAdminPage from "./pages/BonusHuntAdminPage";
-import PointsDashboard from './pages/PointsDashboard';
-import PointsStore from './pages/PointsStore';
-import AdminRedemptions from './pages/AdminRedemptions';
-import AdminStorePage from './pages/AdminStorePage';
-import PointsLeaderboardPage from './pages/PointsLeaderboardPage';
-import AdminPointsConfigPage from './pages/AdminPointsConfigPage';
+import TournamentPage from "./pages/TournamentPage";
 import AdminUserManagementPage from './pages/AdminUserManagementPage';
-import AdminPointsAdjustmentPage from './pages/AdminPointsAdjustmentPage';
-import AdminTransactionLogsPage from './pages/AdminTransactionLogsPage';
-import GuessBalancePage from './pages/GuessBalancePage';
-import AdminGuessBalancePage from './pages/AdminGuessBalancePage';
-import ProfilePage from './pages/ProfilePage';
-import AdminStreamConfigPage from './pages/AdminStreamConfigPage';
+
 function App() {
-	const loadFromStorage = useAuthStore((state) => state.loadFromStorage);
-	const user = useAuthStore((state) => state.user);
+const loadFromStorage = useAuthStore((state) => state.loadFromStorage);
+const user = useAuthStore((state) => state.user);
 
-	useEffect(() => {
-		loadFromStorage();
-	}, [loadFromStorage]);
+useEffect(() => {
+loadFromStorage();
+}, [loadFromStorage]);
 
-	useEffect(() => {
-		if (user?.role === "admin") {
-			// Do admin-specific logic here
-			console.log("User is admin, do admin stuff");
-		} else {
-			// Non-admin logic or nothing
-			console.log("User is not admin");
-		}
-	}, [user]);
-	return (
-		<TooltipProvider>
-			<BrowserRouter>
-				<Routes>
-					<Route path='/' element={<HomePage />} />
-					<Route path='/leaderboard' element={<CSGOLeadPage />} />
-					<Route path='/slot-calls' element={<SlotCallsPage />} />
-					<Route path='/giveaways' element={<GiveawaysPage />} />
-					<Route path='/login' element={<LoginPage />} />
-					<Route path='/signup' element={<SignupPage />} />
-					<Route path='/profile' element={<ProfilePage />} />
-					<Route path='*' element={<NotFoundPage />} />
-					<Route path='/slot-overlay' element={<SlotOverlay />} />
-					<Route path='/bonus-hunt' element={<BonusHuntPage />} />
-					<Route path='/tournament-widget' element={<TournamentWidgetPage />} />
-					<Route path='/bonus-hunt-widget' element={<BonusHuntWidgetPage />} />
-					<Route path='/bonus-hunt/admin' element={<BonusHuntAdminPage />} />
-					<Route path='/leaderboards' element={<RoobetPage />} />
-					<Route path='/Leaderboards' element={<RoobetPage />} />
-					<Route path='/rain' element={<RainPage />} />
-					<Route path='/clash' element={<ClashLeaderboardPage />} />
-					<Route path='/packdraw' element={<PackdrawPage />} />
-					<Route path='/shuffle-leaderboard' element={<ShuffleMonthly />} />
-					<Route path='/shuffle-leaderboard/admin' element={<ShuffleMonthlyAdmin />} />
-					<Route path='/shuffle-monthly' element={<ShuffleMonthly />} />
-					<Route path='/shuffle-monthly/admin' element={<ShuffleMonthlyAdmin />} />
-					<Route path='/tournament' element={<TournamentPage />} />
-					<Route path='/tournaments' element={<TournamentPage />} />
-					<Route path='/points' element={<PointsDashboard />} />
-					<Route path='/store' element={<PointsStore />} />
-					<Route path='/admin/store' element={<AdminStorePage />} />
-					<Route path='/admin/redemptions' element={<AdminRedemptions />} />
-					<Route path='/admin/points-leaderboard' element={<PointsLeaderboardPage />} />
-					<Route path='/admin/points-config' element={<AdminPointsConfigPage />} />
-					<Route path='/admin/users' element={<AdminUserManagementPage />} />
-					<Route path='/admin/points-adjust' element={<AdminPointsAdjustmentPage />} />
-					<Route path='/admin/points-transactions' element={<AdminTransactionLogsPage />} />
-					<Route path='/guess-balance' element={<GuessBalancePage />} />
-					<Route path='/admin/guess-balance' element={<AdminGuessBalancePage />} />
-					<Route path='/admin/stream-config' element={<AdminStreamConfigPage />} />
-				</Routes>
-			</BrowserRouter>
-			<Toaster />
-		</TooltipProvider>
-	);
+useEffect(() => {
+if (user?.role === "admin") {
+console.log("User is admin, do admin stuff");
+} else {
+console.log("User is not admin");
+}
+}, [user]);
+return (
+<TooltipProvider>
+<BrowserRouter>
+<Routes>
+<Route path='/' element={<HomePage />} />
+<Route path='/login' element={<LoginPage />} />
+<Route path='/signup' element={<SignupPage />} />
+<Route path='*' element={<NotFoundPage />} />
+<Route path='/slot-calls' element={<SlotCallsPage />} />
+<Route path='/giveaways' element={<GiveawaysPage />} />
+<Route path='/bonus-hunt' element={<BonusHuntPage />} />
+<Route path='/bonus-hunt/admin' element={<BonusHuntAdminPage />} />
+<Route path='/bonus-hunt-widget' element={<BonusHuntWidgetPage />} />
+<Route path='/tournament' element={<TournamentPage />} />
+<Route path='/tournaments' element={<TournamentPage />} />
+<Route path='/tournament-widget' element={<TournamentWidgetPage />} />
+<Route path='/admin/users' element={<AdminUserManagementPage />} />
+</Routes>
+</BrowserRouter>
+<Toaster />
+</TooltipProvider>
+);
 }
 
 export default App;
