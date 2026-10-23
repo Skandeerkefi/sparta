@@ -13,10 +13,8 @@ import { useEffect, useMemo, useState } from "react";
 	Menu,
 	X,
 	Radio,
-	History,
 		MonitorPlay,
 	Shield,
-	Coins,
 } from "lucide-react";
 import useMediaQuery from "@/hooks/use-media-query";
 import { useAuthStore } from "@/store/useAuthStore";
@@ -37,12 +35,8 @@ export function Navbar() {
 			{ path: "/", name: "Home", icon: <Dices className='w-5 h-5' /> },
 			{ path: "/tournament", name: "Tournament", icon: <Trophy className='w-5 h-5' /> },
 			{ path: "/bonus-hunt", name: "Bonus Hunt", icon: <Flame className='w-5 h-5' /> },
-			{ path: "/shuffle-leaderboard", name: "Shuffle Leaderboard", icon: <CalendarRange className='w-5 h-5' /> },
 			{ path: "/slot-calls", name: "Slot Calls", icon: <Users className='w-5 h-5' /> },
 			{ path: "/giveaways", name: "Giveaways", icon: <Gift className='w-5 h-5' /> },
-			{ path: "/points", name: "Points", icon: <Trophy className='w-5 h-5' /> },
-			{ path: "/guess-balance", name: "Guess Balance", icon: <Trophy className='w-5 h-5 text-yellow-400' /> },
-			{ path: "/store", name: "Store", icon: <Gift className='w-5 h-5' /> },
 		],
 		[]
 	);
@@ -53,15 +47,7 @@ export function Navbar() {
 				? [
 					{ path: "/admin/users", name: "User Management", icon: <Shield className='w-5 h-5' /> },
 					{ path: "/admin/stream-config", name: "Stream Schedule", icon: <CalendarRange className='w-5 h-5' /> },
-					{ path: "/admin/points-adjust", name: "Points Adjustment", icon: <Coins className='w-5 h-5' /> },
-						{ path: "/admin/points-transactions", name: "Transaction Logs", icon: <History className='w-5 h-5' /> },
-					{ path: "/admin/guess-balance", name: "Guess Balance", icon: <Trophy className='w-5 h-5' /> },
-					{ path: "/shuffle-leaderboard/admin", name: "Shuffle Admin", icon: <CalendarRange className='w-5 h-5' /> },
-						{ path: "/bonus-hunt/admin", name: "Bonus Hunt Admin", icon: <Flame className='w-5 h-5' /> },
-						{ path: "/admin/store", name: "Store Manager", icon: <Gift className='w-5 h-5' /> },
-						{ path: "/admin/redemptions", name: "Redemptions", icon: <Gift className='w-5 h-5' /> },
-						{ path: "/admin/points-leaderboard", name: "Points Leaderboard", icon: <Trophy className='w-5 h-5' /> },
-						{ path: "/admin/points-config", name: "Points Config", icon: <Trophy className='w-5 h-5' /> },
+					{ path: "/bonus-hunt/admin", name: "Bonus Hunt Admin", icon: <Flame className='w-5 h-5' /> },
 					]
 				: [],
 		[ user?.role ]
