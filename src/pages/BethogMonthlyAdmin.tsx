@@ -4,20 +4,20 @@ import GraphicalBackground from "@/components/GraphicalBackground";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 
-interface ShuffleEntry {
+interface StakeEntry {
   _id: string;
   username: string;
   wagering: number;
   prize: number;
 }
 
-interface ShuffleLeaderboard {
+interface StakeLeaderboard {
   _id: string;
   title: string;
   startDate: string;
   endDate: string;
   active: boolean;
-  entries: ShuffleEntry[];
+  entries: StakeEntry[];
   totalPrize?: number;
   prizeSplit?: number[];
   totalWagering?: number;
@@ -65,8 +65,8 @@ function toIsoDateTimeLocal(value: string) {
   return new Date(date.getTime() - offset).toISOString().slice(0, 16);
 }
 
-export default function ShuffleMonthlyAdmin() {
-  const [leaderboards, setLeaderboards] = useState<ShuffleLeaderboard[]>([]);
+export default function StakeMonthlyAdmin() {
+  const [leaderboards, setLeaderboards] = useState<StakeLeaderboard[]>([]);
   const [selectedId, setSelectedId] = useState("");
   const [pageLoading, setPageLoading] = useState(true);
   const [pageError, setPageError] = useState("");
@@ -239,7 +239,7 @@ export default function ShuffleMonthlyAdmin() {
     }
   };
 
-  const startEditEntry = (entry: ShuffleEntry) => {
+  const startEditEntry = (entry: StakeEntry) => {
     setPageError("");
     setEditingEntryId(entry._id);
     setEntryForm({
@@ -281,7 +281,7 @@ export default function ShuffleMonthlyAdmin() {
           <div className="overflow-hidden rounded-[2rem] border border-[#C98958]/25 bg-black/55 shadow-2xl shadow-black/40 backdrop-blur-md">
             <div className="border-b border-[#C98958]/20 bg-gradient-to-r from-[#930203] to-[#C98958]/70 px-6 py-8 sm:px-10">
               <p className="text-xs font-semibold uppercase tracking-[0.35em] text-white/75">Admin Control</p>
-              <h1 className="mt-2 text-3xl font-black tracking-tight text-white sm:text-5xl">Shuffle Leaderboard Admin</h1>
+              <h1 className="mt-2 text-3xl font-black tracking-tight text-white sm:text-5xl">Stake Leaderboard Admin</h1>
               <p className="mt-3 max-w-3xl text-sm text-white/80 sm:text-base">
                 Create leaderboard events, set date ranges, edit player rows, and manage prizes in one panel.
               </p>

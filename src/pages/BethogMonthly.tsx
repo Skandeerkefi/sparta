@@ -4,7 +4,7 @@ import GraphicalBackground from "@/components/GraphicalBackground";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 
-interface ShuffleEntry {
+interface StakeEntry {
   _id: string;
   username: string;
   wagering: number;
@@ -12,13 +12,13 @@ interface ShuffleEntry {
   rank?: number;
 }
 
-interface ShuffleLeaderboard {
+interface StakeLeaderboard {
   _id: string;
   title: string;
   startDate: string;
   endDate: string;
   active: boolean;
-  entries: ShuffleEntry[];
+  entries: StakeEntry[];
   totalPrize?: number;
   prizeSplit?: number[];
   totalWagering?: number;
@@ -31,8 +31,8 @@ function formatDate(value?: string) {
   return Number.isNaN(date.getTime()) ? value : date.toLocaleString();
 }
 
-export default function ShuffleMonthly() {
-  const [leaderboards, setLeaderboards] = useState<ShuffleLeaderboard[]>([]);
+export default function StakeMonthly() {
+  const [leaderboards, setLeaderboards] = useState<StakeLeaderboard[]>([]);
   const [selectedId, setSelectedId] = useState<string>("");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -80,7 +80,7 @@ export default function ShuffleMonthly() {
         <section className="mx-auto w-full max-w-7xl">
           <div className="overflow-hidden rounded-[2rem] border border-[#C98958]/25 bg-black/55 shadow-2xl shadow-black/40 backdrop-blur-md">
             <div className="border-b border-[#C98958]/20 bg-gradient-to-r from-[#930203] to-[#C98958]/70 px-6 py-8 sm:px-10">
-              <p className="text-xs font-semibold uppercase tracking-[0.35em] text-white/75">Shuffle Leaderboard</p>
+              <p className="text-xs font-semibold uppercase tracking-[0.35em] text-white/75">Stake Leaderboard</p>
               <h1 className="mt-2 text-3xl font-black tracking-tight text-white sm:text-5xl">Clash Table</h1>
               <p className="mt-3 max-w-3xl text-sm text-white/80 sm:text-base">
                 View the leaderboard classement, wagering totals, prize distribution, and event dates in one place.

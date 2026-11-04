@@ -17,7 +17,7 @@ export function Footer() {
 							Join Spartaaan&apos;s community for exciting gambling streams,
 							giveaways, and more. Use affiliate code{" "}
 							<span className='font-semibold text-[#C98958]'>SpartaaanOnKICK</span> on
-						Shuffle.
+						Stake.
 						</p>
 					</div>
 
@@ -32,10 +32,10 @@ export function Footer() {
 								Home
 							</Link>
 							<Link
-								to='/shuffle-leaderboard'
+								to='/Stake-leaderboard'
 								className='text-sm text-white/70 transition-colors hover:text-[#C98958]'
 							>
-								Shuffle Leaderboard
+								Stake Leaderboard
 							</Link>
 							
 							
@@ -63,14 +63,14 @@ export function Footer() {
 								<FaXTwitter className='w-5 h-5' />
 							</a>
 							<a
-								href='https://shuffle.com/?r=SpartaaanOnKICK'
+								href='https://Stake.com/?r=SpartaaanOnKICK'
 								target='_blank'
 								rel='noreferrer'
 								className='flex items-center justify-center transition-colors bg-[#930203] rounded-full w-9 h-9 hover:bg-[#C98958] p-1'
 							>
 								<img
 									src='https://i.ibb.co/x8LZRrDq/3dgifmaker72872.gif'
-									alt='Shuffle'
+									alt='Stake'
 									className='object-contain w-full h-full'
 								/>
 							</a>

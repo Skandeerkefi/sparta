@@ -151,7 +151,7 @@ function ProfilePage() {
 									<Input id='kickUsername' value={kickUsername} onChange={(e) => setKickUsername(e.target.value)} className='border-[#0F0604]/20 bg-[#F4D3B2] text-[#0F0604] placeholder:text-[#6b5a4f]' />
 								</div>
 								<div className='space-y-2'>
-									<Label htmlFor='rainbetUsername' className='text-[#0F0604]'>Shuffle Username</Label>
+									<Label htmlFor='rainbetUsername' className='text-[#0F0604]'>Stake Username</Label>
 									<Input id='rainbetUsername' value={rainbetUsername} onChange={(e) => setRainbetUsername(e.target.value)} className='border-[#0F0604]/20 bg-[#F4D3B2] text-[#0F0604] placeholder:text-[#6b5a4f]' />
 								</div>
 							</div>

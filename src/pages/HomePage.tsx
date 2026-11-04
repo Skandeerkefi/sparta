@@ -97,7 +97,7 @@ function HomePage() {
 							className='h-14 w-full border-2 border-[#C98958]/60 bg-black/45 text-white hover:bg-[#930203]/50 sm:min-w-[210px]'
 							asChild
 						>
-							{/* <Link to='/shuffle-monthly'>Leaderboard</Link> */}
+							{/* <Link to='/Stake-monthly'>Leaderboard</Link> */}
 						</Button>
 						<Button
 							className='h-14 w-full bg-[#C98958] text-white hover:bg-[#930203] sm:min-w-[210px]'
@@ -146,13 +146,13 @@ function HomePage() {
 
 				<section className='max-w-6xl px-4 py-12 mx-auto sm:px-6 sm:py-16'>
 					<h2 className='text-3xl font-bold text-center text-white uppercase sm:text-5xl'>
-				Shuffle Promo
+				Stake Promo
 			</h2>
 			<p className='mt-4 text-base text-center text-white/65 sm:text-lg'>
-				Use Spartaaan&apos;s official referral and promo code on Shuffle			</p>
+				Use Spartaaan&apos;s official referral and promo code on Stake			</p>
 					<div className='max-w-2xl mx-auto mt-10'>
 						<a
-						href='https://shuffle.com/?r=SpartaaanOnKICK'
+						href='https://Stake.com/?r=SpartaaanOnKICK'
 							target='_blank'
 							rel='noreferrer'
 							className='block p-8 transition-all border rounded-3xl bg-black/55 border-[#C98958]/35 hover:border-[#C98958] hover:-translate-y-1'
@@ -165,9 +165,9 @@ function HomePage() {
 								/>
 							</div>
 							<h3 className='mt-5 text-2xl font-bold text-center text-white'>Promo Code: SpartaaanOnKICK</h3>
-					<p className='mt-2 text-center text-white/65'>Join Shuffle through Spartaaan&apos;s referral page</p>
+					<p className='mt-2 text-center text-white/65'>Join Stake through Spartaaan&apos;s referral page</p>
 					<div className='mt-5 text-center'>
-						<Button className='bg-[#C98958] hover:bg-[#930203] text-white'>Open Shuffle</Button>
+						<Button className='bg-[#C98958] hover:bg-[#930203] text-white'>Open Stake</Button>
 							</div>
 						</a>
 					</div>
@@ -207,18 +207,18 @@ function HomePage() {
 						</a>
 
 						<a
-						href='https://shuffle.com/?r=SpartaaanOnKICK'
+						href='https://Stake.com/?r=SpartaaanOnKICK'
 							rel='noreferrer'
 							className='p-6 transition-all border rounded-3xl bg-black/55 border-[#C98958]/35 hover:border-[#C98958] hover:-translate-y-1'
 						>
 							<div className='flex items-center justify-center w-14 h-14 border rounded-2xl border-[#C98958]/50 bg-[#930203]/30 p-2'>
 								<img
 									src='https://i.ibb.co/k2pTVL1m/Shuffle-removebg-preview.png'
-									alt='Shuffle logo'
+									alt='Stake logo'
 									className='object-contain w-full h-full'
 								/>
 							</div>
-					<h3 className='mt-5 text-2xl font-bold text-white'>Shuffle</h3>
+					<h3 className='mt-5 text-2xl font-bold text-white'>Stake</h3>
 							<p className='mt-2 text-white/65'>Official referral link</p>
 						</a>
 

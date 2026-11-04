@@ -1,4 +1,4 @@
-﻿import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { API_BASE } from "@/lib/api";
 import GraphicalBackground from "@/components/GraphicalBackground";
@@ -142,7 +142,7 @@ function TournamentPage() {
   const [betStake, setBetStake] = useState("500");
   const [betTargetId, setBetTargetId] = useState("");
   const [isPlacingBet, setIsPlacingBet] = useState(false);
-  const [createTitle, setCreateTitle] = useState("Shuffle Slot Tournament");
+  const [createTitle, setCreateTitle] = useState("Stake Slot Tournament");
   const [createLimit, setCreateLimit] = useState("8");
   const [createPrizePool, setCreatePrizePool] = useState("0");
   const [isCreating, setIsCreating] = useState(false);
@@ -679,7 +679,7 @@ function TournamentPage() {
               <p className='text-xs font-semibold uppercase tracking-[0.35em] text-white/75'>Tournament Mode</p>
               <div className='mt-4 grid gap-6 xl:grid-cols-[minmax(0,1.3fr)_360px] xl:items-end'>
                 <div>
-                  <h1 className='text-4xl font-black tracking-tight text-white sm:text-5xl lg:text-6xl'>Shuffle Slot Tournament</h1>
+                  <h1 className='text-4xl font-black tracking-tight text-white sm:text-5xl lg:text-6xl'>Stake Slot Tournament</h1>
                   <p className='max-w-3xl mt-4 text-sm leading-6 text-white/85 sm:text-base'>
                     Players join a fixed bracket, choose one slot for each round, and advance by posting the strongest multiplier.
                     The layout below separates the bracket, player progress, and admin tools so the flow is easier to follow.

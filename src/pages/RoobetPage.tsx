@@ -66,7 +66,7 @@ const RoobetPage: React.FC = () => {
         {/* Header Section */}
         <div className="mb-12 text-center">
           <h1 className="mb-6 text-5xl md:text-6xl font-black text-[#E7AC78] uppercase drop-shadow-[0_0_20px_rgba(255,253,222,0.22)]">
-            Shuffle Monthly Leaderboard
+            Stake Monthly Leaderboard
           </h1>
           <div className="w-24 h-1 mx-auto bg-gradient-to-r from-transparent via-[#C98958] to-transparent mb-8" />
           
